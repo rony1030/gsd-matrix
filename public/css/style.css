@@ -1074,6 +1074,9 @@ footer {
   background: rgba(255,255,255,0.08);
   border-left-color: var(--verde);
 }
+.sidebar-link.sidebar-soon { cursor: default; color: var(--gris-500); justify-content: space-between; }
+.sidebar-link.sidebar-soon:hover { background: transparent; color: var(--gris-500); }
+.sidebar-link.sidebar-soon small { font-size: 0.62rem; font-weight: 600; color: var(--verde); }
 
 .sidebar-footer {
   padding: 1.5rem;
