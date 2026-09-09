@@ -1,0 +1,69 @@
+<%- include('../../admin/partials/layout-start', { pageTitle: 'Propiedades', page: 'propiedades' }) %>
+
+<div class="table-card">
+  <div class="table-card-header">
+    <h3>Propiedades (<%= propiedades.length %>)</h3>
+    <a href="/admin/propiedades/nueva" class="btn-add">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Nueva Propiedad
+    </a>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th style="width:60px">Foto</th>
+        <th>Título</th>
+        <th>Tipo</th>
+        <th>Precio</th>
+        <th>Ubicación</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% propiedades.forEach(p => { %>
+        <% let imgs = []; try { imgs = JSON.parse(p.imagenes || '[]'); } catch(e) {} %>
+      <tr>
+        <td>
+          <% if (imgs.length > 0) { %>
+            <img src="<%= imgs[0] %>" style="width:52px;height:40px;object-fit:cover;border-radius:6px;" alt="">
+          <% } else { %>
+            <div style="width:52px;height:40px;background:var(--gris-200);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;">🏠</div>
+          <% } %>
+        </td>
+        <td>
+          <strong><%= p.titulo %></strong>
+          <% if (p.destacada) { %><span class="badge badge-green" style="margin-left:0.4rem;font-size:0.65rem;">⭐ Destacada</span><% } %>
+        </td>
+        <td><%= p.tipo || '—' %></td>
+        <td style="font-weight:600;color:var(--azul);">
+          <%= p.moneda === 'USD' ? '$' : 'RD$' %><%= p.precio ? Number(p.precio).toLocaleString() : '—' %>
+        </td>
+        <td style="color:var(--gris-500);font-size:0.85rem;"><%= p.ubicacion || '—' %></td>
+        <td>
+          <span class="badge <%= p.estado === 'disponible' ? 'badge-green' : p.estado === 'en_negociacion' ? 'badge-orange' : 'badge-gray' %>">
+            <%= p.estado?.replace('_', ' ') %>
+          </span>
+        </td>
+        <td>
+          <div class="action-btns">
+            <a href="/admin/propiedades/<%= p.id %>/editar" class="btn-icon edit" title="Editar">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </a>
+            <form method="POST" action="/admin/propiedades/<%= p.id %>/eliminar" style="display:inline" onsubmit="return confirm('¿Eliminar esta propiedad?')">
+              <button class="btn-icon delete" type="submit" title="Eliminar">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+              </button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      <% }) %>
+      <% if (propiedades.length === 0) { %>
+      <tr><td colspan="7" style="text-align:center;padding:2.5rem;color:var(--gris-500);">No hay propiedades. <a href="/admin/propiedades/nueva" style="color:var(--verde)">Agrega la primera →</a></td></tr>
+      <% } %>
+    </tbody>
+  </table>
+</div>
+
+<%- include('../../admin/partials/layout-end') %>

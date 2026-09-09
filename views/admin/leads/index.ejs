@@ -1,0 +1,96 @@
+<%- include('../../admin/partials/layout-start', { pageTitle: 'Leads / CRM', page: 'leads' }) %>
+
+<div style="display:flex;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap;align-items:center;">
+  <a href="/admin/leads/nuevo" class="btn-add">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    Nuevo Lead
+  </a>
+  <a href="/admin/leads/exportar" class="btn-add" style="background:var(--azul);">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    Exportar CSV
+  </a>
+  <span style="margin-left:auto;font-size:0.875rem;color:var(--gris-500);">
+    Total: <strong><%= leads.length %></strong> leads |
+    Nuevos: <strong style="color:var(--verde);"><%= leads.filter(l=>l.estado==='nuevo').length %></strong>
+  </span>
+</div>
+
+<div class="table-card">
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Nombre</th>
+        <th>Contacto</th>
+        <th>Servicio</th>
+        <th>Mensaje</th>
+        <th>Estado</th>
+        <th>Origen</th>
+        <th>Fecha</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% leads.forEach(lead => { %>
+      <tr id="lead-row-<%= lead.id %>">
+        <td style="color:var(--gris-500);font-size:0.8rem;">#<%= lead.id %></td>
+        <td><strong><%= lead.nombre %></strong></td>
+        <td>
+          <% if (lead.email) { %><div style="font-size:0.85rem;"><%= lead.email %></div><% } %>
+          <% if (lead.telefono) { %><div style="font-size:0.8rem;color:var(--gris-500);"><%= lead.telefono %></div><% } %>
+        </td>
+        <td><%= lead.servicio || '—' %></td>
+        <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--gris-500);font-size:0.85rem;" title="<%= lead.mensaje %>">
+          <%= lead.mensaje || '—' %>
+        </td>
+        <td>
+          <select class="form-select" style="padding:0.3rem 0.6rem;font-size:0.8rem;width:auto;"
+                  onchange="updateLeadStatus(<%= lead.id %>, this.value)">
+            <% ['nuevo','contactado','cerrado','descartado'].forEach(s => { %>
+            <option value="<%= s %>" <%= lead.estado === s ? 'selected' : '' %>><%= s %></option>
+            <% }) %>
+          </select>
+        </td>
+        <td>
+          <span class="badge <%= lead.origen === 'web' ? 'badge-blue' : 'badge-gray' %>">
+            <%= lead.origen || 'web' %>
+          </span>
+        </td>
+        <td style="color:var(--gris-500);font-size:0.78rem;white-space:nowrap;"><%= lead.created_at?.substring(0,16) || '' %></td>
+        <td>
+          <form method="POST" action="/admin/leads/<%= lead.id %>/eliminar" style="display:inline" onsubmit="return confirm('¿Eliminar este lead?')">
+            <button class="btn-icon delete" type="submit" title="Eliminar">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+            </button>
+          </form>
+        </td>
+      </tr>
+      <% }) %>
+      <% if (leads.length === 0) { %>
+      <tr><td colspan="9" style="text-align:center;padding:2.5rem;color:var(--gris-500);">No hay leads. Los mensajes del sitio web aparecerán aquí.</td></tr>
+      <% } %>
+    </tbody>
+  </table>
+</div>
+
+<script>
+async function updateLeadStatus(id, estado) {
+  try {
+    const res = await fetch(`/admin/leads/${id}/estado`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ estado })
+    });
+    const data = await res.json();
+    if (!data.ok) throw new Error();
+    // Small toast feedback
+    const row = document.getElementById(`lead-row-${id}`);
+    row.style.background = 'rgba(91,158,63,0.08)';
+    setTimeout(() => row.style.background = '', 1500);
+  } catch {
+    alert('Error al actualizar el estado.');
+  }
+}
+</script>
+
+<%- include('../../admin/partials/layout-end') %>

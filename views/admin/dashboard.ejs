@@ -1,0 +1,87 @@
+<%- include('../partials/layout-start', { pageTitle: 'Dashboard', page: 'dashboard' }) %>
+
+<!-- Stats grid -->
+<div class="dash-grid">
+  <div class="dash-card">
+    <div class="dash-card-icon blue">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    </div>
+    <div>
+      <div class="dash-card-num"><%= stats.totalProp %></div>
+      <div class="dash-card-label">Propiedades</div>
+    </div>
+  </div>
+  <div class="dash-card">
+    <div class="dash-card-icon green">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+    </div>
+    <div>
+      <div class="dash-card-num"><%= stats.totalBlogs %></div>
+      <div class="dash-card-label">Artículos de Blog</div>
+    </div>
+  </div>
+  <div class="dash-card">
+    <div class="dash-card-icon orange">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    </div>
+    <div>
+      <div class="dash-card-num"><%= stats.leadsNuevos %></div>
+      <div class="dash-card-label">Leads Nuevos</div>
+    </div>
+  </div>
+</div>
+
+<!-- Quick actions -->
+<div style="display:flex; gap:1rem; margin-bottom:2rem; flex-wrap:wrap;">
+  <a href="/admin/propiedades/nueva" class="btn-add" style="padding:0.65rem 1.4rem; border-radius:8px; font-size:0.875rem;">
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    Nueva Propiedad
+  </a>
+  <a href="/admin/blog/nuevo" class="btn-add" style="padding:0.65rem 1.4rem; border-radius:8px; font-size:0.875rem; background:var(--azul);">
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    Nuevo Blog
+  </a>
+  <a href="/admin/leads/nuevo" class="btn-add" style="padding:0.65rem 1.4rem; border-radius:8px; font-size:0.875rem; background:#e65100;">
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    Nuevo Lead
+  </a>
+</div>
+
+<!-- Latest leads table -->
+<div class="table-card">
+  <div class="table-card-header">
+    <h3>Últimos Leads Recibidos</h3>
+    <a href="/admin/leads" class="btn-add">Ver todos</a>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Email</th>
+        <th>Servicio</th>
+        <th>Estado</th>
+        <th>Fecha</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% latestLeads.forEach(lead => { %>
+      <tr>
+        <td><strong><%= lead.nombre %></strong></td>
+        <td><%= lead.email || '—' %></td>
+        <td><%= lead.servicio || '—' %></td>
+        <td>
+          <span class="badge <%= lead.estado === 'nuevo' ? 'badge-orange' : lead.estado === 'contactado' ? 'badge-blue' : lead.estado === 'cerrado' ? 'badge-green' : 'badge-gray' %>">
+            <%= lead.estado %>
+          </span>
+        </td>
+        <td style="color:var(--gris-500);font-size:0.8rem;"><%= lead.created_at?.substring(0,16) || '' %></td>
+      </tr>
+      <% }) %>
+      <% if (latestLeads.length === 0) { %>
+      <tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--gris-500);">No hay leads aún. Los del formulario de contacto aparecerán aquí.</td></tr>
+      <% } %>
+    </tbody>
+  </table>
+</div>
+
+<%- include('../partials/layout-end') %>

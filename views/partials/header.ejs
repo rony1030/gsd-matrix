@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'GSD — Geosolutions Source Dominicana' %></title>
+  <meta name="description" content="<%= typeof metaDesc !== 'undefined' ? metaDesc : 'Tu aliado estratégico en soluciones legales, inmobiliarias y técnicas en República Dominicana.' %>">
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+  <!-- Styles -->
+  <link rel="stylesheet" href="/css/style.css">
+  <!-- Favicon: usa el isotipo (ícono GSD sin texto) -->
+  <link rel="icon" type="image/png" href="/img/isotipo.png">
+  <link rel="apple-touch-icon" href="/img/isotipo.png">
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar" id="navbar">
+  <div class="navbar-inner">
+    <!-- Logo completo en navbar -->
+    <a href="/" class="navbar-logo" aria-label="GSD Home">
+      <img src="/img/logo-gsd.png" alt="GSD Geosolutions Source Dominicana">
+    </a>
+
+    <div class="nav-links">
+      <a href="/" class="nav-link <%= page === 'inicio' ? 'active' : '' %>">Inicio</a>
+      <a href="#" class="nav-link nav-link-soon" title="Próximamente">Legal</a>
+      <a href="#" class="nav-link nav-link-soon" title="Próximamente">Inmobiliaria</a>
+      <a href="#" class="nav-link nav-link-soon" title="Próximamente">Agrimensura</a>
+      <a href="/nosotros" class="nav-link <%= page === 'nosotros' ? 'active' : '' %>">Nosotros</a>
+      <a href="/#contacto" class="nav-cta">Contáctanos</a>
+    </div>
+
+    <button class="hamburger" aria-label="Menu" id="hamburger">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile menu -->
+<div class="mobile-menu" id="mobile-menu">
+  <a href="/">Inicio</a>
+  <a href="#" class="nav-link-soon">Legal <span class="soon-badge">Próx.</span></a>
+  <a href="#" class="nav-link-soon">Inmobiliaria <span class="soon-badge">Próx.</span></a>
+  <a href="#" class="nav-link-soon">Agrimensura <span class="soon-badge">Próx.</span></a>
+  <a href="/nosotros">Nosotros</a>
+  <a href="/#contacto" style="color: var(--verde); font-weight:600">Contáctanos</a>
+</div>

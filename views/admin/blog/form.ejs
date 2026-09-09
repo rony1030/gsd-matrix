@@ -1,0 +1,125 @@
+<%- include('../../admin/partials/layout-start', { pageTitle: isEdit ? 'Editar Artículo' : 'Nuevo Artículo', page: 'blog' }) %>
+
+<div style="margin-bottom:1.5rem;">
+  <a href="/admin/blog" style="color:var(--gris-500);font-size:0.875rem;display:flex;align-items:center;gap:0.4rem;">
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    Volver al Blog
+  </a>
+</div>
+
+<% if (error) { %>
+<div class="alert-error" style="margin-bottom:1.5rem;">⚠️ <%= error %></div>
+<% } %>
+
+<form method="POST" action="/admin/blog/<%= isEdit ? post.id + '/editar' : 'nuevo' %>" enctype="multipart/form-data">
+  <div style="display:grid;grid-template-columns:2fr 1fr;gap:1.5rem;align-items:start;">
+
+    <!-- Main content -->
+    <div>
+      <div class="admin-form-card">
+        <h3>Contenido del Artículo</h3>
+        <div class="form-group">
+          <label class="form-label">Título *</label>
+          <input type="text" id="titulo" name="titulo" class="form-input" value="<%= isEdit ? post.titulo : '' %>" placeholder="Título del artículo" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Slug (URL)</label>
+          <div style="display:flex;gap:0.5rem;align-items:center;">
+            <span style="color:var(--gris-500);font-size:0.875rem;">/blog/</span>
+            <input type="text" id="slug" name="slug" class="form-input" value="<%= isEdit ? post.slug : '' %>" placeholder="mi-articulo" required style="flex:1;">
+          </div>
+          <p style="font-size:0.72rem;color:var(--gris-500);margin-top:0.25rem;">Se genera automáticamente desde el título. Puedes editarlo.</p>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Contenido (Markdown soportado)</label>
+          <textarea name="contenido" class="form-textarea" style="min-height:280px;font-family:monospace;font-size:0.875rem;" placeholder="Escribe el contenido aquí... Puedes usar **negrita**, # Títulos, - listas, etc."><%= isEdit ? post.contenido || '' : '' %></textarea>
+          <p style="font-size:0.72rem;color:var(--gris-500);margin-top:0.25rem;">Soporta formato Markdown: **negrita**, *cursiva*, # Título, ## Subtítulo, - lista</p>
+        </div>
+      </div>
+
+      <!-- SEO Panel -->
+      <div class="admin-form-card">
+        <h3>🔍 Panel SEO</h3>
+        <p style="font-size:0.8rem;color:var(--gris-500);margin-bottom:1.5rem;">Optimiza cómo aparece este artículo en Google y redes sociales.</p>
+
+        <div class="form-group">
+          <label class="form-label">Meta Title <span style="font-weight:normal;text-transform:none;">(máx 60 caracteres)</span></label>
+          <input type="text" id="meta_title" name="meta_title" class="form-input"
+                 value="<%= isEdit ? post.meta_title || '' : '' %>"
+                 placeholder="Título optimizado para Google" maxlength="80">
+          <div class="char-counter" id="meta-title-count">0/60</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Meta Description <span style="font-weight:normal;text-transform:none;">(máx 155 caracteres)</span></label>
+          <textarea id="meta_description" name="meta_description" class="form-textarea" style="min-height:80px;"
+                    placeholder="Descripción breve que aparece en los resultados de Google..." maxlength="200"><%= isEdit ? post.meta_description || '' : '' %></textarea>
+          <div class="char-counter" id="meta-desc-count">0/155</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Keywords</label>
+          <input type="text" name="keywords" class="form-input"
+                 value="<%= isEdit ? post.keywords || '' : '' %>"
+                 placeholder="inmobiliaria, república dominicana, inversión, terrenos">
+          <p style="font-size:0.72rem;color:var(--gris-500);margin-top:0.25rem;">Separadas por coma</p>
+        </div>
+
+        <!-- Google Preview -->
+        <div>
+          <label class="form-label" style="margin-bottom:0.75rem;">Vista previa en Google</label>
+          <div class="seo-preview">
+            <div class="seo-preview-url">gsdsource.com › blog › <span id="slug-preview"><%= isEdit ? post.slug || 'mi-articulo' : 'mi-articulo' %></span></div>
+            <div class="seo-preview-title" id="seo-title-preview"><%= isEdit ? (post.meta_title || post.titulo || 'Título del artículo') : 'Título del artículo' %></div>
+            <div class="seo-preview-desc" id="seo-desc-preview"><%= isEdit ? (post.meta_description || 'Descripción del artículo...') : 'Descripción del artículo para motores de búsqueda...' %></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div>
+      <div class="admin-form-card">
+        <h3>Publicación</h3>
+        <div class="form-group">
+          <label class="form-label">Estado</label>
+          <select name="estado" class="form-select">
+            <option value="borrador" <%= (!isEdit || post.estado === 'borrador') ? 'selected' : '' %>>Borrador</option>
+            <option value="publicado" <%= (isEdit && post.estado === 'publicado') ? 'selected' : '' %>>Publicado</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Autor</label>
+          <input type="text" name="autor" class="form-input" value="<%= isEdit ? post.autor || 'GSD' : 'GSD' %>" placeholder="GSD">
+        </div>
+        <button type="submit" class="btn-submit" style="margin-top:1rem;">
+          <%= isEdit ? 'Guardar Cambios' : 'Crear Artículo' %>
+        </button>
+      </div>
+
+      <div class="admin-form-card" style="margin-top:1.25rem;">
+        <h3>Imagen de Portada</h3>
+        <% if (isEdit && post.imagen_portada) { %>
+        <img src="<%= post.imagen_portada %>" style="width:100%;border-radius:8px;margin-bottom:0.75rem;aspect-ratio:16/9;object-fit:cover;" alt="">
+        <% } %>
+        <input type="file" name="imagen_portada" class="form-input" accept="image/*" style="padding:0.5rem;">
+        <p style="font-size:0.72rem;color:var(--gris-500);margin-top:0.5rem;">Recomendado: 1200×630px</p>
+      </div>
+    </div>
+  </div>
+</form>
+
+<script>
+// Update slug preview live
+document.getElementById('slug')?.addEventListener('input', function() {
+  document.getElementById('slug-preview').textContent = this.value || 'mi-articulo';
+});
+
+// Init char counters on load
+const mt = document.getElementById('meta_title');
+const md = document.getElementById('meta_description');
+if (mt) { mt.dispatchEvent(new Event('input')); }
+if (md) { md.dispatchEvent(new Event('input')); }
+</script>
+
+<%- include('../../admin/partials/layout-end') %>
