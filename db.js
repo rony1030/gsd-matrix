@@ -1,9 +1,11 @@
 // db.js — GSD Matrix Database (sql.js - pure JS, no compilation needed)
 const path = require('path');
 const fs = require('fs');
+const os = require('os');
 const initSqlJs = require('sql.js');
 
-const DB_PATH = path.join(__dirname, 'db', 'gsd.db');
+const DB_DIR = process.env.VERCEL ? os.tmpdir() : path.join(__dirname, 'db');
+const DB_PATH = path.join(DB_DIR, 'gsd.db');
 
 let db = null;
 
@@ -26,6 +28,7 @@ async function getDb() {
 
 function saveDb() {
   if (!db) return;
+  fs.mkdirSync(DB_DIR, { recursive: true });
   const data = db.export();
   const buffer = Buffer.from(data);
   fs.writeFileSync(DB_PATH, buffer);

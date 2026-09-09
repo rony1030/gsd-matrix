@@ -1,0 +1,14 @@
+<%- include('../partials/layout-start', {pageTitle:property?'Editar propiedad':'Nueva propiedad', page}) %>
+<a href="/admin/bienes-raices">Volver a Bienes Raíces</a>
+<% if(error){ %><p role="alert"><%= error %></p><% } %>
+<form method="post" action="/admin/bienes-raices/propiedad" style="max-width:850px;margin-top:24px">
+<input type="hidden" name="csrf" value="<%= csrf %>">
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px">
+<% [{name:'title',label:'Nombre'},{name:'slug',label:'Identificador URL'},{name:'location',label:'Destino'},{name:'price',label:'Precio',type:'number'},{name:'beds',label:'Habitaciones',type:'number'},{name:'baths',label:'Baños',type:'number'},{name:'area',label:'Superficie (m²)',type:'number'}].forEach(f=>{ %><label><%= f.label %><input class="form-input" style="width:100%" name="<%= f.name %>" type="<%= f.type||'text' %>" value="<%= property?.[f.name] ?? '' %>" <%= f.name==='slug' && property ?'readonly':'' %> required></label><% }) %>
+<% [{name:'type',label:'Tipo',options:['Apartamento','Casa','Villa','Terreno','Local']},{name:'operation',label:'Operación',options:['Venta','Alquiler']},{name:'currency',label:'Moneda',options:['USD','DOP']},{name:'status',label:'Publicación',options:['draft','published','archived']}].forEach(f=>{ %><label><%= f.label %><select class="form-select" style="width:100%" name="<%= f.name %>"><% f.options.forEach(v=>{ %><option <%= property?.[f.name]===v?'selected':'' %>><%= v %></option><% }) %></select></label><% }) %>
+</div><label style="display:block;margin-top:20px">Descripción<textarea class="form-input" style="width:100%" name="description" rows="4" required><%= property?.description || '' %></textarea></label>
+<label style="display:block;margin-top:20px">Imágenes (una URL HTTPS por línea)<textarea class="form-input" style="width:100%" name="images" rows="5" required><%= (property?.images||[]).join('\n') %></textarea></label>
+<label style="display:block;margin-top:20px">Amenidades (separadas por comas)<input class="form-input" style="width:100%" name="amenities" value="<%= (property?.amenities||[]).join(', ') %>"></label>
+<label style="display:block;margin:20px 0"><input type="checkbox" name="featured" <%= property?.featured?'checked':'' %>> Destacada</label>
+<button class="btn-add" type="submit">Guardar propiedad</button></form>
+<%- include('../partials/layout-end') %>

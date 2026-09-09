@@ -4,11 +4,13 @@ const session = require('express-session');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const os = require('os');
 const { marked } = require('marked');
 const { getDb, queryAll, queryOne, run } = require('./db');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const isVercel = Boolean(process.env.VERCEL);
 
 // ─── Setup ───────────────────────────────────────────
 app.set('view engine', 'ejs');
@@ -24,8 +26,15 @@ app.use(session({
 }));
 
 // Uploads config
-const uploadsDir = path.join(__dirname, 'public', 'uploads');
-['propiedades', 'blog'].forEach(d => fs.mkdirSync(path.join(uploadsDir, d), { recursive: true }));
+const uploadsDir = isVercel
+  ? path.join(os.tmpdir(), 'gsd-uploads')
+  : path.join(__dirname, 'public', 'uploads');
+
+['propiedades', 'blog'].forEach((d) => {
+  fs.mkdirSync(path.join(uploadsDir, d), { recursive: true });
+});
+
+app.use('/uploads', express.static(uploadsDir));
 
 const upload = multer({
   storage: multer.diskStorage({
@@ -50,6 +59,8 @@ function requireAuth(req, res, next) {
   if (req.session?.admin) return next();
   res.redirect('/admin/login');
 }
+
+app.use('/admin/bienes-raices', requireAuth, require('./real-estate-router'));
 
 // ─── Initialize DB ────────────────────────────────────
 let dbReady = false;
@@ -337,4 +348,3 @@ if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
 }
 
 module.exports = app;
-
