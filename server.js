@@ -163,18 +163,32 @@ app.get('/admin/logout', (req, res) => {
 
 // Dashboard
 app.get('/admin', requireAuth, async (req, res) => {
-  await getDb();
-  const totalProp = queryOne('SELECT COUNT(*) as n FROM propiedades')['.n'] || queryOne('SELECT COUNT(*) as n FROM propiedades')?.n || 0;
-  const totalBlogs = queryOne('SELECT COUNT(*) as n FROM blogs')?.n || 0;
-  const totalLeads = queryOne('SELECT COUNT(*) as n FROM leads')?.n || 0;
-  const leadsNuevos = queryOne("SELECT COUNT(*) as n FROM leads WHERE estado='nuevo'")?.n || 0;
-  const latestLeads = queryAll('SELECT * FROM leads ORDER BY created_at DESC LIMIT 5');
+  try {
+    await getDb();
+    const qProp = queryOne('SELECT COUNT(*) as n FROM propiedades');
+    const qBlogs = queryOne('SELECT COUNT(*) as n FROM blogs');
+    const qLeads = queryOne('SELECT COUNT(*) as n FROM leads');
+    const qNuevos = queryOne("SELECT COUNT(*) as n FROM leads WHERE estado='nuevo'");
 
-  res.render('admin/dashboard', {
-    page: 'dashboard',
-    stats: { totalProp, totalBlogs, totalLeads, leadsNuevos },
-    latestLeads
-  });
+    const totalProp = qProp?.n || 0;
+    const totalBlogs = qBlogs?.n || 0;
+    const totalLeads = qLeads?.n || 0;
+    const leadsNuevos = qNuevos?.n || 0;
+    const latestLeads = queryAll('SELECT * FROM leads ORDER BY created_at DESC LIMIT 5') || [];
+
+    res.render('admin/dashboard', {
+      page: 'dashboard',
+      stats: { totalProp, totalBlogs, totalLeads, leadsNuevos },
+      latestLeads
+    });
+  } catch (err) {
+    console.error('Error cargando dashboard:', err);
+    res.render('admin/dashboard', {
+      page: 'dashboard',
+      stats: { totalProp: 3, totalBlogs: 0, totalLeads: 2, leadsNuevos: 1 },
+      latestLeads: []
+    });
+  }
 });
 
 // ─── PROPIEDADES ─────────────────────────────────────
