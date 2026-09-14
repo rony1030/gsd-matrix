@@ -12,7 +12,13 @@ let db = null;
 async function getDb() {
   if (db) return db;
 
-  const SQL = await initSqlJs();
+  const wasmPath = path.join(__dirname, 'node_modules', 'sql.js', 'dist', 'sql-wasm.wasm');
+  const SQL = await initSqlJs({
+    locateFile: file => {
+      if (fs.existsSync(wasmPath)) return wasmPath;
+      return file;
+    }
+  });
 
   if (fs.existsSync(DB_PATH)) {
     const fileBuffer = fs.readFileSync(DB_PATH);
