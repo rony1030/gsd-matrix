@@ -16,61 +16,63 @@
 </div>
 
 <div class="table-card">
-  <table>
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>Nombre</th>
-        <th>Contacto</th>
-        <th>Servicio</th>
-        <th>Mensaje</th>
-        <th>Estado</th>
-        <th>Origen</th>
-        <th>Fecha</th>
-        <th>Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% leads.forEach(lead => { %>
-      <tr id="lead-row-<%= lead.id %>">
-        <td style="color:var(--gris-500);font-size:0.8rem;">#<%= lead.id %></td>
-        <td><strong><%= lead.nombre %></strong></td>
-        <td>
-          <% if (lead.email) { %><div style="font-size:0.85rem;"><%= lead.email %></div><% } %>
-          <% if (lead.telefono) { %><div style="font-size:0.8rem;color:var(--gris-500);"><%= lead.telefono %></div><% } %>
-        </td>
-        <td><%= lead.servicio || '—' %></td>
-        <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--gris-500);font-size:0.85rem;" title="<%= lead.mensaje %>">
-          <%= lead.mensaje || '—' %>
-        </td>
-        <td>
-          <select class="form-select" style="padding:0.3rem 0.6rem;font-size:0.8rem;width:auto;"
-                  onchange="updateLeadStatus(<%= lead.id %>, this.value)">
-            <% ['nuevo','contactado','cerrado','descartado'].forEach(s => { %>
-            <option value="<%= s %>" <%= lead.estado === s ? 'selected' : '' %>><%= s %></option>
-            <% }) %>
-          </select>
-        </td>
-        <td>
-          <span class="badge <%= lead.origen === 'web' ? 'badge-blue' : 'badge-gray' %>">
-            <%= lead.origen || 'web' %>
-          </span>
-        </td>
-        <td style="color:var(--gris-500);font-size:0.78rem;white-space:nowrap;"><%= lead.created_at?.substring(0,16) || '' %></td>
-        <td>
-          <form method="POST" action="/admin/leads/<%= lead.id %>/eliminar" style="display:inline" onsubmit="return confirm('¿Eliminar este lead?')">
-            <button class="btn-icon delete" type="submit" title="Eliminar">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
-            </button>
-          </form>
-        </td>
-      </tr>
-      <% }) %>
-      <% if (leads.length === 0) { %>
-      <tr><td colspan="9" style="text-align:center;padding:2.5rem;color:var(--gris-500);">No hay leads. Los mensajes del sitio web aparecerán aquí.</td></tr>
-      <% } %>
-    </tbody>
-  </table>
+  <div class="table-responsive">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Nombre</th>
+          <th>Contacto</th>
+          <th>Servicio</th>
+          <th>Mensaje</th>
+          <th>Estado</th>
+          <th>Origen</th>
+          <th>Fecha</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% leads.forEach(lead => { %>
+        <tr id="lead-row-<%= lead.id %>">
+          <td style="color:var(--gris-500);font-size:0.8rem;">#<%= lead.id %></td>
+          <td><strong><%= lead.nombre %></strong></td>
+          <td>
+            <% if (lead.email) { %><div style="font-size:0.85rem;"><%= lead.email %></div><% } %>
+            <% if (lead.telefono) { %><div style="font-size:0.8rem;color:var(--gris-500);"><%= lead.telefono %></div><% } %>
+          </td>
+          <td><%= lead.servicio || '—' %></td>
+          <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--gris-500);font-size:0.85rem;" title="<%= lead.mensaje %>">
+            <%= lead.mensaje || '—' %>
+          </td>
+          <td>
+            <select class="form-select" style="padding:0.3rem 0.6rem;font-size:0.8rem;width:auto;"
+                    onchange="updateLeadStatus(<%= lead.id %>, this.value)">
+              <% ['nuevo','contactado','cerrado','descartado'].forEach(s => { %>
+              <option value="<%= s %>" <%= lead.estado === s ? 'selected' : '' %>><%= s %></option>
+              <% }) %>
+            </select>
+          </td>
+          <td>
+            <span class="badge <%= lead.origen === 'web' ? 'badge-blue' : 'badge-gray' %>">
+              <%= lead.origen || 'web' %>
+            </span>
+          </td>
+          <td style="color:var(--gris-500);font-size:0.78rem;white-space:nowrap;"><%= lead.created_at?.substring(0,16) || '' %></td>
+          <td>
+            <form method="POST" action="/admin/leads/<%= lead.id %>/eliminar" style="display:inline" onsubmit="return confirm('¿Eliminar este lead?')">
+              <button class="btn-icon delete" type="submit" title="Eliminar">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+              </button>
+            </form>
+          </td>
+        </tr>
+        <% }) %>
+        <% if (leads.length === 0) { %>
+        <tr><td colspan="9" style="text-align:center;padding:2.5rem;color:var(--gris-500);">No hay leads. Los mensajes del sitio web aparecerán aquí.</td></tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
 </div>
 
 <script>

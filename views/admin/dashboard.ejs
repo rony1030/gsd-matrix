@@ -32,26 +32,26 @@
 </div>
 
 <!-- Quick actions -->
-<div style="display:flex; gap:1rem; margin-bottom:2rem; flex-wrap:wrap;">
-  <a href="/admin/cotizaciones" class="btn-add" style="padding:0.65rem 1.4rem; border-radius:8px; font-size:0.875rem; background:#4A9B6F;">
-    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-    GSD Cotizaciones
+<div class="dash-quick-actions">
+  <a href="/admin/cotizaciones" class="dash-action-btn btn-coti">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+    <span>GSD Cotizaciones</span>
   </a>
-  <a href="/admin/expedientes" class="btn-add" style="padding:0.65rem 1.4rem; border-radius:8px; font-size:0.875rem; background:#1A3A52;">
-    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-    GSD Expedientes
+  <a href="/admin/expedientes" class="dash-action-btn btn-expe">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+    <span>GSD Expedientes</span>
   </a>
-  <a href="/admin/propiedades/nueva" class="btn-add" style="padding:0.65rem 1.4rem; border-radius:8px; font-size:0.875rem;">
-    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-    Nueva Propiedad
+  <a href="/admin/propiedades/nueva" class="dash-action-btn btn-prop">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    <span>Nueva Propiedad</span>
   </a>
-  <a href="/admin/blog/nuevo" class="btn-add" style="padding:0.65rem 1.4rem; border-radius:8px; font-size:0.875rem; background:var(--azul);">
-    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-    Nuevo Blog
+  <a href="/admin/blog/nuevo" class="dash-action-btn btn-blog">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    <span>Nuevo Blog</span>
   </a>
-  <a href="/admin/bienes-raices" class="btn-add" style="padding:0.65rem 1.4rem; border-radius:8px; font-size:0.875rem; background:#0284c7;">
-    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m10 15 5-3-5-3v6Z"/></svg>
-    Real Estate CRM
+  <a href="/admin/bienes-raices" class="dash-action-btn btn-re">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m10 15 5-3-5-3v6Z"/></svg>
+    <span>Real Estate CRM</span>
   </a>
 </div>
 
@@ -61,35 +61,37 @@
     <h3>Últimos Leads Recibidos</h3>
     <a href="/admin/leads" class="btn-add">Ver todos</a>
   </div>
-  <table>
-    <thead>
-      <tr>
-        <th>Nombre</th>
-        <th>Email</th>
-        <th>Servicio</th>
-        <th>Estado</th>
-        <th>Fecha</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% latestLeads.forEach(lead => { %>
-      <tr>
-        <td><strong><%= lead.nombre %></strong></td>
-        <td><%= lead.email || '—' %></td>
-        <td><%= lead.servicio || '—' %></td>
-        <td>
-          <span class="badge <%= lead.estado === 'nuevo' ? 'badge-orange' : lead.estado === 'contactado' ? 'badge-blue' : lead.estado === 'cerrado' ? 'badge-green' : 'badge-gray' %>">
-            <%= lead.estado %>
-          </span>
-        </td>
-        <td style="color:var(--gris-500);font-size:0.8rem;"><%= lead.created_at?.substring(0,16) || '' %></td>
-      </tr>
-      <% }) %>
-      <% if (latestLeads.length === 0) { %>
-      <tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--gris-500);">No hay leads aún. Los del formulario de contacto aparecerán aquí.</td></tr>
-      <% } %>
-    </tbody>
-  </table>
+  <div class="table-responsive">
+    <table>
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Email</th>
+          <th>Servicio</th>
+          <th>Estado</th>
+          <th>Fecha</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% latestLeads.forEach(lead => { %>
+        <tr>
+          <td><strong><%= lead.nombre %></strong></td>
+          <td><%= lead.email || '—' %></td>
+          <td><%= lead.servicio || '—' %></td>
+          <td>
+            <span class="badge <%= lead.estado === 'nuevo' ? 'badge-orange' : lead.estado === 'contactado' ? 'badge-blue' : lead.estado === 'cerrado' ? 'badge-green' : 'badge-gray' %>">
+              <%= lead.estado %>
+            </span>
+          </td>
+          <td style="color:var(--gris-500);font-size:0.8rem;"><%= lead.created_at?.substring(0,16) || '' %></td>
+        </tr>
+        <% }) %>
+        <% if (latestLeads.length === 0) { %>
+        <tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--gris-500);">No hay leads aún. Los del formulario de contacto aparecerán aquí.</td></tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
 </div>
 
 <%- include('partials/layout-end') %>

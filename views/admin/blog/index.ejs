@@ -8,53 +8,55 @@
       Nuevo Artículo
     </a>
   </div>
-  <table>
-    <thead>
-      <tr>
-        <th>Título</th>
-        <th>Slug</th>
-        <th>Autor</th>
-        <th>Estado</th>
-        <th>Fecha</th>
-        <th>Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% posts.forEach(p => { %>
-      <tr>
-        <td><strong><%= p.titulo %></strong></td>
-        <td><code style="font-size:0.8rem;color:var(--gris-500);">/<%= p.slug %></code></td>
-        <td><%= p.autor || 'GSD' %></td>
-        <td>
-          <span class="badge <%= p.estado === 'publicado' ? 'badge-green' : 'badge-gray' %>">
-            <%= p.estado %>
-          </span>
-        </td>
-        <td style="color:var(--gris-500);font-size:0.8rem;"><%= p.fecha_publicacion?.substring(0,10) || p.created_at?.substring(0,10) %></td>
-        <td>
-          <div class="action-btns">
-            <% if (p.estado === 'publicado') { %>
-            <a href="/blog/<%= p.slug %>" target="_blank" class="btn-icon view" title="Ver publicado">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-            </a>
-            <% } %>
-            <a href="/admin/blog/<%= p.id %>/editar" class="btn-icon edit" title="Editar">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-            </a>
-            <form method="POST" action="/admin/blog/<%= p.id %>/eliminar" style="display:inline" onsubmit="return confirm('¿Eliminar este artículo?')">
-              <button class="btn-icon delete" type="submit" title="Eliminar">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
-              </button>
-            </form>
-          </div>
-        </td>
-      </tr>
-      <% }) %>
-      <% if (posts.length === 0) { %>
-      <tr><td colspan="6" style="text-align:center;padding:2.5rem;color:var(--gris-500);">No hay artículos. <a href="/admin/blog/nuevo" style="color:var(--verde)">Crea el primero →</a></td></tr>
-      <% } %>
-    </tbody>
-  </table>
+  <div class="table-responsive">
+    <table>
+      <thead>
+        <tr>
+          <th>Título</th>
+          <th>Slug</th>
+          <th>Autor</th>
+          <th>Estado</th>
+          <th>Fecha</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% posts.forEach(p => { %>
+        <tr>
+          <td><strong><%= p.titulo %></strong></td>
+          <td><code style="font-size:0.8rem;color:var(--gris-500);">/<%= p.slug %></code></td>
+          <td><%= p.autor || 'GSD' %></td>
+          <td>
+            <span class="badge <%= p.estado === 'publicado' ? 'badge-green' : 'badge-gray' %>">
+              <%= p.estado %>
+            </span>
+          </td>
+          <td style="color:var(--gris-500);font-size:0.8rem;"><%= p.fecha_publicacion?.substring(0,10) || p.created_at?.substring(0,10) %></td>
+          <td>
+            <div class="action-btns">
+              <% if (p.estado === 'publicado') { %>
+              <a href="/blog/<%= p.slug %>" target="_blank" class="btn-icon view" title="Ver publicado">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </a>
+              <% } %>
+              <a href="/admin/blog/<%= p.id %>/editar" class="btn-icon edit" title="Editar">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              </a>
+              <form method="POST" action="/admin/blog/<%= p.id %>/eliminar" style="display:inline" onsubmit="return confirm('¿Eliminar este artículo?')">
+                <button class="btn-icon delete" type="submit" title="Eliminar">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+                </button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        <% }) %>
+        <% if (posts.length === 0) { %>
+        <tr><td colspan="6" style="text-align:center;padding:2.5rem;color:var(--gris-500);">No hay artículos. <a href="/admin/blog/nuevo" style="color:var(--verde)">Crea el primero →</a></td></tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
 </div>
 
 <%- include('../../admin/partials/layout-end') %>
