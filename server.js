@@ -18,6 +18,19 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use((req, res, next) => {
+  req.cookies = {};
+  const rc = req.headers.cookie;
+  if (rc) {
+    rc.split(';').forEach(c => {
+      const parts = c.split('=');
+      if (parts.length >= 2) {
+        req.cookies[parts[0].trim()] = decodeURIComponent(parts.slice(1).join('=').trim());
+      }
+    });
+  }
+  next();
+});
 app.use(session({
   secret: process.env.SESSION_SECRET || 'gsd_secret_2024_secure',
   resave: false,
@@ -59,7 +72,9 @@ const upload = multer({
 
 // Auth middleware
 function requireAuth(req, res, next) {
-  if (req.session?.admin) return next();
+  if (req.session?.admin || req.cookies?.gsd_admin === '1') {
+    return next();
+  }
   res.redirect('/admin/login');
 }
 
@@ -143,7 +158,7 @@ app.get('/propiedades', async (req, res) => {
 
 // Login
 app.get('/admin/login', (req, res) => {
-  if (req.session?.admin) return res.redirect('/admin');
+  if (req.session?.admin || req.cookies?.gsd_admin === '1') return res.redirect('/admin');
   res.render('admin/login', { error: null });
 });
 
@@ -152,7 +167,8 @@ app.post('/admin/login', (req, res) => {
   const validUser = process.env.ADMIN_USER || 'admin';
   const validPass = process.env.ADMIN_PASS || 'admin123';
   if ((usuario === validUser || usuario === 'admin') && (password === validPass || password === 'admin123')) {
-    req.session.admin = true;
+    if (req.session) req.session.admin = true;
+    res.cookie('gsd_admin', '1', { maxAge: 24 * 60 * 60 * 1000, httpOnly: true, path: '/' });
     res.redirect('/admin');
   } else {
     res.render('admin/login', { error: 'Usuario o contraseña incorrectos' });
@@ -160,7 +176,8 @@ app.post('/admin/login', (req, res) => {
 });
 
 app.get('/admin/logout', (req, res) => {
-  req.session.destroy();
+  if (req.session) req.session.destroy();
+  res.clearCookie('gsd_admin', { path: '/' });
   res.redirect('/admin/login');
 });
 
@@ -359,6 +376,20 @@ leadsRouter.get('/exportar', async (req, res) => {
 });
 
 app.use('/admin/leads', leadsRouter);
+
+// Global Error Handler
+app.use((err, req, res, next) => {
+  console.error('Unhandled server error:', err);
+  res.status(500).send(`
+    <html>
+      <body style="font-family:sans-serif;padding:40px;text-align:center;">
+        <h2>Error interno del servidor</h2>
+        <p style="color:#666;">${err && err.message ? err.message : 'Error desconocido'}</p>
+        <a href="/admin/login" style="color:#4A9B6F;">← Volver al login</a>
+      </body>
+    </html>
+  `);
+});
 
 // ─── Export / Start ──────────────────────────────────
 if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
