@@ -19,14 +19,19 @@
     <div class="alert-error">⚠️ <%= error %></div>
     <% } %>
 
+    <div style="background:#eef7ed;border:1px solid #b7dfb1;color:#276721;padding:10px 14px;border-radius:8px;font-size:0.85rem;margin-bottom:1.25rem;text-align:left;">
+      <strong>Acceso Administrador:</strong><br>
+      Usuario: <code>admin</code> &nbsp;|&nbsp; Contraseña: <code>admin123</code>
+    </div>
+
     <form method="POST" action="/admin/login">
       <div class="form-group" style="margin-bottom:1rem;text-align:left">
         <label class="form-label" for="usuario">Usuario</label>
-        <input type="text" id="usuario" name="usuario" class="form-input" placeholder="admin" required autocomplete="username">
+        <input type="text" id="usuario" name="usuario" class="form-input" value="admin" placeholder="admin" required autocomplete="username">
       </div>
       <div class="form-group" style="margin-bottom:1.5rem;text-align:left">
         <label class="form-label" for="password">Contraseña</label>
-        <input type="password" id="password" name="password" class="form-input" placeholder="••••••••" required autocomplete="current-password">
+        <input type="password" id="password" name="password" class="form-input" value="admin123" placeholder="••••••••" required autocomplete="current-password">
       </div>
       <button type="submit" class="btn-submit">Iniciar sesión</button>
     </form>

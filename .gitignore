@@ -3,3 +3,6 @@ node_modules/
 .env.real-estate
 .npm-cache/
 db/*.db
+
+.vercel
+.env*
