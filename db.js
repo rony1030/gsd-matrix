@@ -32,6 +32,14 @@ async function getDb() {
   if (fs.existsSync(DB_PATH)) {
     const fileBuffer = fs.readFileSync(DB_PATH);
     db = new SQL.Database(fileBuffer);
+    try {
+      db.run(`
+        UPDATE propiedades SET imagenes = '["/img/propiedades/apartment.jpg"]' WHERE id = 1 AND (imagenes IS NULL OR imagenes = '[]' OR imagenes = '');
+        UPDATE propiedades SET imagenes = '["/img/propiedades/villa.jpg"]' WHERE id = 2 AND (imagenes IS NULL OR imagenes = '[]' OR imagenes = '');
+        UPDATE propiedades SET imagenes = '["/img/propiedades/home.jpg"]' WHERE id = 3 AND (imagenes IS NULL OR imagenes = '[]' OR imagenes = '');
+      `);
+      saveDb();
+    } catch(e) {}
   } else {
     db = new SQL.Database();
     initSchema();
@@ -96,13 +104,19 @@ function initSchema() {
     );
   `);
 
-  // Seed some sample data
+  // Seed some sample data with real cover photos
   db.run(`
-    INSERT OR IGNORE INTO propiedades (id, titulo, descripcion, precio, moneda, tipo, ubicacion, estado, destacada)
+    INSERT OR IGNORE INTO propiedades (id, titulo, descripcion, precio, moneda, tipo, ubicacion, estado, imagenes, destacada)
     VALUES
-    (1, 'Apartamento en Piantini', 'Lujoso apartamento de 3 habitaciones con vista panorámica en el sector más exclusivo de Santo Domingo.', 280000, 'USD', 'Apartamento', 'Piantini, Santo Domingo', 'disponible', 1),
-    (2, 'Villa en Casa de Campo', 'Espectacular villa de 4 habitaciones con piscina privada y acceso al campo de golf.', 750000, 'USD', 'Villa', 'Casa de Campo, La Romana', 'disponible', 1),
-    (3, 'Terreno en Bávaro', 'Terreno de 2,000m² en zona turística con todos los servicios.', 120000, 'USD', 'Terreno', 'Bávaro, Punta Cana', 'disponible', 0);
+    (1, 'Apartamento en Piantini', 'Lujoso apartamento de 3 habitaciones con vista panorámica en el sector más exclusivo de Santo Domingo.', 280000, 'USD', 'Apartamento', 'Piantini, Santo Domingo', 'disponible', '["/img/propiedades/apartment.jpg"]', 1),
+    (2, 'Villa en Casa de Campo', 'Espectacular villa de 4 habitaciones con piscina privada y acceso al campo de golf.', 750000, 'USD', 'Villa', 'Casa de Campo, La Romana', 'disponible', '["/img/propiedades/villa.jpg"]', 1),
+    (3, 'Terreno en Bávaro', 'Terreno de 2,000m² en zona turística con todos los servicios.', 120000, 'USD', 'Terreno', 'Bávaro, Punta Cana', 'disponible', '["/img/propiedades/home.jpg"]', 0);
+  `);
+
+  db.run(`
+    UPDATE propiedades SET imagenes = '["/img/propiedades/apartment.jpg"]' WHERE id = 1 AND (imagenes IS NULL OR imagenes = '[]' OR imagenes = '');
+    UPDATE propiedades SET imagenes = '["/img/propiedades/villa.jpg"]' WHERE id = 2 AND (imagenes IS NULL OR imagenes = '[]' OR imagenes = '');
+    UPDATE propiedades SET imagenes = '["/img/propiedades/home.jpg"]' WHERE id = 3 AND (imagenes IS NULL OR imagenes = '[]' OR imagenes = '');
   `);
 
   db.run(`

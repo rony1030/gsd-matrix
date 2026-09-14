@@ -16,7 +16,10 @@
     <p>Ingresa tus credenciales para continuar</p>
 
     <% if (error) { %>
-    <div class="alert-error">⚠️ <%= error %></div>
+    <div class="alert-error" style="display:flex;align-items:center;gap:0.5rem;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span><%= error %></span>
+    </div>
     <% } %>
 
     <div style="background:#eef7ed;border:1px solid #b7dfb1;color:#276721;padding:10px 14px;border-radius:8px;font-size:0.85rem;margin-bottom:1.25rem;text-align:left;">
