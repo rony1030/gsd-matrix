@@ -13,12 +13,21 @@ async function getDb() {
   if (db) return db;
 
   const wasmPath = path.join(__dirname, 'node_modules', 'sql.js', 'dist', 'sql-wasm.wasm');
-  const SQL = await initSqlJs({
-    locateFile: file => {
-      if (fs.existsSync(wasmPath)) return wasmPath;
-      return file;
-    }
-  });
+  let config = {};
+  if (fs.existsSync(wasmPath)) {
+    const wasmBinary = fs.readFileSync(wasmPath);
+    config = {
+      instantiateWasm: (imports, successCallback) => {
+        WebAssembly.instantiate(wasmBinary, imports).then(output => {
+          successCallback(output.instance);
+        }).catch(err => {
+          console.error('Error instantiating wasm:', err);
+        });
+        return {};
+      }
+    };
+  }
+  const SQL = await initSqlJs(config);
 
   if (fs.existsSync(DB_PATH)) {
     const fileBuffer = fs.readFileSync(DB_PATH);
