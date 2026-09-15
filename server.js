@@ -195,42 +195,46 @@ app.get('/admin/logout', (req, res) => {
   res.redirect('/admin/login');
 });
 
-// Dashboard
+// Dashboard CRM Unificado
 app.get('/admin', requireAuth, async (req, res) => {
   try {
     await getDb();
-    const qProp = queryOne('SELECT COUNT(*) as n FROM propiedades');
-    const qBlogs = queryOne('SELECT COUNT(*) as n FROM blogs');
-    const qLeads = queryOne('SELECT COUNT(*) as n FROM leads');
-    const qNuevos = queryOne("SELECT COUNT(*) as n FROM leads WHERE estado='nuevo'");
-    const qContactados = queryOne("SELECT COUNT(*) as n FROM leads WHERE estado='contactado'");
-    const qCerrados = queryOne("SELECT COUNT(*) as n FROM leads WHERE estado='cerrado'");
-
-    const totalProp = qProp?.n || 0;
-    const totalBlogs = qBlogs?.n || 0;
-    const totalLeads = qLeads?.n || 0;
-    const leadsNuevos = qNuevos?.n || 0;
-    const leadsContactados = qContactados?.n || 0;
-    const leadsCerrados = qCerrados?.n || 0;
-
-    const latestLeads = queryAll('SELECT * FROM leads ORDER BY created_at DESC LIMIT 6') || [];
-    const leadsByService = queryAll('SELECT servicio, COUNT(*) as count FROM leads GROUP BY servicio ORDER BY count DESC') || [];
-
-    res.render('admin/dashboard', {
+    const expedientes = queryAll('SELECT * FROM expedientes ORDER BY created_at DESC') || [];
+    res.render('admin/expedientes/index', {
       page: 'dashboard',
-      stats: { totalProp, totalBlogs, totalLeads, leadsNuevos, leadsContactados, leadsCerrados },
-      latestLeads,
-      leadsByService
+      initialView: 'dash',
+      expedientes
     });
   } catch (err) {
-    console.error('Error cargando dashboard:', err);
-    res.render('admin/dashboard', {
+    console.error('Error cargando dashboard CRM:', err);
+    res.render('admin/expedientes/index', {
       page: 'dashboard',
-      stats: { totalProp: 3, totalBlogs: 3, totalLeads: 2, leadsNuevos: 1, leadsContactados: 1, leadsCerrados: 0 },
-      latestLeads: [],
-      leadsByService: []
+      initialView: 'dash',
+      expedientes: []
     });
   }
+});
+
+// Submódulos CRM unificados
+const crmSubmodules = [
+  { path: '/admin/expedientes', view: 'list', page: 'expedientes' },
+  { path: '/admin/tareas', view: 'mytasks', page: 'tareas' },
+  { path: '/admin/calendario', view: 'cal', page: 'calendario' },
+  { path: '/admin/clientes', view: 'clients', page: 'clientes' },
+  { path: '/admin/documentos', view: 'docs', page: 'documentos' },
+  { path: '/admin/plantillas', view: 'tpl', page: 'plantillas' }
+];
+
+crmSubmodules.forEach(({ path: subPath, view, page }) => {
+  app.get(subPath, requireAuth, async (req, res) => {
+    try {
+      await getDb();
+      const expedientes = queryAll('SELECT * FROM expedientes ORDER BY created_at DESC') || [];
+      res.render('admin/expedientes/index', { page, initialView: view, expedientes });
+    } catch (err) {
+      res.render('admin/expedientes/index', { page, initialView: view, expedientes: [] });
+    }
+  });
 });
 
 // ─── PROPIEDADES ─────────────────────────────────────
@@ -607,8 +611,8 @@ expeRouter.use(requireAuth);
 
 expeRouter.get('/', async (req, res) => {
   await getDb();
-  const expedientes = queryAll('SELECT * FROM expedientes ORDER BY created_at DESC');
-  res.render('admin/expedientes/index', { page: 'expedientes', expedientes });
+  const expedientes = queryAll('SELECT * FROM expedientes ORDER BY created_at DESC') || [];
+  res.render('admin/expedientes/index', { page: 'expedientes', initialView: 'list', expedientes });
 });
 
 expeRouter.post('/api/guardar', async (req, res) => {

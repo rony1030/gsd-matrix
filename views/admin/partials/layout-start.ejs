@@ -151,32 +151,49 @@
       <i data-lucide="folder"></i>
       Expedientes
     </a>
-    <a href="/admin/cotizaciones" class="sidebar-link <%= page === 'cotizaciones' ? 'active' : '' %>">
-      <i data-lucide="file-text"></i>
-      Cotizaciones & Quoter
+    <a href="/admin/tareas" class="sidebar-link <%= page === 'tareas' ? 'active' : '' %>">
+      <i data-lucide="check-square"></i>
+      Mis tareas
+      <span class="n" style="margin-left:auto;background:#C0392B;color:#fff;font-size:10px;padding:1px 7px;border-radius:10px;font-weight:600;">3</span>
     </a>
-    <a href="/admin/leads" class="sidebar-link <%= page === 'leads' ? 'active' : '' %>">
+    <a href="/admin/calendario" class="sidebar-link <%= page === 'calendario' ? 'active' : '' %>">
+      <i data-lucide="calendar"></i>
+      Calendario
+    </a>
+    <a href="/admin/clientes" class="sidebar-link <%= (page === 'clientes' || page === 'leads') ? 'active' : '' %>">
       <i data-lucide="users"></i>
       Clientes & Leads
     </a>
+    <a href="/admin/documentos" class="sidebar-link <%= page === 'documentos' ? 'active' : '' %>">
+      <i data-lucide="file-text"></i>
+      Documentos
+    </a>
 
-    <div class="sidebar-section" style="margin-top:10px;">GESTIÓN & BIENES RAÍCES</div>
+    <div class="sidebar-section" style="margin-top:12px;">OPERACIONES & SERVICIOS</div>
+    <a href="/admin/cotizaciones" class="sidebar-link <%= page === 'cotizaciones' ? 'active' : '' %>">
+      <i data-lucide="file-spreadsheet"></i>
+      GSD Quoter
+    </a>
     <a href="/admin/propiedades" class="sidebar-link <%= page === 'propiedades' ? 'active' : '' %>">
       <i data-lucide="building-2"></i>
-      Propiedades
+      Bienes Raíces
     </a>
     <a href="/admin/blog" class="sidebar-link <%= page === 'blog' ? 'active' : '' %>">
       <i data-lucide="newspaper"></i>
       Blog & SEO
     </a>
 
-    <div class="sidebar-section" style="margin-top:10px;">CONFIGURACIÓN</div>
+    <div class="sidebar-section" style="margin-top:12px;">GESTIÓN & SISTEMA</div>
+    <a href="/admin/plantillas" class="sidebar-link <%= page === 'plantillas' ? 'active' : '' %>">
+      <i data-lucide="layers"></i>
+      Plantillas de expedientes
+    </a>
     <a href="/admin/ajustes" class="sidebar-link <%= (typeof page !== 'undefined' && (page === 'ajustes' || page === 'branding' || page === 'instagram')) ? 'active' : '' %>">
       <i data-lucide="settings"></i>
       Ajustes del Sistema
     </a>
 
-    <div class="sidebar-section" style="margin-top:10px;">PORTALES PÚBLICOS</div>
+    <div class="sidebar-section" style="margin-top:12px;">PORTALES PÚBLICOS</div>
     <a href="/" target="_blank" class="sidebar-link">
       <i data-lucide="globe"></i>
       Sitio Matriz Web
@@ -217,7 +234,7 @@
         GSD QUOTER
       </a>
       <span style="color:#E5E7EB;font-weight:300;">|</span>
-      <a href="/admin/expedientes" class="crm-switch-tab <%= page === 'expedientes' ? 'active' : '' %>">
+      <a href="/admin/expedientes" class="crm-switch-tab <%= (page === 'expedientes' || page === 'dashboard' || page === 'tareas' || page === 'calendario' || page === 'clientes' || page === 'documentos' || page === 'plantillas') ? 'active' : '' %>">
         GSD EXPEDIENTES
       </a>
       <span style="color:#E5E7EB;font-weight:300;">|</span>
@@ -226,11 +243,20 @@
       </a>
     </div>
 
+    <!-- Pipeline Flow Bar -->
+    <div class="flow" style="display:flex;align-items:center;gap:6px;font-size:11px;color:#6B7280;margin-left:14px;">
+      <span style="padding:2px 8px;border-radius:10px;background:#F3F4F6;">Cotizar</span>→
+      <span style="padding:2px 8px;border-radius:10px;background:#F3F4F6;">Aprobar</span>→
+      <span style="padding:2px 8px;border-radius:10px;background:#E8F4EF;color:#2F6B4A;font-weight:500;">Expediente</span>→
+      <span style="padding:2px 8px;border-radius:10px;background:#E8F4EF;color:#2F6B4A;font-weight:500;">Gestionar</span>→
+      <span style="padding:2px 8px;border-radius:10px;background:#F3F4F6;">Cerrar</span>
+    </div>
+
     <div style="flex:1;"></div>
 
     <div class="crm-search-box">
       <i data-lucide="search"></i>
-      <input type="text" placeholder="Buscar expediente, cliente, propiedad..." onkeydown="if(event.key==='Enter'){window.location.href='/admin/expedientes?q='+encodeURIComponent(this.value);}">
+      <input type="text" placeholder="Buscar expediente, cliente o parcela..." onkeydown="if(event.key==='Enter'){window.location.href='/admin/expedientes?q='+encodeURIComponent(this.value);}">
     </div>
 
     <% if (page === 'propiedades') { %>
@@ -242,12 +268,15 @@
         <i data-lucide="plus" style="width:15px;height:15px;"></i> Nuevo Artículo
       </a>
     <% } else if (page === 'cotizaciones') { %>
-      <a href="/admin/cotizaciones" class="btn btn-p" style="background:#4A9B6F;color:#fff;border-color:#4A9B6F;padding:6px 12px;font-size:12px;font-weight:600;border-radius:6px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;">
-        <i data-lucide="plus" style="width:15px;height:15px;"></i> Nueva Cotización
+      <a href="/admin/expedientes" class="btn btn-p" style="background:#4A9B6F;color:#fff;border-color:#4A9B6F;padding:6px 12px;font-size:12px;font-weight:600;border-radius:6px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;">
+        <i data-lucide="arrow-right" style="width:15px;height:15px;"></i> GSD Expedientes
       </a>
     <% } else { %>
       <a href="/admin/expedientes" class="btn btn-p" style="background:#4A9B6F;color:#fff;border-color:#4A9B6F;padding:6px 12px;font-size:12px;font-weight:600;border-radius:6px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;">
         <i data-lucide="plus" style="width:15px;height:15px;"></i> Nuevo Expediente
+      </a>
+      <a href="/admin/cotizaciones" class="quoter" style="border:1px solid #E5E7EB;background:#fff;color:#1A3A52;padding:6px 12px;border-radius:6px;font-weight:500;font-size:12px;display:inline-flex;align-items:center;gap:6px;text-decoration:none;">
+        <i data-lucide="arrow-left" style="width:14px;height:14px;"></i> GSD Quoter
       </a>
     <% } %>
 
