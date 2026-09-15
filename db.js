@@ -121,8 +121,13 @@ async function getDb() {
           evidencias_json TEXT DEFAULT '[]',
           log_json TEXT DEFAULT '[]',
           created_at TEXT DEFAULT (datetime('now','localtime')),
+        CREATE TABLE IF NOT EXISTS settings (
+          key TEXT PRIMARY KEY,
+          value TEXT,
           updated_at TEXT DEFAULT (datetime('now','localtime'))
         );
+
+        INSERT OR IGNORE INTO settings (key, value) VALUES ('logo_url', '/img/logo-gsd.png');
       `);
       saveDb();
     } catch(e) {}
@@ -292,6 +297,14 @@ function initSchema() {
       posts_json TEXT DEFAULT '[]',
       updated_at TEXT DEFAULT (datetime('now','localtime'))
     );
+
+    CREATE TABLE IF NOT EXISTS settings (
+      key TEXT PRIMARY KEY,
+      value TEXT,
+      updated_at TEXT DEFAULT (datetime('now','localtime'))
+    );
+
+    INSERT OR IGNORE INTO settings (key, value) VALUES ('logo_url', '/img/logo-gsd.png');
   `);
 
   // Seed some sample data with real cover photos

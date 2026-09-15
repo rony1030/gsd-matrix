@@ -46,7 +46,7 @@ const uploadsDir = isVercel
   ? path.join(os.tmpdir(), 'gsd-uploads')
   : path.join(__dirname, 'public', 'uploads');
 
-['propiedades', 'blog'].forEach((d) => {
+['propiedades', 'blog', 'branding'].forEach((d) => {
   fs.mkdirSync(path.join(uploadsDir, d), { recursive: true });
 });
 
@@ -55,7 +55,9 @@ app.use('/uploads', express.static(uploadsDir));
 const upload = multer({
   storage: multer.diskStorage({
     destination: (req, file, cb) => {
-      const sub = req.baseUrl.includes('propiedades') ? 'propiedades' : 'blog';
+      let sub = 'blog';
+      if (req.baseUrl.includes('propiedades')) sub = 'propiedades';
+      else if (req.baseUrl.includes('branding')) sub = 'branding';
       cb(null, path.join(uploadsDir, sub));
     },
     filename: (req, file, cb) => {
@@ -64,10 +66,30 @@ const upload = multer({
     }
   }),
   fileFilter: (req, file, cb) => {
-    const ok = /\.(jpg|jpeg|png|webp)$/i.test(file.originalname);
+    const ok = /\.(jpg|jpeg|png|webp|svg)$/i.test(file.originalname) || file.mimetype === 'image/svg+xml';
     cb(null, ok);
   },
   limits: { fileSize: 5 * 1024 * 1024 }
+});
+
+// Global logo middleware
+app.use(async (req, res, next) => {
+  try {
+    await getDb();
+    const logoRow = queryOne("SELECT value FROM settings WHERE key='logo_url'");
+    let activeLogo = logoRow?.value;
+    if (!activeLogo) {
+      if (fs.existsSync(path.join(__dirname, 'public', 'img', 'logo-gsd.svg'))) {
+        activeLogo = '/img/logo-gsd.svg';
+      } else {
+        activeLogo = '/img/logo-gsd.png';
+      }
+    }
+    res.locals.logoUrl = activeLogo;
+  } catch(e) {
+    res.locals.logoUrl = '/img/logo-gsd.png';
+  }
+  next();
 });
 
 // Auth middleware
@@ -616,6 +638,80 @@ expeRouter.post('/api/guardar', async (req, res) => {
 });
 
 app.use('/admin/expedientes', expeRouter);
+
+// ─── BRANDING & LOGO VECTORIAL (SVG / PNG) ───────────
+const brandingRouter = express.Router();
+brandingRouter.use(requireAuth);
+
+brandingRouter.get('/', async (req, res) => {
+  await getDb();
+  const logoRow = queryOne("SELECT value FROM settings WHERE key='logo_url'");
+  const currentLogo = logoRow?.value || (fs.existsSync(path.join(__dirname, 'public', 'img', 'logo-gsd.svg')) ? '/img/logo-gsd.svg' : '/img/logo-gsd.png');
+  res.render('admin/branding', {
+    page: 'branding',
+    logoUrl: currentLogo,
+    success: req.query.saved === '1',
+    error: req.query.error ? decodeURIComponent(req.query.error) : null
+  });
+});
+
+brandingRouter.post('/logo', upload.single('logo'), async (req, res) => {
+  if (!req.file) {
+    return res.redirect('/admin/branding?error=' + encodeURIComponent('Por favor selecciona un archivo SVG o PNG válido.'));
+  }
+  
+  const uploadedPath = req.file.path;
+  const isSvg = req.file.originalname.toLowerCase().endsWith('.svg') || req.file.mimetype === 'image/svg+xml';
+  const targetLogoRel = isSvg ? '/img/logo-gsd.svg' : `/uploads/branding/${req.file.filename}`;
+
+  try {
+    if (isSvg) {
+      try {
+        const destSvg = path.join(__dirname, 'public', 'img', 'logo-gsd.svg');
+        fs.copyFileSync(uploadedPath, destSvg);
+      } catch(e) {}
+    }
+
+    await getDb();
+    const logoUrl = isSvg ? '/img/logo-gsd.svg' : targetLogoRel;
+    run("INSERT OR REPLACE INTO settings (key, value, updated_at) VALUES ('logo_url', ?, datetime('now','localtime'))", [logoUrl]);
+    res.redirect('/admin/branding?saved=1');
+  } catch(err) {
+    res.redirect('/admin/branding?error=' + encodeURIComponent(err.message));
+  }
+});
+
+brandingRouter.post('/svg-code', async (req, res) => {
+  const { svg_code } = req.body;
+  if (!svg_code || !svg_code.trim().startsWith('<svg')) {
+    return res.redirect('/admin/branding?error=' + encodeURIComponent('El código SVG ingresado no es válido. Debe iniciar con <svg.'));
+  }
+
+  try {
+    try {
+      const destSvg = path.join(__dirname, 'public', 'img', 'logo-gsd.svg');
+      fs.writeFileSync(destSvg, svg_code.trim(), 'utf8');
+    } catch(e) {}
+
+    await getDb();
+    run("INSERT OR REPLACE INTO settings (key, value, updated_at) VALUES ('logo_url', '/img/logo-gsd.svg', datetime('now','localtime'))");
+    res.redirect('/admin/branding?saved=1');
+  } catch(err) {
+    res.redirect('/admin/branding?error=' + encodeURIComponent(err.message));
+  }
+});
+
+brandingRouter.post('/reset', async (req, res) => {
+  try {
+    await getDb();
+    run("INSERT OR REPLACE INTO settings (key, value, updated_at) VALUES ('logo_url', '/img/logo-gsd.png', datetime('now','localtime'))");
+    res.redirect('/admin/branding?saved=1');
+  } catch(err) {
+    res.redirect('/admin/branding?error=' + encodeURIComponent(err.message));
+  }
+});
+
+app.use('/admin/branding', brandingRouter);
 
 // ─── INSTAGRAM & REDES (MULTIMARCA / PROYECTOS) ──────
 const instagramRouter = express.Router();

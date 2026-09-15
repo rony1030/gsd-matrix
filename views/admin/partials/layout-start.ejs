@@ -17,7 +17,7 @@
 <aside class="admin-sidebar" id="adminSidebar">
   <div class="sidebar-logo">
     <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
-      <img src="/img/logo-gsd.png" alt="GSD">
+      <img src="<%= typeof logoUrl !== 'undefined' ? logoUrl : '/img/logo-gsd.png' %>" alt="GSD" style="max-height:36px;max-width:140px;object-fit:contain;">
       <button type="button" class="sidebar-close-btn" id="sidebarCloseBtn" aria-label="Cerrar menú">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
@@ -58,6 +58,13 @@
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m10 15 5-3-5-3v6Z"/></svg>
       GSD Bienes Raíces
     </a>
+    <div class="sidebar-section">Configuración & Marca</div>
+    <a href="/admin/branding" class="sidebar-link <%= page === 'branding' ? 'active' : '' %>">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+      Logo & Marca (SVG)
+    </a>
+
+    <div class="sidebar-section">Redes Sociales</div>
     <a href="/admin/instagram" class="sidebar-link <%= page === 'instagram' ? 'active' : '' %>">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
       Redes & Instagram

@@ -39,9 +39,25 @@ function generateQuotationPDF(data) {
       const INK = '#1F2937';
 
       // ─── ENCABEZADO ───────────────────────────────────
-      doc.fontSize(22).font('Helvetica-Bold').fillColor(NAVY).text('GSD', 45, 45);
-      doc.fontSize(8).font('Helvetica-Bold').fillColor(GRAY).text('GEOSOLUTIONS SOURCE DOMINICANA', 45, 70);
-      doc.fontSize(7.5).font('Helvetica').fillColor(GREEN).text('DERECHO INMOBILIARIO · AGRIMENSURA · REAL ESTATE', 45, 80);
+      const fs = require('fs');
+      const path = require('path');
+      const logoPng = path.join(__dirname, '..', 'public', 'img', 'logo-gsd.png');
+      let renderedLogo = false;
+
+      if (fs.existsSync(logoPng)) {
+        try {
+          doc.image(logoPng, 45, 42, { height: 36 });
+          doc.fontSize(7.5).font('Helvetica-Bold').fillColor(GRAY).text('GEOSOLUTIONS SOURCE DOMINICANA', 165, 49);
+          doc.fontSize(7).font('Helvetica').fillColor(GREEN).text('DERECHO INMOBILIARIO · AGRIMENSURA · REAL ESTATE', 165, 60);
+          renderedLogo = true;
+        } catch(e) {}
+      }
+
+      if (!renderedLogo) {
+        doc.fontSize(22).font('Helvetica-Bold').fillColor(NAVY).text('GSD', 45, 45);
+        doc.fontSize(8).font('Helvetica-Bold').fillColor(GRAY).text('GEOSOLUTIONS SOURCE DOMINICANA', 45, 70);
+        doc.fontSize(7.5).font('Helvetica').fillColor(GREEN).text('DERECHO INMOBILIARIO · AGRIMENSURA · REAL ESTATE', 45, 80);
+      }
 
       doc.fontSize(7.5).font('Helvetica').fillColor(GRAY).text('Punta Cana, Rep. Dominicana', 380, 45, { align: 'right' });
       doc.fontSize(7.5).text('Tel: (829) 493-7254 | RNC: 1-33-79694-5', 380, 56, { align: 'right' });

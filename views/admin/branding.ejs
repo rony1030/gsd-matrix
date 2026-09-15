@@ -1,0 +1,376 @@
+<%- include('partials/layout-start', { pageTitle: 'Marca & Logo Vectorial', page: 'branding' }) %>
+
+<style>
+  .branding-container {
+    max-width: 1080px;
+    margin: 0 auto;
+  }
+  .branding-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+  }
+  @media (max-width: 880px) {
+    .branding-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  .b-card {
+    background: #ffffff;
+    border-radius: 14px;
+    border: 1px solid var(--line, #E5E7EB);
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+  }
+  .b-card-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--navy, #1A3A52);
+    margin-bottom: 0.35rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .b-card-sub {
+    font-size: 0.85rem;
+    color: var(--gray, #6B7280);
+    margin-bottom: 1.25rem;
+  }
+  .preview-stage {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+  }
+  .preview-box {
+    border-radius: 10px;
+    padding: 2rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 140px;
+    border: 1px dashed #cbd5e1;
+    position: relative;
+  }
+  .preview-box.light {
+    background: #ffffff;
+  }
+  .preview-box.dark {
+    background: #1A3A52;
+  }
+  .preview-box img, .preview-box svg {
+    max-height: 55px;
+    max-width: 180px;
+    object-fit: contain;
+  }
+  .preview-tag {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  .preview-box.light .preview-tag { background: #f1f5f9; color: #475569; }
+  .preview-box.dark .preview-tag { background: rgba(255,255,255,0.15); color: #ffffff; }
+
+  .dropzone {
+    border: 2px dashed #94a3b8;
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    background: #f8fafc;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .dropzone:hover, .dropzone.dragover {
+    border-color: var(--green, #4A9B6F);
+    background: #f0fdf4;
+  }
+  .dropzone-icon {
+    width: 44px;
+    height: 44px;
+    margin: 0 auto 0.75rem;
+    color: var(--green, #4A9B6F);
+  }
+  .dropzone p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #334155;
+    font-weight: 500;
+  }
+  .dropzone small {
+    display: block;
+    margin-top: 0.35rem;
+    font-size: 0.75rem;
+    color: #64748b;
+  }
+
+  .tabs-nav {
+    display: flex;
+    gap: 0.5rem;
+    border-bottom: 1px solid #e2e8f0;
+    margin-bottom: 1.25rem;
+  }
+  .tab-btn {
+    background: none;
+    border: none;
+    padding: 0.6rem 1rem;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #64748b;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+  }
+  .tab-btn.active {
+    color: var(--green, #4A9B6F);
+    border-bottom-color: var(--green, #4A9B6F);
+  }
+
+  .alert-banner {
+    padding: 0.85rem 1.15rem;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .alert-banner.success {
+    background: #dcfce7;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+  }
+  .alert-banner.error {
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+  }
+</style>
+
+<div class="branding-container">
+
+  <% if (typeof success !== 'undefined' && success) { %>
+    <div class="alert-banner success">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      <span><strong>¡Logo actualizado!</strong> El logotipo vectorial se ha guardado y sincronizado en todo el sistema.</span>
+    </div>
+  <% } %>
+
+  <% if (typeof error !== 'undefined' && error) { %>
+    <div class="alert-banner error">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span><%= error %></span>
+    </div>
+  <% } %>
+
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem;">
+    <div>
+      <h2 style="font-size:1.4rem;font-weight:700;color:var(--navy, #1A3A52);margin:0;">Gestión de Marca & Logotipo Vectorial</h2>
+      <p style="font-size:0.88rem;color:var(--gray, #6B7280);margin:0.25rem 0 0;">Actualiza el logo corporativo de GSD en formato <strong>SVG Vectorial</strong> o PNG de alta fidelidad para la web, CRM y cotizaciones.</p>
+    </div>
+  </div>
+
+  <div class="branding-grid">
+
+    <!-- Tarjeta 1: Vista Previa en Vivo -->
+    <div class="b-card">
+      <div class="b-card-title">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+        Logotipo Activo
+      </div>
+      <div class="b-card-sub">Visualización en vivo del logotipo actual sobre fondos claros y oscuros.</div>
+
+      <div class="preview-stage">
+        <div class="preview-box light">
+          <span class="preview-tag">Fondo Claro</span>
+          <img src="<%= typeof logoUrl !== 'undefined' ? logoUrl : '/img/logo-gsd.png' %>" alt="Logo GSD" id="activeLogoPreviewLight">
+        </div>
+        <div class="preview-box dark">
+          <span class="preview-tag">Fondo Azul GSD</span>
+          <img src="<%= typeof logoUrl !== 'undefined' ? logoUrl : '/img/logo-gsd.png' %>" alt="Logo GSD" id="activeLogoPreviewDark">
+        </div>
+      </div>
+
+      <div style="background:#f8fafc;border-radius:8px;padding:0.85rem 1rem;font-size:0.82rem;color:#475569;display:flex;flex-direction:column;gap:0.35rem;">
+        <div style="display:flex;justify-content:space-between;">
+          <span>Ruta del archivo:</span>
+          <code style="font-weight:600;color:var(--navy);"><%= typeof logoUrl !== 'undefined' ? logoUrl : '/img/logo-gsd.png' %></code>
+        </div>
+        <div style="display:flex;justify-content:space-between;">
+          <span>Formato actual:</span>
+          <span style="font-weight:600;color:var(--green);"><%= (typeof logoUrl !== 'undefined' && logoUrl.endsWith('.svg')) ? 'SVG Vectorial (Óptimo)' : 'Imagen Raster (PNG/JPG)' %></span>
+        </div>
+      </div>
+
+      <form action="/admin/branding/reset" method="POST" style="margin-top:1rem;" onsubmit="return confirm('¿Restablecer el logotipo original predeterminado?');">
+        <button type="submit" class="btn btn-sm" style="width:100%;color:#ef4444;border-color:#fecaca;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          Restablecer Logotipo Original
+        </button>
+      </form>
+    </div>
+
+    <!-- Tarjeta 2: Subida y Editor -->
+    <div class="b-card">
+      <div class="b-card-title">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        Actualizar Logotipo
+      </div>
+
+      <div class="tabs-nav">
+        <button type="button" class="tab-btn active" id="tabUploadBtn" onclick="switchBrandTab('upload')">Subir Archivo (.svg / .png)</button>
+        <button type="button" class="tab-btn" id="tabCodeBtn" onclick="switchBrandTab('code')">Pegar Código SVG</button>
+      </div>
+
+      <!-- Panel 1: Subir Archivo -->
+      <div id="panelUpload">
+        <form action="/admin/branding/logo" method="POST" enctype="multipart/form-data" id="logoUploadForm">
+          <div class="dropzone" id="dropzone" onclick="document.getElementById('logoFile').click()">
+            <svg class="dropzone-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M12 12v9"/><path d="m16 16-4-4-4 4"/></svg>
+            <p>Haz clic para seleccionar o arrastra tu archivo aquí</p>
+            <small>Formatos recomendados: <strong>.SVG (Vectorial)</strong>, .PNG, .WEBP (Máx. 5MB)</small>
+            <input type="file" id="logoFile" name="logo" accept=".svg,.png,.jpg,.jpeg,.webp" style="display:none;" onchange="handleFileSelected(this)">
+          </div>
+
+          <div id="filePreviewContainer" style="display:none;margin-top:1.25rem;border:1px solid #e2e8f0;border-radius:10px;padding:1rem;background:#f8fafc;">
+            <div style="font-size:0.8rem;font-weight:600;color:#64748b;margin-bottom:0.5rem;">VISTA PREVIA DEL ARCHIVO SELECCIONADO:</div>
+            <div style="display:flex;align-items:center;justify-content:center;min-height:90px;background:#ffffff;border-radius:8px;border:1px solid #cbd5e1;padding:1rem;">
+              <img id="tempImagePreview" src="" alt="Vista previa" style="max-height:60px;max-width:200px;object-fit:contain;">
+            </div>
+            <div id="fileInfoText" style="font-size:0.8rem;color:#334155;margin-top:0.5rem;text-align:center;"></div>
+          </div>
+
+          <div style="margin-top:1.5rem;">
+            <button type="submit" class="btn btn-p" id="saveLogoBtn" style="width:100%;justify-content:center;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              Guardar Logotipo
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Panel 2: Pegar Código SVG -->
+      <div id="panelCode" style="display:none;">
+        <form action="/admin/branding/svg-code" method="POST">
+          <label style="display:block;font-size:0.82rem;font-weight:600;color:#334155;margin-bottom:0.35rem;">Código XML del SVG:</label>
+          <textarea name="svg_code" id="svgCodeInput" placeholder='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"> ... </svg>' style="font-family:monospace;font-size:0.8rem;min-height:160px;" oninput="previewSvgCode(this.value)"></textarea>
+
+          <div id="codePreviewBox" style="display:none;margin-top:1rem;border:1px solid #e2e8f0;border-radius:10px;padding:1rem;background:#ffffff;text-align:center;">
+            <div style="font-size:0.75rem;font-weight:600;color:#64748b;margin-bottom:0.5rem;">RENDERIZADO EN VIVO:</div>
+            <div id="svgRenderContainer" style="display:flex;align-items:center;justify-content:center;min-height:70px;"></div>
+          </div>
+
+          <div style="margin-top:1.5rem;">
+            <button type="submit" class="btn btn-p" style="width:100%;justify-content:center;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              Guardar Código SVG
+            </button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+  function switchBrandTab(tab) {
+    const uploadBtn = document.getElementById('tabUploadBtn');
+    const codeBtn = document.getElementById('tabCodeBtn');
+    const panelUpload = document.getElementById('panelUpload');
+    const panelCode = document.getElementById('panelCode');
+
+    if (tab === 'upload') {
+      uploadBtn.classList.add('active');
+      codeBtn.classList.remove('active');
+      panelUpload.style.display = 'block';
+      panelCode.style.display = 'none';
+    } else {
+      codeBtn.classList.add('active');
+      uploadBtn.classList.remove('active');
+      panelCode.style.display = 'block';
+      panelUpload.style.display = 'none';
+    }
+  }
+
+  function handleFileSelected(input) {
+    if (!input.files || !input.files[0]) return;
+    const file = input.files[0];
+    const previewContainer = document.getElementById('filePreviewContainer');
+    const imgPreview = document.getElementById('tempImagePreview');
+    const infoText = document.getElementById('fileInfoText');
+
+    infoText.innerText = `${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+    const reader = new FileReader();
+
+    if (file.name.endsWith('.svg') || file.type === 'image/svg+xml') {
+      reader.onload = function(e) {
+        imgPreview.src = e.target.result;
+        previewContainer.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    } else {
+      reader.onload = function(e) {
+        imgPreview.src = e.target.result;
+        previewContainer.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  function previewSvgCode(code) {
+    const box = document.getElementById('codePreviewBox');
+    const container = document.getElementById('svgRenderContainer');
+    if (!code || !code.trim().startsWith('<svg')) {
+      box.style.display = 'none';
+      container.innerHTML = '';
+      return;
+    }
+    box.style.display = 'block';
+    container.innerHTML = code;
+    const svgEl = container.querySelector('svg');
+    if (svgEl) {
+      svgEl.style.maxHeight = '60px';
+      svgEl.style.maxWidth = '200px';
+    }
+  }
+
+  // Drag & drop handlers
+  const dropzone = document.getElementById('dropzone');
+  if (dropzone) {
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropzone.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        dropzone.classList.add('dragover');
+      }, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropzone.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        dropzone.classList.remove('dragover');
+      }, false);
+    });
+
+    dropzone.addEventListener('drop', (e) => {
+      const dt = e.dataTransfer;
+      const files = dt.files;
+      if (files && files.length > 0) {
+        const fileInput = document.getElementById('logoFile');
+        fileInput.files = files;
+        handleFileSelected(fileInput);
+      }
+    });
+  }
+</script>
+
+<%- include('partials/layout-end') %>
