@@ -6,7 +6,6 @@
   <title><%= typeof pageTitle !== 'undefined' ? pageTitle + ' — GSD CRM' : 'GSD CRM & Gestión' %></title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.460.0/dist/umd/lucide.min.js"></script>
-  <link rel="stylesheet" href="/css/style.css">
   <style>
     :root{--navy:#1A3A52;--green:#4A9B6F;--green-l:#E8F4EF;--gray:#6B7280;--line:#E5E7EB;--bg:#F9FAFB;--white:#fff;--red:#C0392B;--red-l:#FBEAEA;--amber:#B7791F;--amber-l:#FDF3E1;--blue:#2B6CB0;--blue-l:#E8F0FA;--ink:#1F2937}
     *{box-sizing:border-box;margin:0;padding:0}
@@ -137,22 +136,8 @@
   </div>
   
   <div class="hdr-actions">
-    <% if (typeof page !== 'undefined' && page === 'propiedades') { %>
-      <a href="/admin/propiedades/nueva" class="btn p"><i data-lucide="plus"></i>Nueva Propiedad</a>
-    <% } else if (typeof page !== 'undefined' && page === 'blog') { %>
-      <a href="/admin/blog/nuevo" class="btn p"><i data-lucide="plus"></i>Nuevo Artículo</a>
-    <% } else if (typeof page !== 'undefined' && page === 'cotizaciones') { %>
-      <a href="/admin/expedientes" class="btn p"><i data-lucide="folder-open"></i>GSD Expedientes</a>
-    <% } else if (typeof page !== 'undefined' && (page === 'ajustes' || page === 'branding' || page === 'instagram')) { %>
-      <!-- En Ajustes las acciones están dentro de la configuración -->
-    <% } else { %>
-      <a href="/admin/expedientes" class="btn p"><i data-lucide="plus"></i>Nuevo Expediente</a>
-    <% } %>
-    
-    <% if (typeof page !== 'undefined' && page !== 'cotizaciones') { %>
-      <a href="/admin/cotizaciones" class="quoter"><i data-lucide="calculator"></i>GSD Quoter</a>
-    <% } %>
-
+    <a href="/admin/expedientes" class="btn p"><i data-lucide="plus"></i>Nuevo expediente</a>
+    <a href="/admin/cotizaciones" class="quoter"><i data-lucide="calculator"></i>GSD Quoter</a>
     <div class="user"><div class="av">EM</div>Esteban Mejía</div>
   </div>
 </header>

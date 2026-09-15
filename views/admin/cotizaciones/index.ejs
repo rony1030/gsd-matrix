@@ -3,19 +3,23 @@
 <style>
   .quoter-layout {
     display: grid;
-    grid-template-columns: 240px 1fr 340px;
+    grid-template-columns: 220px minmax(0, 1fr) 330px;
     gap: 16px;
     align-items: start;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
   }
-  @media (max-width: 1200px) {
+  @media (max-width: 1380px) {
     .quoter-layout {
-      grid-template-columns: 220px 1fr;
+      grid-template-columns: 210px minmax(0, 1fr);
     }
     .quoter-preview-col {
       grid-column: 1 / -1;
+      margin-top: 14px;
     }
   }
-  @media (max-width: 768px) {
+  @media (max-width: 800px) {
     .quoter-layout {
       grid-template-columns: 1fr;
     }
@@ -131,7 +135,7 @@
 
       <button type="button" onclick="resetForm()" class="btn p" style="width:100%;margin-top:14px;justify-content:center;">
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        + Nueva Cotización
+        Nueva Cotización
       </button>
     </div>
   </div>
