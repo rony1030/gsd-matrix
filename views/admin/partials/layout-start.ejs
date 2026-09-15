@@ -11,17 +11,20 @@
     :root{--navy:#1A3A52;--green:#4A9B6F;--green-l:#E8F4EF;--gray:#6B7280;--line:#E5E7EB;--bg:#F9FAFB;--white:#fff;--red:#C0392B;--red-l:#FBEAEA;--amber:#B7791F;--amber-l:#FDF3E1;--blue:#2B6CB0;--blue-l:#E8F0FA;--ink:#1F2937}
     *{box-sizing:border-box;margin:0;padding:0}
     body.admin-body{font-family:'Poppins',system-ui,sans-serif!important;font-size:13px!important;color:var(--ink)!important;background:var(--bg)!important;height:100vh!important;display:grid!important;grid-template-columns:250px 1fr!important;grid-template-rows:56px 1fr!important;overflow:hidden!important;margin:0!important;padding:0!important}
-    .hdr{grid-column:1/3;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 20px;gap:16px;height:56px;z-index:10}
-    .hdr .sp{flex:1}
-    .hdr .search{width:320px;font-family:inherit;font-size:13px;padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--ink)}
-    .hdr .search:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px rgba(74,155,111,.15)}
+    .hdr{grid-column:2;grid-row:1;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 24px;height:56px;position:relative;z-index:10;box-sizing:border-box}
+    .hdr-search{position:absolute;left:50%;transform:translateX(-50%);width:380px;max-width:calc(100% - 460px);display:flex;align-items:center}
+    .hdr-search i{position:absolute;left:11px;color:var(--gray);width:15px;height:15px;pointer-events:none}
+    .hdr-search input.search{width:100%;font-family:inherit;font-size:12.5px;padding:7px 12px 7px 34px;border:1px solid var(--line);border-radius:7px;background:var(--bg);color:var(--ink);transition:all .15s}
+    .hdr-search input.search:focus{background:#fff;border-color:var(--green);box-shadow:0 0 0 3px rgba(74,155,111,.15);outline:none}
+    .hdr-actions{margin-left:auto;display:flex;align-items:center;gap:12px}
     .hdr .quoter{border:1px solid var(--line);background:#fff;color:var(--navy);padding:7px 12px;border-radius:6px;font-weight:500;display:flex;align-items:center;gap:6px;font-size:12px;text-decoration:none;white-space:nowrap}
     .hdr .user{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink);white-space:nowrap}
     .hdr .av{width:30px;height:30px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:11px}
-    .side{background:#fff;border-right:1px solid var(--line);display:flex;flex-direction:column;overflow:hidden;height:calc(100vh - 56px)}
-    .side .logo{padding:20px 22px 14px;border-bottom:1px solid var(--line)}
-    .side .logo img{max-height:40px;max-width:140px;width:auto;object-fit:contain;display:block}
-    .side .logo .prod{font-size:11px;letter-spacing:2px;color:var(--green);font-weight:600;margin-top:8px}
+    .side{grid-column:1;grid-row:1/3;height:100vh;background:#fff;border-right:1px solid var(--line);display:flex;flex-direction:column;overflow:hidden;z-index:20}
+    .side .logo{height:56px;padding:0 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;box-sizing:border-box}
+    .side .logo a{display:flex;align-items:center;gap:8px;text-decoration:none;width:100%}
+    .side .logo img{max-height:36px;max-width:130px;width:auto;object-fit:contain;display:block}
+    .side .logo .prod{font-size:9.5px;letter-spacing:1.5px;color:var(--green);font-weight:600;white-space:nowrap;text-transform:uppercase}
     .side .grp{font-size:10.5px;letter-spacing:1px;text-transform:uppercase;color:var(--gray);padding:16px 22px 6px}
     .side nav{flex:1;overflow-y:auto}
     .side a{display:flex;align-items:center;gap:10px;padding:9px 22px;color:var(--navy);font-weight:500;cursor:pointer;font-size:12.5px;border-left:3px solid transparent;text-decoration:none;transition:background .15s,border-color .15s,color .15s}
@@ -33,7 +36,7 @@
     .side .me .av:after{content:'';position:absolute;right:-1px;bottom:-1px;width:10px;height:10px;border-radius:50%;background:var(--green);border:2px solid #fff}
     .side .me b{display:block;font-weight:500;color:var(--navy);font-size:12.5px}
     .side .me span{font-size:11px;color:var(--gray)}
-    .main{overflow-y:auto;padding:26px 30px;height:calc(100vh - 56px);background:var(--bg)}
+    .main{grid-column:2;grid-row:2;overflow-y:auto;padding:26px 30px;height:calc(100vh - 56px);background:var(--bg);box-sizing:border-box}
     .btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:#fff;color:var(--navy);padding:8px 14px;border-radius:6px;font-weight:500;font-size:12.5px;text-decoration:none;cursor:pointer;transition:background .15s,border-color .15s,color .15s}
     .btn:hover{background:var(--bg)}
     .btn.p{background:var(--green);border-color:var(--green);color:#fff}
@@ -47,38 +50,17 @@
     .admin-topbar-crm{display:none!important}
     .admin-content{padding:0!important}
 
-    @media (max-width:1400px){body.admin-body{grid-template-columns:220px 1fr!important}.hdr .search{width:220px}}
-    @media (max-width:1200px){body.admin-body{grid-template-columns:64px 1fr!important}.side .logo img,.side .logo .prod,.side .grp,.side a span:not(.n),.side .me div{display:none}.side .logo{padding:14px 10px}.side a{padding:12px 0;justify-content:center;border-left:0}.side .me{justify-content:center}.main{padding:18px}}
+    @media (max-width:1400px){body.admin-body{grid-template-columns:220px 1fr!important}.hdr-search{width:280px;max-width:calc(100% - 380px)}}
+    @media (max-width:1200px){body.admin-body{grid-template-columns:64px 1fr!important}.side .logo img,.side .logo .prod,.side .grp,.side a span:not(.n),.side .me div{display:none}.side .logo{padding:0;justify-content:center}.side a{padding:12px 0;justify-content:center;border-left:0}.side .me{justify-content:center}.hdr-search{position:static;transform:none;width:200px;max-width:220px;margin:0 auto}.main{padding:18px}}
   </style>
 </head>
 <body class="admin-body">
 
-<header class="hdr">
-  <input class="search" id="search" placeholder="Buscar expediente, cliente o parcela..." onkeydown="if(event.key==='Enter'){window.location.href='/admin/expedientes?q='+encodeURIComponent(this.value);}">
-  <span class="sp"></span>
-  
-  <% if (typeof page !== 'undefined' && page === 'propiedades') { %>
-    <a href="/admin/propiedades/nueva" class="btn p"><i data-lucide="plus"></i>Nueva Propiedad</a>
-  <% } else if (typeof page !== 'undefined' && page === 'blog') { %>
-    <a href="/admin/blog/nuevo" class="btn p"><i data-lucide="plus"></i>Nuevo Artículo</a>
-  <% } else if (typeof page !== 'undefined' && page === 'cotizaciones') { %>
-    <a href="/admin/expedientes" class="btn p"><i data-lucide="folder-open"></i>GSD Expedientes</a>
-  <% } else { %>
-    <a href="/admin/expedientes" class="btn p"><i data-lucide="plus"></i>Nuevo Expediente</a>
-  <% } %>
-  
-  <% if (typeof page !== 'undefined' && page !== 'cotizaciones') { %>
-    <a href="/admin/cotizaciones" class="quoter"><i data-lucide="calculator"></i>GSD Quoter</a>
-  <% } %>
-
-  <div class="user"><div class="av">EM</div>Esteban Mejía</div>
-</header>
-
 <aside class="side">
   <div class="logo">
-    <a href="/admin" style="text-decoration:none;display:block;">
-      <img src="<%= typeof logoUrl !== 'undefined' ? logoUrl : '/img/logo-gsd.png' %>" alt="GSD Logo">
-      <div class="prod">GSD EXPEDIENTES</div>
+    <a href="/admin" style="text-decoration:none;display:flex;align-items:center;gap:8px;width:100%;">
+      <img src="<%= typeof logoUrl !== 'undefined' ? logoUrl : '/img/logo-gsd.png' %>" alt="GSD Logo" style="max-height:36px;max-width:130px;width:auto;object-fit:contain;">
+      <span class="prod" style="font-size:10px;letter-spacing:1px;color:var(--green);font-weight:600;white-space:nowrap;">EXPEDIENTES</span>
     </a>
   </div>
   <nav>
@@ -102,5 +84,30 @@
   </nav>
   <div class="me"><div class="av">EM</div><div><b>Esteban Mejía</b><span>Abogado / Administrador</span></div></div>
 </aside>
+
+<header class="hdr">
+  <div class="hdr-search">
+    <i data-lucide="search"></i>
+    <input class="search" id="search" placeholder="Buscar expediente, cliente o parcela..." onkeydown="if(event.key==='Enter'){window.location.href='/admin/expedientes?q='+encodeURIComponent(this.value);}">
+  </div>
+  
+  <div class="hdr-actions">
+    <% if (typeof page !== 'undefined' && page === 'propiedades') { %>
+      <a href="/admin/propiedades/nueva" class="btn p"><i data-lucide="plus"></i>Nueva Propiedad</a>
+    <% } else if (typeof page !== 'undefined' && page === 'blog') { %>
+      <a href="/admin/blog/nuevo" class="btn p"><i data-lucide="plus"></i>Nuevo Artículo</a>
+    <% } else if (typeof page !== 'undefined' && page === 'cotizaciones') { %>
+      <a href="/admin/expedientes" class="btn p"><i data-lucide="folder-open"></i>GSD Expedientes</a>
+    <% } else { %>
+      <a href="/admin/expedientes" class="btn p"><i data-lucide="plus"></i>Nuevo Expediente</a>
+    <% } %>
+    
+    <% if (typeof page !== 'undefined' && page !== 'cotizaciones') { %>
+      <a href="/admin/cotizaciones" class="quoter"><i data-lucide="calculator"></i>GSD Quoter</a>
+    <% } %>
+
+    <div class="user"><div class="av">EM</div>Esteban Mejía</div>
+  </div>
+</header>
 
 <main class="main" id="main">
