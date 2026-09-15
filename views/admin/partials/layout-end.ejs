@@ -1,38 +1,8 @@
-  </div><!-- end admin-content -->
-</main><!-- end admin-main -->
-
+﻿</main>
 <script>
-  (function() {
-    var toggleBtn = document.getElementById('adminMenuToggle');
-    var sidebar = document.getElementById('adminSidebar');
-    var backdrop = document.getElementById('adminBackdrop');
-    var closeBtn = document.getElementById('sidebarCloseBtn');
-
-    function openMenu() {
-      if (sidebar) sidebar.classList.add('open');
-      if (backdrop) backdrop.classList.add('open');
-      document.body.style.overflow = 'hidden';
-    }
-
-    function closeMenu() {
-      if (sidebar) sidebar.classList.remove('open');
-      if (backdrop) backdrop.classList.remove('open');
-      document.body.style.overflow = '';
-    }
-
-    if (toggleBtn) toggleBtn.addEventListener('click', openMenu);
-    if (closeBtn) closeBtn.addEventListener('click', closeMenu);
-    if (backdrop) backdrop.addEventListener('click', closeMenu);
-
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') closeMenu();
-    });
-
-    if (window.lucide) {
-      lucide.createIcons();
-    }
-  })();
+  if (window.lucide) {
+    lucide.createIcons();
+  }
 </script>
-<script src="/js/animations.js"></script>
 </body>
 </html>

@@ -1,289 +1,117 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><%= typeof pageTitle !== 'undefined' ? pageTitle + ' — GSD CRM' : 'GSD CRM & Gestión' %></title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.460.0/dist/umd/lucide.min.js"></script>
   <link rel="stylesheet" href="/css/style.css">
   <style>
-    body.admin-body {
-      font-family: 'Poppins', system-ui, -apple-system, sans-serif !important;
-      background: #F9FAFB !important;
-      color: #1F2937 !important;
-      font-size: 13px !important;
-    }
-    .admin-topbar-crm {
-      background: #ffffff;
-      border-bottom: 1px solid #E5E7EB;
-      height: 56px;
-      display: flex;
-      align-items: center;
-      padding: 0 1.5rem;
-      gap: 16px;
-      position: sticky;
-      top: 0;
-      z-index: 90;
-    }
-    .crm-switch-tabs {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .crm-switch-tab {
-      font-weight: 600;
-      font-size: 12px;
-      letter-spacing: 0.8px;
-      text-decoration: none;
-      color: #6B7280;
-      transition: color 0.15s ease;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .crm-switch-tab:hover {
-      color: #1A3A52;
-    }
-    .crm-switch-tab.active {
-      color: #1A3A52;
-      font-weight: 700;
-    }
-    .crm-search-box {
-      flex: 1;
-      max-width: 380px;
-      position: relative;
-    }
-    .crm-search-box input {
-      width: 100%;
-      padding: 7px 12px 7px 34px;
-      font-size: 12.5px;
-      border: 1px solid #E5E7EB;
-      border-radius: 6px;
-      background: #F9FAFB;
-      color: #1F2937;
-      font-family: inherit;
-    }
-    .crm-search-box input:focus {
-      background: #ffffff;
-      border-color: #4A9B6F;
-      outline: none;
-      box-shadow: 0 0 0 3px rgba(74, 155, 111, 0.12);
-    }
-    .crm-search-box svg {
-      position: absolute;
-      left: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: #9CA3AF;
-      width: 15px;
-      height: 15px;
-    }
-    .crm-user-profile {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 12px;
-      color: #1A3A52;
-      text-decoration: none;
-    }
-    .crm-user-avatar {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      background: #1A3A52;
-      color: #ffffff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 600;
-      font-size: 11px;
-      position: relative;
-    }
-    .crm-user-avatar::after {
-      content: '';
-      position: absolute;
-      right: -1px;
-      bottom: -1px;
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #4A9B6F;
-      border: 1.5px solid #ffffff;
-    }
-    .side-prod-badge {
-      font-size: 10px;
-      letter-spacing: 2px;
-      color: #4A9B6F;
-      font-weight: 700;
-      margin-top: 6px;
-      text-transform: uppercase;
-    }
+    :root{--navy:#1A3A52;--green:#4A9B6F;--green-l:#E8F4EF;--gray:#6B7280;--line:#E5E7EB;--bg:#F9FAFB;--white:#fff;--red:#C0392B;--red-l:#FBEAEA;--amber:#B7791F;--amber-l:#FDF3E1;--blue:#2B6CB0;--blue-l:#E8F0FA;--ink:#1F2937}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body.admin-body{font-family:'Poppins',system-ui,sans-serif!important;font-size:13px!important;color:var(--ink)!important;background:var(--bg)!important;height:100vh!important;display:grid!important;grid-template-columns:250px 1fr!important;grid-template-rows:56px 1fr!important;overflow:hidden!important;margin:0!important;padding:0!important}
+    .hdr{grid-column:1/3;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 20px;gap:16px;height:56px;z-index:10}
+    .hdr .sp{flex:1}
+    .hdr .search{width:320px;font-family:inherit;font-size:13px;padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--ink)}
+    .hdr .search:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px rgba(74,155,111,.15)}
+    .hdr .quoter{border:1px solid var(--line);background:#fff;color:var(--navy);padding:7px 12px;border-radius:6px;font-weight:500;display:flex;align-items:center;gap:6px;font-size:12px;text-decoration:none;white-space:nowrap}
+    .hdr .user{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink);white-space:nowrap}
+    .hdr .av{width:30px;height:30px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:11px}
+    .flow{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--gray)}
+    .flow span{padding:2px 8px;border-radius:10px;background:var(--bg)}
+    .flow span.on{background:var(--green-l);color:#2F6B4A;font-weight:500}
+    .side{background:#fff;border-right:1px solid var(--line);display:flex;flex-direction:column;overflow:hidden;height:calc(100vh - 56px)}
+    .side .logo{padding:20px 22px 14px;border-bottom:1px solid var(--line)}
+    .side .logo img{max-height:40px;max-width:140px;width:auto;object-fit:contain;display:block}
+    .side .logo .prod{font-size:11px;letter-spacing:2px;color:var(--green);font-weight:600;margin-top:8px}
+    .side .grp{font-size:10.5px;letter-spacing:1px;text-transform:uppercase;color:var(--gray);padding:16px 22px 6px}
+    .side nav{flex:1;overflow-y:auto}
+    .side a{display:flex;align-items:center;gap:10px;padding:9px 22px;color:var(--navy);font-weight:500;cursor:pointer;font-size:12.5px;border-left:3px solid transparent;text-decoration:none;transition:background .15s,border-color .15s,color .15s}
+    .side a:hover{background:var(--bg)}
+    .side a.on{background:var(--green-l);border-left-color:var(--green);color:var(--green)}
+    .side a .n{margin-left:auto;background:var(--red);color:#fff;font-size:10px;padding:1px 7px;border-radius:10px}
+    .side .me{padding:14px 22px;border-top:1px solid var(--line);display:flex;gap:10px;align-items:center}
+    .side .me .av{width:34px;height:34px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;position:relative}
+    .side .me .av:after{content:'';position:absolute;right:-1px;bottom:-1px;width:10px;height:10px;border-radius:50%;background:var(--green);border:2px solid #fff}
+    .side .me b{display:block;font-weight:500;color:var(--navy);font-size:12.5px}
+    .side .me span{font-size:11px;color:var(--gray)}
+    .main{overflow-y:auto;padding:26px 30px;height:calc(100vh - 56px);background:var(--bg)}
+    .btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:#fff;color:var(--navy);padding:8px 14px;border-radius:6px;font-weight:500;font-size:12.5px;text-decoration:none;cursor:pointer;transition:background .15s,border-color .15s,color .15s}
+    .btn:hover{background:var(--bg)}
+    .btn.p{background:var(--green);border-color:var(--green);color:#fff}
+    .btn.p:hover{background:#3E8A5F}
+    .btn.sm{padding:5px 9px;font-size:11.5px}
+    .btn.ghost{border-color:transparent;color:var(--gray)}
+
+    /* Override legacy style.css classes */
+    .admin-sidebar{display:none!important}
+    .admin-main{margin-left:0!important;display:contents!important}
+    .admin-topbar-crm{display:none!important}
+    .admin-content{padding:0!important}
+
+    @media (max-width:1400px){body.admin-body{grid-template-columns:220px 1fr!important}.hdr .search{width:220px}}
+    @media (max-width:1200px){body.admin-body{grid-template-columns:64px 1fr!important}.side .logo img,.side .logo .prod,.side .grp,.side a span:not(.n),.side .me div{display:none}.side .logo{padding:14px 10px}.side a{padding:12px 0;justify-content:center;border-left:0}.side .me{justify-content:center}.main{padding:18px}}
+    @media (max-width:900px){.flow{display:none}}
   </style>
 </head>
 <body class="admin-body">
 
-<!-- Mobile backdrop overlay -->
-<div class="admin-backdrop" id="adminBackdrop"></div>
-
-<!-- Sidebar -->
-<aside class="admin-sidebar" id="adminSidebar">
-  <div class="sidebar-logo" style="padding:18px 20px 14px;border-bottom:1px solid #E5E7EB;">
-    <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
-      <a href="/admin" style="display:block;text-decoration:none;">
-        <img src="<%= typeof logoUrl !== 'undefined' ? logoUrl : '/img/logo-gsd.png' %>" alt="GSD" style="max-height:34px;max-width:145px;object-fit:contain;display:block;">
-        <div class="side-prod-badge">GSD CRM & MATRIZ</div>
-      </a>
-      <button type="button" class="sidebar-close-btn" id="sidebarCloseBtn" aria-label="Cerrar menú">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-    </div>
+<header class="hdr">
+  <div class="flow" id="flow">
+    <span <%= (typeof page !== 'undefined' && page === 'cotizaciones') ? 'class="on"' : '' %>>Cotizar</span>→
+    <span>Aprobar</span>→
+    <span <%= (typeof page !== 'undefined' && (page === 'expedientes' || page === 'dashboard' || page === 'tareas' || page === 'calendario' || page === 'clientes' || page === 'documentos' || page === 'plantillas')) ? 'class="on"' : '' %>>Expediente</span>→
+    <span <%= (typeof page !== 'undefined' && page === 'propiedades') ? 'class="on"' : '' %>>Gestionar</span>→
+    <span>Cerrar</span>
   </div>
+  <span class="sp"></span>
+  <input class="search" id="search" placeholder="Buscar expediente, cliente o parcela" onkeydown="if(event.key==='Enter'){window.location.href='/admin/expedientes?q='+encodeURIComponent(this.value);}">
+  
+  <% if (typeof page !== 'undefined' && page === 'propiedades') { %>
+    <a href="/admin/propiedades/nueva" class="btn p"><i data-lucide="plus"></i>Nueva Propiedad</a>
+  <% } else if (typeof page !== 'undefined' && page === 'blog') { %>
+    <a href="/admin/blog/nuevo" class="btn p"><i data-lucide="plus"></i>Nuevo Artículo</a>
+  <% } else if (typeof page !== 'undefined' && page === 'cotizaciones') { %>
+    <a href="/admin/expedientes" class="btn p"><i data-lucide="folder-open"></i>GSD Expedientes</a>
+  <% } else { %>
+    <a href="/admin/expedientes" class="btn p"><i data-lucide="plus"></i>Nuevo Expediente</a>
+  <% } %>
+  
+  <% if (typeof page !== 'undefined' && page !== 'cotizaciones') { %>
+    <a href="/admin/cotizaciones" class="quoter"><i data-lucide="calculator"></i>GSD Quoter</a>
+  <% } %>
 
-  <nav class="sidebar-nav" style="padding:10px 0;flex:1;overflow-y:auto;">
-    <div class="sidebar-section">PRINCIPAL</div>
-    <a href="/admin" class="sidebar-link <%= page === 'dashboard' ? 'active' : '' %>">
-      <i data-lucide="layout-grid"></i>
-      Dashboard
-    </a>
-    <a href="/admin/expedientes" class="sidebar-link <%= page === 'expedientes' ? 'active' : '' %>">
-      <i data-lucide="folder"></i>
-      Expedientes
-    </a>
-    <a href="/admin/tareas" class="sidebar-link <%= page === 'tareas' ? 'active' : '' %>">
-      <i data-lucide="check-square"></i>
-      Mis tareas
-      <span class="n" style="margin-left:auto;background:#C0392B;color:#fff;font-size:10px;padding:1px 7px;border-radius:10px;font-weight:600;">3</span>
-    </a>
-    <a href="/admin/calendario" class="sidebar-link <%= page === 'calendario' ? 'active' : '' %>">
-      <i data-lucide="calendar"></i>
-      Calendario
-    </a>
-    <a href="/admin/clientes" class="sidebar-link <%= (page === 'clientes' || page === 'leads') ? 'active' : '' %>">
-      <i data-lucide="users"></i>
-      Clientes & Leads
-    </a>
-    <a href="/admin/documentos" class="sidebar-link <%= page === 'documentos' ? 'active' : '' %>">
-      <i data-lucide="file-text"></i>
-      Documentos
-    </a>
+  <div class="user"><div class="av">EM</div>Esteban Mejía</div>
+</header>
 
-    <div class="sidebar-section" style="margin-top:12px;">OPERACIONES & SERVICIOS</div>
-    <a href="/admin/cotizaciones" class="sidebar-link <%= page === 'cotizaciones' ? 'active' : '' %>">
-      <i data-lucide="file-spreadsheet"></i>
-      GSD Quoter
+<aside class="side">
+  <div class="logo">
+    <a href="/admin" style="text-decoration:none;display:block;">
+      <img src="<%= typeof logoUrl !== 'undefined' ? logoUrl : '/img/logo-gsd.png' %>" alt="GSD Logo">
+      <div class="prod">GSD EXPEDIENTES</div>
     </a>
-    <a href="/admin/propiedades" class="sidebar-link <%= page === 'propiedades' ? 'active' : '' %>">
-      <i data-lucide="building-2"></i>
-      Bienes Raíces
-    </a>
-    <a href="/admin/blog" class="sidebar-link <%= page === 'blog' ? 'active' : '' %>">
-      <i data-lucide="newspaper"></i>
-      Blog & SEO
-    </a>
-
-    <div class="sidebar-section" style="margin-top:12px;">GESTIÓN & SISTEMA</div>
-    <a href="/admin/plantillas" class="sidebar-link <%= page === 'plantillas' ? 'active' : '' %>">
-      <i data-lucide="layers"></i>
-      Plantillas de expedientes
-    </a>
-    <a href="/admin/ajustes" class="sidebar-link <%= (typeof page !== 'undefined' && (page === 'ajustes' || page === 'branding' || page === 'instagram')) ? 'active' : '' %>">
-      <i data-lucide="settings"></i>
-      Ajustes del Sistema
-    </a>
-
-    <div class="sidebar-section" style="margin-top:12px;">PORTALES PÚBLICOS</div>
-    <a href="/" target="_blank" class="sidebar-link">
-      <i data-lucide="globe"></i>
-      Sitio Matriz Web
-      <i data-lucide="external-link" style="width:13px;height:13px;margin-left:auto;color:#9ca3af;"></i>
-    </a>
-    <a href="https://gsd-bienes-raices.vercel.app" target="_blank" class="sidebar-link">
-      <i data-lucide="home"></i>
-      Portal Real Estate
-      <i data-lucide="external-link" style="width:13px;height:13px;margin-left:auto;color:#9ca3af;"></i>
-    </a>
+  </div>
+  <nav>
+    <div class="grp">Principal</div>
+    <a href="/admin" class="<%= (typeof page !== 'undefined' && page === 'dashboard') ? 'on' : '' %>"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a>
+    <a href="/admin/expedientes" class="<%= (typeof page !== 'undefined' && page === 'expedientes') ? 'on' : '' %>"><i data-lucide="folder-open"></i><span>Expedientes</span></a>
+    <a href="/admin/tareas" class="<%= (typeof page !== 'undefined' && page === 'tareas') ? 'on' : '' %>"><i data-lucide="check-square"></i><span>Mis tareas</span><span class="n" id="nMy">3</span></a>
+    <a href="/admin/calendario" class="<%= (typeof page !== 'undefined' && page === 'calendario') ? 'on' : '' %>"><i data-lucide="calendar"></i><span>Calendario</span></a>
+    <a href="/admin/clientes" class="<%= (typeof page !== 'undefined' && (page === 'clientes' || page === 'leads')) ? 'on' : '' %>"><i data-lucide="users"></i><span>Clientes</span></a>
+    <a href="/admin/documentos" class="<%= (typeof page !== 'undefined' && page === 'documentos') ? 'on' : '' %>"><i data-lucide="file-text"></i><span>Documentos</span></a>
+    
+    <div class="grp">Operaciones</div>
+    <a href="/admin/cotizaciones" class="<%= (typeof page !== 'undefined' && page === 'cotizaciones') ? 'on' : '' %>"><i data-lucide="calculator"></i><span>GSD Quoter</span></a>
+    <a href="/admin/propiedades" class="<%= (typeof page !== 'undefined' && page === 'propiedades') ? 'on' : '' %>"><i data-lucide="home"></i><span>Bienes Raíces</span></a>
+    <a href="/admin/blog" class="<%= (typeof page !== 'undefined' && page === 'blog') ? 'on' : '' %>"><i data-lucide="newspaper"></i><span>Blog & SEO</span></a>
+    
+    <div class="grp">Gestión & Sistema</div>
+    <a href="/admin/plantillas" class="<%= (typeof page !== 'undefined' && page === 'plantillas') ? 'on' : '' %>"><i data-lucide="layout-template"></i><span>Plantillas de expedientes</span></a>
+    <a href="/admin/ajustes" class="<%= (typeof page !== 'undefined' && (page === 'ajustes' || page === 'branding' || page === 'instagram')) ? 'on' : '' %>"><i data-lucide="settings"></i><span>Ajustes</span></a>
+    <a href="/admin/logout" style="color:var(--red);"><i data-lucide="log-out"></i><span>Cerrar Sesión</span></a>
   </nav>
-
-  <!-- User Profile at bottom matching Expedientes CRM -->
-  <div class="sidebar-footer" style="padding:14px 20px;border-top:1px solid #E5E7EB;background:#ffffff;display:flex;align-items:center;justify-content:space-between;">
-    <div style="display:flex;align-items:center;gap:10px;overflow:hidden;">
-      <div class="crm-user-avatar">EM</div>
-      <div style="line-height:1.2;overflow:hidden;">
-        <b style="display:block;font-weight:600;color:#1A3A52;font-size:12px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;">Esteban Mejía</b>
-        <span style="font-size:10.5px;color:#6B7280;display:block;">Abogado / Admin</span>
-      </div>
-    </div>
-    <a href="/admin/logout" title="Cerrar sesión" style="color:#9CA3AF;padding:4px;border-radius:4px;transition:color 0.15s;" onmouseover="this.style.color='#C0392B'" onmouseout="this.style.color='#9CA3AF'">
-      <i data-lucide="log-out" style="width:16px;height:16px;"></i>
-    </a>
-  </div>
+  <div class="me"><div class="av">EM</div><div><b>Esteban Mejía</b><span>Abogado / Administrador</span></div></div>
 </aside>
 
-<!-- Main Area -->
-<main class="admin-main">
-  <!-- Topbar matching Expedientes CRM style -->
-  <div class="admin-topbar-crm">
-    <button type="button" class="admin-menu-toggle" id="adminMenuToggle" aria-label="Abrir menú" style="display:none;background:none;border:none;color:#1A3A52;cursor:pointer;padding:4px;">
-      <i data-lucide="menu" style="width:20px;height:20px;"></i>
-    </button>
-    
-    <div class="crm-switch-tabs">
-      <a href="/admin/cotizaciones" class="crm-switch-tab <%= page === 'cotizaciones' ? 'active' : '' %>">
-        GSD QUOTER
-      </a>
-      <span style="color:#E5E7EB;font-weight:300;">|</span>
-      <a href="/admin/expedientes" class="crm-switch-tab <%= (page === 'expedientes' || page === 'dashboard' || page === 'tareas' || page === 'calendario' || page === 'clientes' || page === 'documentos' || page === 'plantillas') ? 'active' : '' %>">
-        GSD EXPEDIENTES
-      </a>
-      <span style="color:#E5E7EB;font-weight:300;">|</span>
-      <a href="/admin/propiedades" class="crm-switch-tab <%= page === 'propiedades' ? 'active' : '' %>">
-        GSD REAL ESTATE
-      </a>
-    </div>
-
-    <!-- Pipeline Flow Bar -->
-    <div class="flow" style="display:flex;align-items:center;gap:6px;font-size:11px;color:#6B7280;margin-left:14px;">
-      <span style="padding:2px 8px;border-radius:10px;background:#F3F4F6;">Cotizar</span>→
-      <span style="padding:2px 8px;border-radius:10px;background:#F3F4F6;">Aprobar</span>→
-      <span style="padding:2px 8px;border-radius:10px;background:#E8F4EF;color:#2F6B4A;font-weight:500;">Expediente</span>→
-      <span style="padding:2px 8px;border-radius:10px;background:#E8F4EF;color:#2F6B4A;font-weight:500;">Gestionar</span>→
-      <span style="padding:2px 8px;border-radius:10px;background:#F3F4F6;">Cerrar</span>
-    </div>
-
-    <div style="flex:1;"></div>
-
-    <div class="crm-search-box">
-      <i data-lucide="search"></i>
-      <input type="text" placeholder="Buscar expediente, cliente o parcela..." onkeydown="if(event.key==='Enter'){window.location.href='/admin/expedientes?q='+encodeURIComponent(this.value);}">
-    </div>
-
-    <% if (page === 'propiedades') { %>
-      <a href="/admin/propiedades/nueva" class="btn btn-p" style="background:#4A9B6F;color:#fff;border-color:#4A9B6F;padding:6px 12px;font-size:12px;font-weight:600;border-radius:6px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;">
-        <i data-lucide="plus" style="width:15px;height:15px;"></i> Nueva Propiedad
-      </a>
-    <% } else if (page === 'blog') { %>
-      <a href="/admin/blog/nuevo" class="btn btn-p" style="background:#4A9B6F;color:#fff;border-color:#4A9B6F;padding:6px 12px;font-size:12px;font-weight:600;border-radius:6px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;">
-        <i data-lucide="plus" style="width:15px;height:15px;"></i> Nuevo Artículo
-      </a>
-    <% } else if (page === 'cotizaciones') { %>
-      <a href="/admin/expedientes" class="btn btn-p" style="background:#4A9B6F;color:#fff;border-color:#4A9B6F;padding:6px 12px;font-size:12px;font-weight:600;border-radius:6px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;">
-        <i data-lucide="arrow-right" style="width:15px;height:15px;"></i> GSD Expedientes
-      </a>
-    <% } else { %>
-      <a href="/admin/expedientes" class="btn btn-p" style="background:#4A9B6F;color:#fff;border-color:#4A9B6F;padding:6px 12px;font-size:12px;font-weight:600;border-radius:6px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;">
-        <i data-lucide="plus" style="width:15px;height:15px;"></i> Nuevo Expediente
-      </a>
-      <a href="/admin/cotizaciones" class="quoter" style="border:1px solid #E5E7EB;background:#fff;color:#1A3A52;padding:6px 12px;border-radius:6px;font-weight:500;font-size:12px;display:inline-flex;align-items:center;gap:6px;text-decoration:none;">
-        <i data-lucide="arrow-left" style="width:14px;height:14px;"></i> GSD Quoter
-      </a>
-    <% } %>
-
-    <div class="crm-user-profile">
-      <div class="crm-user-avatar">EM</div>
-      <span style="font-weight:600;font-size:12px;color:#1A3A52;">Esteban Mejía</span>
-    </div>
-  </div>
-
-  <div class="admin-content" style="padding:24px 28px;background:#F9FAFB;">
+<main class="main" id="main">
