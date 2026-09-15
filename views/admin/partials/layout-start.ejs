@@ -3,10 +3,124 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= typeof pageTitle !== 'undefined' ? pageTitle + ' — GSD Admin' : 'GSD Admin' %></title>
+  <title><%= typeof pageTitle !== 'undefined' ? pageTitle + ' — GSD CRM' : 'GSD CRM & Gestión' %></title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.460.0/dist/umd/lucide.min.js"></script>
   <link rel="stylesheet" href="/css/style.css">
+  <style>
+    body.admin-body {
+      font-family: 'Poppins', system-ui, -apple-system, sans-serif !important;
+      background: #F9FAFB !important;
+      color: #1F2937 !important;
+      font-size: 13px !important;
+    }
+    .admin-topbar-crm {
+      background: #ffffff;
+      border-bottom: 1px solid #E5E7EB;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      padding: 0 1.5rem;
+      gap: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 90;
+    }
+    .crm-switch-tabs {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .crm-switch-tab {
+      font-weight: 600;
+      font-size: 12px;
+      letter-spacing: 0.8px;
+      text-decoration: none;
+      color: #6B7280;
+      transition: color 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .crm-switch-tab:hover {
+      color: #1A3A52;
+    }
+    .crm-switch-tab.active {
+      color: #1A3A52;
+      font-weight: 700;
+    }
+    .crm-search-box {
+      flex: 1;
+      max-width: 380px;
+      position: relative;
+    }
+    .crm-search-box input {
+      width: 100%;
+      padding: 7px 12px 7px 34px;
+      font-size: 12.5px;
+      border: 1px solid #E5E7EB;
+      border-radius: 6px;
+      background: #F9FAFB;
+      color: #1F2937;
+      font-family: inherit;
+    }
+    .crm-search-box input:focus {
+      background: #ffffff;
+      border-color: #4A9B6F;
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(74, 155, 111, 0.12);
+    }
+    .crm-search-box svg {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #9CA3AF;
+      width: 15px;
+      height: 15px;
+    }
+    .crm-user-profile {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: #1A3A52;
+      text-decoration: none;
+    }
+    .crm-user-avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #1A3A52;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 11px;
+      position: relative;
+    }
+    .crm-user-avatar::after {
+      content: '';
+      position: absolute;
+      right: -1px;
+      bottom: -1px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #4A9B6F;
+      border: 1.5px solid #ffffff;
+    }
+    .side-prod-badge {
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: #4A9B6F;
+      font-weight: 700;
+      margin-top: 6px;
+      text-transform: uppercase;
+    }
+  </style>
 </head>
 <body class="admin-body">
 
@@ -15,82 +129,132 @@
 
 <!-- Sidebar -->
 <aside class="admin-sidebar" id="adminSidebar">
-  <div class="sidebar-logo">
+  <div class="sidebar-logo" style="padding:18px 20px 14px;border-bottom:1px solid #E5E7EB;">
     <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
-      <img src="<%= typeof logoUrl !== 'undefined' ? logoUrl : '/img/logo-gsd.png' %>" alt="GSD" style="max-height:36px;max-width:140px;object-fit:contain;">
+      <a href="/admin" style="display:block;text-decoration:none;">
+        <img src="<%= typeof logoUrl !== 'undefined' ? logoUrl : '/img/logo-gsd.png' %>" alt="GSD" style="max-height:34px;max-width:145px;object-fit:contain;display:block;">
+        <div class="side-prod-badge">GSD CRM & MATRIZ</div>
+      </a>
       <button type="button" class="sidebar-close-btn" id="sidebarCloseBtn" aria-label="Cerrar menú">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
   </div>
 
-  <nav class="sidebar-nav">
-    <div class="sidebar-section">Gestión Principal</div>
+  <nav class="sidebar-nav" style="padding:10px 0;flex:1;overflow-y:auto;">
+    <div class="sidebar-section">PRINCIPAL</div>
     <a href="/admin" class="sidebar-link <%= page === 'dashboard' ? 'active' : '' %>">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      <i data-lucide="layout-grid"></i>
       Dashboard
     </a>
+    <a href="/admin/expedientes" class="sidebar-link <%= page === 'expedientes' ? 'active' : '' %>">
+      <i data-lucide="folder"></i>
+      Expedientes
+    </a>
+    <a href="/admin/cotizaciones" class="sidebar-link <%= page === 'cotizaciones' ? 'active' : '' %>">
+      <i data-lucide="file-text"></i>
+      Cotizaciones & Quoter
+    </a>
+    <a href="/admin/leads" class="sidebar-link <%= page === 'leads' ? 'active' : '' %>">
+      <i data-lucide="users"></i>
+      Clientes & Leads
+    </a>
+
+    <div class="sidebar-section" style="margin-top:10px;">GESTIÓN & BIENES RAÍCES</div>
     <a href="/admin/propiedades" class="sidebar-link <%= page === 'propiedades' ? 'active' : '' %>">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <i data-lucide="building-2"></i>
       Propiedades
     </a>
     <a href="/admin/blog" class="sidebar-link <%= page === 'blog' ? 'active' : '' %>">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      <i data-lucide="newspaper"></i>
       Blog & SEO
     </a>
-    <a href="/admin/leads" class="sidebar-link <%= page === 'leads' ? 'active' : '' %>">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-      Leads / Contactos
-    </a>
 
-    <div class="sidebar-section">Operaciones & Clientes</div>
-    <a href="/admin/cotizaciones" class="sidebar-link <%= page === 'cotizaciones' ? 'active' : '' %>">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-      GSD Cotizaciones
-    </a>
-    <a href="/admin/expedientes" class="sidebar-link <%= page === 'expedientes' ? 'active' : '' %>">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-      GSD Expedientes
-    </a>
-
-    <div class="sidebar-section">Sistema</div>
+    <div class="sidebar-section" style="margin-top:10px;">CONFIGURACIÓN</div>
     <a href="/admin/ajustes" class="sidebar-link <%= (typeof page !== 'undefined' && (page === 'ajustes' || page === 'branding' || page === 'instagram')) ? 'active' : '' %>">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-      Ajustes
+      <i data-lucide="settings"></i>
+      Ajustes del Sistema
     </a>
 
-    <div class="sidebar-section">Sitio</div>
+    <div class="sidebar-section" style="margin-top:10px;">PORTALES PÚBLICOS</div>
     <a href="/" target="_blank" class="sidebar-link">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-      Ver Sitio Matriz
+      <i data-lucide="globe"></i>
+      Sitio Matriz Web
+      <i data-lucide="external-link" style="width:13px;height:13px;margin-left:auto;color:#9ca3af;"></i>
     </a>
     <a href="https://gsd-bienes-raices.vercel.app" target="_blank" class="sidebar-link">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-      Ver Real Estate
+      <i data-lucide="home"></i>
+      Portal Real Estate
+      <i data-lucide="external-link" style="width:13px;height:13px;margin-left:auto;color:#9ca3af;"></i>
     </a>
   </nav>
 
-  <div class="sidebar-footer">
-    <a href="/admin/logout">
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-      Cerrar sesión
+  <!-- User Profile at bottom matching Expedientes CRM -->
+  <div class="sidebar-footer" style="padding:14px 20px;border-top:1px solid #E5E7EB;background:#ffffff;display:flex;align-items:center;justify-content:space-between;">
+    <div style="display:flex;align-items:center;gap:10px;overflow:hidden;">
+      <div class="crm-user-avatar">EM</div>
+      <div style="line-height:1.2;overflow:hidden;">
+        <b style="display:block;font-weight:600;color:#1A3A52;font-size:12px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;">Esteban Mejía</b>
+        <span style="font-size:10.5px;color:#6B7280;display:block;">Abogado / Admin</span>
+      </div>
+    </div>
+    <a href="/admin/logout" title="Cerrar sesión" style="color:#9CA3AF;padding:4px;border-radius:4px;transition:color 0.15s;" onmouseover="this.style.color='#C0392B'" onmouseout="this.style.color='#9CA3AF'">
+      <i data-lucide="log-out" style="width:16px;height:16px;"></i>
     </a>
   </div>
 </aside>
 
-<!-- Main -->
+<!-- Main Area -->
 <main class="admin-main">
-  <div class="admin-topbar">
-    <div style="display:flex;align-items:center;gap:0.75rem;">
-      <button type="button" class="admin-menu-toggle" id="adminMenuToggle" aria-label="Abrir menú de navegación">
-        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-      </button>
-      <h1 class="admin-page-title"><%= typeof pageTitle !== 'undefined' ? pageTitle : 'Dashboard' %></h1>
+  <!-- Topbar matching Expedientes CRM style -->
+  <div class="admin-topbar-crm">
+    <button type="button" class="admin-menu-toggle" id="adminMenuToggle" aria-label="Abrir menú" style="display:none;background:none;border:none;color:#1A3A52;cursor:pointer;padding:4px;">
+      <i data-lucide="menu" style="width:20px;height:20px;"></i>
+    </button>
+    
+    <div class="crm-switch-tabs">
+      <a href="/admin/cotizaciones" class="crm-switch-tab <%= page === 'cotizaciones' ? 'active' : '' %>">
+        GSD QUOTER
+      </a>
+      <span style="color:#E5E7EB;font-weight:300;">|</span>
+      <a href="/admin/expedientes" class="crm-switch-tab <%= page === 'expedientes' ? 'active' : '' %>">
+        GSD EXPEDIENTES
+      </a>
+      <span style="color:#E5E7EB;font-weight:300;">|</span>
+      <a href="/admin/propiedades" class="crm-switch-tab <%= page === 'propiedades' ? 'active' : '' %>">
+        GSD REAL ESTATE
+      </a>
     </div>
-    <div style="display:flex;align-items:center;gap:0.75rem;">
-      <span class="admin-user-tag" style="font-size:0.8rem;color:var(--gris-500);">Admin GSD</span>
-      <div style="width:34px;height:34px;border-radius:50%;background:var(--azul);display:flex;align-items:center;justify-content:center;color:white;font-size:0.75rem;font-weight:700;">A</div>
+
+    <div style="flex:1;"></div>
+
+    <div class="crm-search-box">
+      <i data-lucide="search"></i>
+      <input type="text" placeholder="Buscar expediente, cliente, propiedad..." onkeydown="if(event.key==='Enter'){window.location.href='/admin/expedientes?q='+encodeURIComponent(this.value);}">
+    </div>
+
+    <% if (page === 'propiedades') { %>
+      <a href="/admin/propiedades/nueva" class="btn btn-p" style="background:#4A9B6F;color:#fff;border-color:#4A9B6F;padding:6px 12px;font-size:12px;font-weight:600;border-radius:6px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;">
+        <i data-lucide="plus" style="width:15px;height:15px;"></i> Nueva Propiedad
+      </a>
+    <% } else if (page === 'blog') { %>
+      <a href="/admin/blog/nuevo" class="btn btn-p" style="background:#4A9B6F;color:#fff;border-color:#4A9B6F;padding:6px 12px;font-size:12px;font-weight:600;border-radius:6px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;">
+        <i data-lucide="plus" style="width:15px;height:15px;"></i> Nuevo Artículo
+      </a>
+    <% } else if (page === 'cotizaciones') { %>
+      <a href="/admin/cotizaciones" class="btn btn-p" style="background:#4A9B6F;color:#fff;border-color:#4A9B6F;padding:6px 12px;font-size:12px;font-weight:600;border-radius:6px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;">
+        <i data-lucide="plus" style="width:15px;height:15px;"></i> Nueva Cotización
+      </a>
+    <% } else { %>
+      <a href="/admin/expedientes" class="btn btn-p" style="background:#4A9B6F;color:#fff;border-color:#4A9B6F;padding:6px 12px;font-size:12px;font-weight:600;border-radius:6px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;">
+        <i data-lucide="plus" style="width:15px;height:15px;"></i> Nuevo Expediente
+      </a>
+    <% } %>
+
+    <div class="crm-user-profile">
+      <div class="crm-user-avatar">EM</div>
+      <span style="font-weight:600;font-size:12px;color:#1A3A52;">Esteban Mejía</span>
     </div>
   </div>
 
-  <div class="admin-content">
+  <div class="admin-content" style="padding:24px 28px;background:#F9FAFB;">
