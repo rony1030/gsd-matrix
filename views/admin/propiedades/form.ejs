@@ -1,50 +1,59 @@
 <%- include('../../admin/partials/layout-start', { pageTitle: isEdit ? 'Editar Propiedad' : 'Nueva Propiedad', page: 'propiedades' }) %>
 
 <style>
-  /* Tabs styling inspirado en Solemare */
+  /* Tabs styling compacto y responsive sin desbordamiento */
   .prop-tabs-nav {
-    display: flex;
-    gap: 8px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
     background: #ffffff;
-    padding: 8px;
-    border-radius: 16px;
-    border: 1px solid #e2e8f0;
-    margin-bottom: 24px;
-    overflow-x: auto;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    padding: 6px;
+    border-radius: 12px;
+    border: 1px solid var(--line, #E5E7EB);
+    margin-bottom: 22px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.02);
   }
   .prop-tab-btn {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 18px;
-    border-radius: 12px;
-    font-size: 0.8rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+    justify-content: center;
+    gap: 7px;
+    padding: 9px 12px;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
     border: none;
     background: transparent;
-    color: #64748b;
+    color: var(--gray, #6B7280);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.15s ease;
     white-space: nowrap;
   }
   .prop-tab-btn:hover {
-    background: #f1f5f9;
-    color: #0f172a;
+    background: #F9FAFB;
+    color: var(--navy, #1A3A52);
   }
   .prop-tab-btn.active {
-    background: #091724;
+    background: var(--navy, #1A3A52);
     color: #ffffff;
-    box-shadow: 0 4px 12px rgba(9, 23, 36, 0.15);
+    box-shadow: 0 2px 8px rgba(26, 58, 82, 0.15);
+  }
+  @media (max-width: 900px) {
+    .prop-tabs-nav {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  @media (max-width: 520px) {
+    .prop-tabs-nav {
+      grid-template-columns: 1fr;
+    }
   }
   .prop-tab-content {
     display: none;
   }
   .prop-tab-content.active {
     display: block;
-    animation: fadeInTab 0.25s ease forwards;
+    animation: fadeInTab 0.2s ease forwards;
   }
   @keyframes fadeInTab {
     from { opacity: 0; transform: translateY(4px); }
@@ -208,7 +217,7 @@
 <div class="prop-tabs-nav">
   <button type="button" class="prop-tab-btn active" onclick="switchTab('general')">
     <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-    1. Información General
+    1. Detalles
   </button>
   <button type="button" class="prop-tab-btn" onclick="switchTab('location')">
     <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
@@ -216,15 +225,15 @@
   </button>
   <button type="button" class="prop-tab-btn" onclick="switchTab('specs')">
     <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="m9 12 2 2 4-4"/></svg>
-    3. Especificaciones & Amenidades
+    3. Especificaciones
   </button>
   <button type="button" class="prop-tab-btn" onclick="switchTab('media')">
     <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-    4. Galería & Multimedia
+    4. Galería
   </button>
   <button type="button" class="prop-tab-btn" onclick="switchTab('seo')">
     <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-    5. Optimización SEO
+    5. SEO
   </button>
 </div>
 
