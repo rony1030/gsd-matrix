@@ -639,25 +639,52 @@ expeRouter.post('/api/guardar', async (req, res) => {
 
 app.use('/admin/expedientes', expeRouter);
 
-// ─── BRANDING & LOGO VECTORIAL (SVG / PNG) ───────────
-const brandingRouter = express.Router();
-brandingRouter.use(requireAuth);
+// ─── AJUSTES DEL SISTEMA (MARCA, LOGO SVG, INSTAGRAM & META API, DATOS EMPRESA) ───
+const { syncInstagramFeed } = require('./services/instagramService');
+const ajustesRouter = express.Router();
+ajustesRouter.use(requireAuth);
 
-brandingRouter.get('/', async (req, res) => {
+ajustesRouter.get('/', async (req, res) => {
   await getDb();
   const logoRow = queryOne("SELECT value FROM settings WHERE key='logo_url'");
   const currentLogo = logoRow?.value || (fs.existsSync(path.join(__dirname, 'public', 'img', 'logo-gsd.svg')) ? '/img/logo-gsd.svg' : '/img/logo-gsd.png');
-  res.render('admin/branding', {
-    page: 'branding',
+  
+  const metaTokenRow = queryOne("SELECT value FROM settings WHERE key='meta_access_token'");
+  const metaUserRow = queryOne("SELECT value FROM settings WHERE key='meta_user_id'");
+  const handleRow = queryOne("SELECT instagram_handle, posts_json FROM social_feeds WHERE project='bienes-raices'") || {};
+  
+  const compName = queryOne("SELECT value FROM settings WHERE key='company_name'")?.value || 'Geosolutions Source Dominicana, S.R.L.';
+  const compRnc = queryOne("SELECT value FROM settings WHERE key='company_rnc'")?.value || '1-33-79694-5';
+  const compPhone = queryOne("SELECT value FROM settings WHERE key='company_phone'")?.value || '(829) 493-7254';
+  const compEmail = queryOne("SELECT value FROM settings WHERE key='company_email'")?.value || 'Esteban@geosolutions.com';
+  const compAddress = queryOne("SELECT value FROM settings WHERE key='company_address'")?.value || 'Av. Barceló, Plaza Roque III, Punta Cana, R.D.';
+
+  let instaPosts = [];
+  try {
+    instaPosts = JSON.parse(handleRow.posts_json || '[]');
+  } catch(e) { instaPosts = []; }
+
+  res.render('admin/ajustes/index', {
+    page: 'ajustes',
     logoUrl: currentLogo,
+    metaToken: metaTokenRow?.value || '',
+    metaUserId: metaUserRow?.value || 'me',
+    instaHandle: handleRow.instagram_handle || '@gsd.realestate',
+    instaPosts,
+    companyName: compName,
+    companyRnc: compRnc,
+    companyPhone: compPhone,
+    companyEmail: compEmail,
+    companyAddress: compAddress,
     success: req.query.saved === '1',
+    successMsg: req.query.msg ? decodeURIComponent(req.query.msg) : '¡Configuración guardada exitosamente!',
     error: req.query.error ? decodeURIComponent(req.query.error) : null
   });
 });
 
-brandingRouter.post('/logo', upload.single('logo'), async (req, res) => {
+ajustesRouter.post('/logo', upload.single('logo'), async (req, res) => {
   if (!req.file) {
-    return res.redirect('/admin/branding?error=' + encodeURIComponent('Por favor selecciona un archivo SVG o PNG válido.'));
+    return res.redirect('/admin/ajustes?error=' + encodeURIComponent('Por favor selecciona un archivo SVG o PNG válido.') + '#logo');
   }
   
   const uploadedPath = req.file.path;
@@ -675,16 +702,16 @@ brandingRouter.post('/logo', upload.single('logo'), async (req, res) => {
     await getDb();
     const logoUrl = isSvg ? '/img/logo-gsd.svg' : targetLogoRel;
     run("INSERT OR REPLACE INTO settings (key, value, updated_at) VALUES ('logo_url', ?, datetime('now','localtime'))", [logoUrl]);
-    res.redirect('/admin/branding?saved=1');
+    res.redirect('/admin/ajustes?saved=1&msg=' + encodeURIComponent('Logotipo vectorial actualizado correctamente.') + '#logo');
   } catch(err) {
-    res.redirect('/admin/branding?error=' + encodeURIComponent(err.message));
+    res.redirect('/admin/ajustes?error=' + encodeURIComponent(err.message) + '#logo');
   }
 });
 
-brandingRouter.post('/svg-code', async (req, res) => {
+ajustesRouter.post('/svg-code', async (req, res) => {
   const { svg_code } = req.body;
   if (!svg_code || !svg_code.trim().startsWith('<svg')) {
-    return res.redirect('/admin/branding?error=' + encodeURIComponent('El código SVG ingresado no es válido. Debe iniciar con <svg.'));
+    return res.redirect('/admin/ajustes?error=' + encodeURIComponent('El código SVG ingresado no es válido. Debe iniciar con <svg.') + '#logo');
   }
 
   try {
@@ -695,73 +722,52 @@ brandingRouter.post('/svg-code', async (req, res) => {
 
     await getDb();
     run("INSERT OR REPLACE INTO settings (key, value, updated_at) VALUES ('logo_url', '/img/logo-gsd.svg', datetime('now','localtime'))");
-    res.redirect('/admin/branding?saved=1');
+    res.redirect('/admin/ajustes?saved=1&msg=' + encodeURIComponent('Código SVG guardado con éxito.') + '#logo');
   } catch(err) {
-    res.redirect('/admin/branding?error=' + encodeURIComponent(err.message));
+    res.redirect('/admin/ajustes?error=' + encodeURIComponent(err.message) + '#logo');
   }
 });
 
-brandingRouter.post('/reset', async (req, res) => {
+ajustesRouter.post('/instagram/save', async (req, res) => {
+  const { meta_access_token, meta_user_id, instagram_handle } = req.body;
+  await getDb();
   try {
-    await getDb();
-    run("INSERT OR REPLACE INTO settings (key, value, updated_at) VALUES ('logo_url', '/img/logo-gsd.png', datetime('now','localtime'))");
-    res.redirect('/admin/branding?saved=1');
+    run("INSERT OR REPLACE INTO settings (key, value, updated_at) VALUES ('meta_access_token', ?, datetime('now','localtime'))", [meta_access_token ? meta_access_token.trim() : '']);
+    run("INSERT OR REPLACE INTO settings (key, value, updated_at) VALUES ('meta_user_id', ?, datetime('now','localtime'))", [meta_user_id ? meta_user_id.trim() : 'me']);
+    run("UPDATE social_feeds SET instagram_handle=?, updated_at=datetime('now','localtime')", [instagram_handle ? instagram_handle.trim() : '@gsd']);
+    res.redirect('/admin/ajustes?saved=1&msg=' + encodeURIComponent('Credenciales de Meta Graph API guardadas.') + '#instagram');
   } catch(err) {
-    res.redirect('/admin/branding?error=' + encodeURIComponent(err.message));
+    res.redirect('/admin/ajustes?error=' + encodeURIComponent(err.message) + '#instagram');
   }
 });
 
-app.use('/admin/branding', brandingRouter);
+ajustesRouter.post('/instagram/sync', async (req, res) => {
+  try {
+    const result = await syncInstagramFeed({ project: 'all' });
+    res.redirect('/admin/ajustes?saved=1&msg=' + encodeURIComponent(`¡Se sincronizaron exitosamente ${result.count} publicaciones reales desde Meta Graph API!`) + '#instagram');
+  } catch(err) {
+    res.redirect('/admin/ajustes?error=' + encodeURIComponent('Error al conectar con Meta Graph API: ' + err.message) + '#instagram');
+  }
+});
 
-// ─── INSTAGRAM & REDES (MULTIMARCA / PROYECTOS) ──────
-const instagramRouter = express.Router();
-instagramRouter.use(requireAuth);
-
-instagramRouter.get('/', async (req, res) => {
+ajustesRouter.post('/empresa', async (req, res) => {
+  const { company_name, company_rnc, company_phone, company_email, company_address } = req.body;
   await getDb();
-  const allFeeds = queryAll('SELECT * FROM social_feeds ORDER BY id ASC');
-  const targetProject = req.query.project || (allFeeds[0] ? allFeeds[0].project : 'bienes-raices');
-  let currentFeed = allFeeds.find(f => f.project === targetProject) || allFeeds[0];
-
-  if (currentFeed) {
-    try {
-      currentFeed.posts = JSON.parse(currentFeed.posts_json || '[]');
-    } catch {
-      currentFeed.posts = [];
-    }
+  try {
+    run("INSERT OR REPLACE INTO settings (key, value, updated_at) VALUES ('company_name', ?, datetime('now','localtime'))", [company_name || '']);
+    run("INSERT OR REPLACE INTO settings (key, value, updated_at) VALUES ('company_rnc', ?, datetime('now','localtime'))", [company_rnc || '']);
+    run("INSERT OR REPLACE INTO settings (key, value, updated_at) VALUES ('company_phone', ?, datetime('now','localtime'))", [company_phone || '']);
+    run("INSERT OR REPLACE INTO settings (key, value, updated_at) VALUES ('company_email', ?, datetime('now','localtime'))", [company_email || '']);
+    run("INSERT OR REPLACE INTO settings (key, value, updated_at) VALUES ('company_address', ?, datetime('now','localtime'))", [company_address || '']);
+    res.redirect('/admin/ajustes?saved=1&msg=' + encodeURIComponent('Datos institucionales guardados.') + '#empresa');
+  } catch(err) {
+    res.redirect('/admin/ajustes?error=' + encodeURIComponent(err.message) + '#empresa');
   }
-
-  res.render('admin/instagram', {
-    page: 'instagram',
-    allFeeds,
-    currentFeed,
-    success: req.query.saved === '1'
-  });
 });
 
-instagramRouter.post('/', async (req, res) => {
-  await getDb();
-  const { project, instagram_handle, instagram_url } = req.body;
-
-  const posts = [];
-  for (let i = 0; i < 4; i++) {
-    const image = (req.body[`post_image_${i}`] || '').trim();
-    const link = (req.body[`post_link_${i}`] || '').trim();
-    const caption = (req.body[`post_caption_${i}`] || '').trim();
-    if (image) {
-      posts.push({ image, link, caption });
-    }
-  }
-
-  run(
-    'UPDATE social_feeds SET instagram_handle=?, instagram_url=?, posts_json=?, updated_at=datetime("now","localtime") WHERE project=?',
-    [instagram_handle || '@gsd', instagram_url || 'https://www.instagram.com/', JSON.stringify(posts), project]
-  );
-
-  res.redirect(`/admin/instagram?project=${encodeURIComponent(project)}&saved=1`);
-});
-
-app.use('/admin/instagram', instagramRouter);
+app.use('/admin/ajustes', ajustesRouter);
+app.get('/admin/branding', (req, res) => res.redirect('/admin/ajustes#logo'));
+app.get('/admin/instagram', (req, res) => res.redirect('/admin/ajustes#instagram'));
 
 // Public API for Instagram feeds across projects (CORS enabled for child sites)
 app.get('/api/instagram/:project?', async (req, res) => {

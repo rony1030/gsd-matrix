@@ -1,0 +1,507 @@
+<%- include('../partials/layout-start', { pageTitle: 'Ajustes del Sistema', page: 'ajustes' }) %>
+
+<style>
+  .settings-container {
+    max-width: 1040px;
+    margin: 0 auto;
+  }
+  
+  /* Tabs bar */
+  .settings-tabs-nav {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    background: #ffffff;
+    padding: 6px;
+    border-radius: 12px;
+    border: 1px solid var(--line, #E5E7EB);
+    margin-bottom: 24px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+  }
+  @media (max-width: 640px) {
+    .settings-tabs-nav {
+      grid-template-columns: 1fr;
+    }
+  }
+  .settings-tab-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 0.84rem;
+    font-weight: 600;
+    border: none;
+    background: transparent;
+    color: var(--gray, #6B7280);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+  }
+  .settings-tab-btn:hover {
+    background: #F9FAFB;
+    color: var(--navy, #1A3A52);
+  }
+  .settings-tab-btn.active {
+    background: var(--navy, #1A3A52);
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(26, 58, 82, 0.15);
+  }
+  .settings-tab-content {
+    display: none;
+  }
+  .settings-tab-content.active {
+    display: block;
+    animation: fadeInTab 0.2s ease forwards;
+  }
+  @keyframes fadeInTab {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .s-card {
+    background: #ffffff;
+    border-radius: 14px;
+    border: 1px solid var(--line, #E5E7EB);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+  }
+  .s-card-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--navy, #1A3A52);
+    margin-bottom: 0.35rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .s-card-sub {
+    font-size: 0.85rem;
+    color: var(--gray, #6B7280);
+    margin-bottom: 1.25rem;
+  }
+
+  .preview-stage {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+  }
+  @media (max-width: 600px) {
+    .preview-stage {
+      grid-template-columns: 1fr;
+    }
+  }
+  .preview-box {
+    border-radius: 10px;
+    padding: 2rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 140px;
+    border: 1px dashed #cbd5e1;
+    position: relative;
+  }
+  .preview-box.light { background: #ffffff; }
+  .preview-box.dark { background: #1A3A52; }
+  .preview-box img, .preview-box svg {
+    max-height: 55px;
+    max-width: 180px;
+    object-fit: contain;
+  }
+  .preview-tag {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  .preview-box.light .preview-tag { background: #f1f5f9; color: #475569; }
+  .preview-box.dark .preview-tag { background: rgba(255,255,255,0.15); color: #ffffff; }
+
+  .dropzone {
+    border: 2px dashed #94a3b8;
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    background: #f8fafc;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .dropzone:hover, .dropzone.dragover {
+    border-color: var(--green, #4A9B6F);
+    background: #f0fdf4;
+  }
+  .dropzone-icon {
+    width: 44px;
+    height: 44px;
+    margin: 0 auto 0.75rem;
+    color: var(--green, #4A9B6F);
+  }
+  .dropzone p { margin: 0; font-size: 0.9rem; color: #334155; font-weight: 500; }
+  .dropzone small { display: block; margin-top: 0.35rem; font-size: 0.75rem; color: #64748b; }
+
+  /* Instagram feed preview */
+  .insta-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 14px;
+    margin-top: 14px;
+  }
+  .insta-card {
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--line, #E5E7EB);
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+  }
+  .insta-card img {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+  }
+  .insta-card-caption {
+    padding: 10px;
+    font-size: 0.78rem;
+    color: #475569;
+    line-height: 1.4;
+    flex: 1;
+  }
+
+  .alert-banner {
+    padding: 0.85rem 1.15rem;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .alert-banner.success { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+  .alert-banner.error { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+</style>
+
+<div class="settings-container">
+
+  <% if (typeof success !== 'undefined' && success) { %>
+    <div class="alert-banner success">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      <span><%= typeof successMsg !== 'undefined' && successMsg ? successMsg : '¡Configuración guardada exitosamente!' %></span>
+    </div>
+  <% } %>
+
+  <% if (typeof error !== 'undefined' && error) { %>
+    <div class="alert-banner error">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span><%= error %></span>
+    </div>
+  <% } %>
+
+  <div style="margin-bottom:1.5rem;">
+    <h2 style="font-size:1.4rem;font-weight:700;color:var(--navy, #1A3A52);margin:0;">Ajustes del Sistema & Configuración</h2>
+    <p style="font-size:0.88rem;color:var(--gray, #6B7280);margin:0.25rem 0 0;">Administra la identidad corporativa, el logotipo vectorial SVG, la integración de Instagram vía Meta API y los datos fiscales.</p>
+  </div>
+
+  <!-- Tabs Navigation -->
+  <div class="settings-tabs-nav">
+    <button type="button" class="settings-tab-btn active" onclick="switchSettingsTab('logo')">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+      1. Logo & Marca (SVG)
+    </button>
+    <button type="button" class="settings-tab-btn" onclick="switchSettingsTab('instagram')">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
+      2. Instagram & Meta API
+    </button>
+    <button type="button" class="settings-tab-btn" onclick="switchSettingsTab('empresa')">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      3. Datos Corporativos
+    </button>
+  </div>
+
+  <!-- TAB 1: LOGO & MARCA (SVG) -->
+  <div id="tab-logo" class="settings-tab-content active">
+    <div class="s-card">
+      <div class="s-card-title">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+        Logotipo Activo
+      </div>
+      <div class="s-card-sub">Visualización sobre fondo blanco y fondo corporativo Azul Marino GSD.</div>
+
+      <div class="preview-stage">
+        <div class="preview-box light">
+          <span class="preview-tag">Fondo Claro</span>
+          <img src="<%= typeof logoUrl !== 'undefined' ? logoUrl : '/img/logo-gsd.png' %>" alt="Logo GSD" id="activeLogoPreviewLight">
+        </div>
+        <div class="preview-box dark">
+          <span class="preview-tag">Fondo Azul GSD</span>
+          <img src="<%= typeof logoUrl !== 'undefined' ? logoUrl : '/img/logo-gsd.png' %>" alt="Logo GSD" id="activeLogoPreviewDark">
+        </div>
+      </div>
+
+      <div style="background:#f8fafc;border-radius:8px;padding:0.85rem 1rem;font-size:0.82rem;color:#475569;display:flex;justify-content:space-between;margin-bottom:1rem;">
+        <div>Ruta del archivo: <code style="font-weight:600;color:var(--navy);"><%= typeof logoUrl !== 'undefined' ? logoUrl : '/img/logo-gsd.png' %></code></div>
+        <span style="font-weight:600;color:var(--green);"><%= (typeof logoUrl !== 'undefined' && logoUrl.endsWith('.svg')) ? 'SVG Vectorial (Máxima Calidad)' : 'Raster (PNG/JPG)' %></span>
+      </div>
+
+      <form action="/admin/ajustes/logo" method="POST" enctype="multipart/form-data" id="logoUploadForm">
+        <div class="dropzone" id="dropzone" onclick="document.getElementById('logoFile').click()">
+          <svg class="dropzone-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M12 12v9"/><path d="m16 16-4-4-4 4"/></svg>
+          <p>Haz clic o arrastra aquí tu nuevo <strong>Logotipo Vectorial (.SVG)</strong> o .PNG</p>
+          <small>El formato SVG garantiza resolución nítida en cualquier pantalla y en las cotizaciones PDF.</small>
+          <input type="file" id="logoFile" name="logo" accept=".svg,.png,.jpg,.jpeg,.webp" style="display:none;" onchange="handleFileSelected(this)">
+        </div>
+
+        <div id="filePreviewContainer" style="display:none;margin-top:1.25rem;border:1px solid #e2e8f0;border-radius:10px;padding:1rem;background:#f8fafc;">
+          <div style="font-size:0.8rem;font-weight:600;color:#64748b;margin-bottom:0.5rem;">VISTA PREVIA DEL ARCHIVO SELECCIONADO:</div>
+          <div style="display:flex;align-items:center;justify-content:center;min-height:90px;background:#ffffff;border-radius:8px;border:1px solid #cbd5e1;padding:1rem;">
+            <img id="tempImagePreview" src="" alt="Vista previa" style="max-height:60px;max-width:200px;object-fit:contain;">
+          </div>
+          <div id="fileInfoText" style="font-size:0.8rem;color:#334155;margin-top:0.5rem;text-align:center;"></div>
+        </div>
+
+        <div style="display:flex;gap:0.75rem;margin-top:1.25rem;">
+          <button type="submit" class="btn btn-p" style="flex:1;justify-content:center;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            Guardar Logotipo
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Pegar Código SVG -->
+    <div class="s-card">
+      <div class="s-card-title">Pegar Código SVG Directo</div>
+      <div class="s-card-sub">Si tienes el código XML vectorial de Illustrator o Figma, pégalo directamente aquí:</div>
+      <form action="/admin/ajustes/svg-code" method="POST">
+        <textarea name="svg_code" id="svgCodeInput" placeholder='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"> ... </svg>' style="font-family:monospace;font-size:0.8rem;min-height:120px;" oninput="previewSvgCode(this.value)"></textarea>
+        <div id="codePreviewBox" style="display:none;margin-top:0.75rem;border:1px solid #e2e8f0;border-radius:8px;padding:0.75rem;background:#ffffff;text-align:center;">
+          <div id="svgRenderContainer" style="display:flex;align-items:center;justify-content:center;min-height:60px;"></div>
+        </div>
+        <div style="margin-top:1rem;">
+          <button type="submit" class="btn btn-p" style="width:100%;justify-content:center;">Guardar Código SVG</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- TAB 2: INSTAGRAM & META API -->
+  <div id="tab-instagram" class="settings-tab-content">
+    <div class="s-card">
+      <div class="s-card-title">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
+        Conexión Oficial Meta Graph API (Instagram)
+      </div>
+      <div class="s-card-sub">Conecta con la API oficial de Meta para sincronizar las publicaciones reales directamente en el sitio matriz y portal inmobiliario.</div>
+
+      <form action="/admin/ajustes/instagram/save" method="POST">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+          <div>
+            <label class="form-label" style="font-weight:600;font-size:0.82rem;color:#334155;margin-bottom:0.35rem;display:block;">Cuenta / Handle de Instagram</label>
+            <input type="text" name="instagram_handle" value="<%= typeof instaHandle !== 'undefined' ? instaHandle : '@gsd.realestate' %>" placeholder="@gsd.realestate">
+          </div>
+          <div>
+            <label class="form-label" style="font-weight:600;font-size:0.82rem;color:#334155;margin-bottom:0.35rem;display:block;">Instagram User ID / Account ID (opcional)</label>
+            <input type="text" name="meta_user_id" value="<%= typeof metaUserId !== 'undefined' ? metaUserId : 'me' %>" placeholder="me o tu Instagram ID numérico">
+          </div>
+        </div>
+
+        <div style="margin-bottom:1.25rem;">
+          <label class="form-label" style="font-weight:600;font-size:0.82rem;color:#334155;margin-bottom:0.35rem;display:block;">Token de Acceso Meta Graph API (User Access Token) *</label>
+          <input type="password" name="meta_access_token" value="<%= typeof metaToken !== 'undefined' ? metaToken : '' %>" placeholder="EAA..." style="font-family:monospace;">
+          <small style="color:#64748b;font-size:0.75rem;margin-top:0.25rem;display:block;">Token de larga duración de Meta for Developers con permisos <code>instagram_basic</code> y <code>pages_show_list</code>.</small>
+        </div>
+
+        <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
+          <button type="submit" class="btn btn-p" style="flex:1;justify-content:center;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            Guardar Credenciales de Meta
+          </button>
+        </div>
+      </form>
+
+      <!-- Botón de Sincronización Inmediata -->
+      <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
+        <div>
+          <strong style="color:var(--navy);font-size:0.9rem;display:block;">Sincronizar Publicaciones en Vivo</strong>
+          <small style="color:#64748b;font-size:0.8rem;">Descarga las últimas fotos y textos reales de tu cuenta de Instagram.</small>
+        </div>
+        <form action="/admin/ajustes/instagram/sync" method="POST">
+          <button type="submit" class="btn" style="background:#10b981;color:#ffffff;border-color:#10b981;font-weight:600;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+            Sincronizar con Meta API Ahora
+          </button>
+        </form>
+      </div>
+
+      <!-- Vista Previa de Publicaciones Sincronizadas -->
+      <div style="margin-top:2rem;">
+        <h4 style="font-size:0.95rem;color:var(--navy);font-weight:700;margin-bottom:0.75rem;">Publicaciones Actuales en el Feed:</h4>
+        <div class="insta-grid">
+          <% if (typeof instaPosts !== 'undefined' && instaPosts.length > 0) { %>
+            <% instaPosts.forEach(post => { %>
+              <div class="insta-card">
+                <img src="<%= post.image %>" alt="Post">
+                <div class="insta-card-caption">
+                  <%= post.caption ? post.caption.substring(0, 80) + '...' : 'Publicación de Instagram' %>
+                  <div style="margin-top:6px;">
+                    <a href="<%= post.link %>" target="_blank" style="color:var(--green);font-weight:600;font-size:0.75rem;">Ver en Instagram →</a>
+                  </div>
+                </div>
+              </div>
+            <% }) %>
+          <% } else { %>
+            <div style="grid-column:1/-1;padding:2rem;text-align:center;background:#f8fafc;border-radius:10px;color:#64748b;font-size:0.85rem;">
+              No hay publicaciones sincronizadas aún. Ingresa tu Meta Access Token y pulsa "Sincronizar con Meta API Ahora".
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 3: DATOS CORPORATIVOS -->
+  <div id="tab-empresa" class="settings-tab-content">
+    <div class="s-card">
+      <div class="s-card-title">Datos Institucionales & Facturación</div>
+      <div class="s-card-sub">Estos datos se reflejan automáticamente en los encabezados de las cotizaciones PDF y footer del sitio.</div>
+
+      <form action="/admin/ajustes/empresa" method="POST">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+          <div>
+            <label class="form-label" style="font-weight:600;font-size:0.82rem;color:#334155;margin-bottom:0.35rem;display:block;">Razón Social</label>
+            <input type="text" name="company_name" value="<%= typeof companyName !== 'undefined' ? companyName : 'Geosolutions Source Dominicana, S.R.L.' %>">
+          </div>
+          <div>
+            <label class="form-label" style="font-weight:600;font-size:0.82rem;color:#334155;margin-bottom:0.35rem;display:block;">RNC</label>
+            <input type="text" name="company_rnc" value="<%= typeof companyRnc !== 'undefined' ? companyRnc : '1-33-79694-5' %>">
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+          <div>
+            <label class="form-label" style="font-weight:600;font-size:0.82rem;color:#334155;margin-bottom:0.35rem;display:block;">Teléfono Principal</label>
+            <input type="text" name="company_phone" value="<%= typeof companyPhone !== 'undefined' ? companyPhone : '(829) 493-7254' %>">
+          </div>
+          <div>
+            <label class="form-label" style="font-weight:600;font-size:0.82rem;color:#334155;margin-bottom:0.35rem;display:block;">Correo Electrónico</label>
+            <input type="email" name="company_email" value="<%= typeof companyEmail !== 'undefined' ? companyEmail : 'Esteban@geosolutions.com' %>">
+          </div>
+        </div>
+
+        <div style="margin-bottom:1.5rem;">
+          <label class="form-label" style="font-weight:600;font-size:0.82rem;color:#334155;margin-bottom:0.35rem;display:block;">Dirección Oficial</label>
+          <input type="text" name="company_address" value="<%= typeof companyAddress !== 'undefined' ? companyAddress : 'Av. Barceló, Plaza Roque III, Punta Cana, R.D.' %>">
+        </div>
+
+        <button type="submit" class="btn btn-p" style="width:100%;justify-content:center;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          Guardar Datos Institucionales
+        </button>
+      </form>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function switchSettingsTab(tab) {
+    const tabs = ['logo', 'instagram', 'empresa'];
+    const buttons = document.querySelectorAll('.settings-tab-btn');
+    
+    tabs.forEach((t, i) => {
+      const panel = document.getElementById(`tab-${t}`);
+      if (panel) {
+        if (t === tab) {
+          panel.classList.add('active');
+          if (buttons[i]) buttons[i].classList.add('active');
+        } else {
+          panel.classList.remove('active');
+          if (buttons[i]) buttons[i].classList.remove('active');
+        }
+      }
+    });
+
+    // Save active tab in URL hash
+    window.location.hash = tab;
+  }
+
+  // Restore hash tab on load
+  if (window.location.hash) {
+    const hash = window.location.hash.replace('#', '');
+    if (['logo', 'instagram', 'empresa'].includes(hash)) {
+      switchSettingsTab(hash);
+    }
+  }
+
+  function handleFileSelected(input) {
+    if (!input.files || !input.files[0]) return;
+    const file = input.files[0];
+    const previewContainer = document.getElementById('filePreviewContainer');
+    const imgPreview = document.getElementById('tempImagePreview');
+    const infoText = document.getElementById('fileInfoText');
+
+    infoText.innerText = `${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+      imgPreview.src = e.target.result;
+      previewContainer.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function previewSvgCode(code) {
+    const box = document.getElementById('codePreviewBox');
+    const container = document.getElementById('svgRenderContainer');
+    if (!code || !code.trim().startsWith('<svg')) {
+      box.style.display = 'none';
+      container.innerHTML = '';
+      return;
+    }
+    box.style.display = 'block';
+    container.innerHTML = code;
+    const svgEl = container.querySelector('svg');
+    if (svgEl) {
+      svgEl.style.maxHeight = '50px';
+      svgEl.style.maxWidth = '180px';
+    }
+  }
+
+  // Drag & drop handlers
+  const dropzone = document.getElementById('dropzone');
+  if (dropzone) {
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropzone.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        dropzone.classList.add('dragover');
+      }, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropzone.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        dropzone.classList.remove('dragover');
+      }, false);
+    });
+
+    dropzone.addEventListener('drop', (e) => {
+      const dt = e.dataTransfer;
+      const files = dt.files;
+      if (files && files.length > 0) {
+        const fileInput = document.getElementById('logoFile');
+        fileInput.files = files;
+        handleFileSelected(fileInput);
+      }
+    });
+  }
+</script>
+
+<%- include('../partials/layout-end') %>
