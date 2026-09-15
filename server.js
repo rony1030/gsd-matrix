@@ -377,6 +377,90 @@ leadsRouter.get('/exportar', async (req, res) => {
 
 app.use('/admin/leads', leadsRouter);
 
+// ─── INSTAGRAM & REDES (MULTIMARCA / PROYECTOS) ──────
+const instagramRouter = express.Router();
+instagramRouter.use(requireAuth);
+
+instagramRouter.get('/', async (req, res) => {
+  await getDb();
+  const allFeeds = queryAll('SELECT * FROM social_feeds ORDER BY id ASC');
+  const targetProject = req.query.project || (allFeeds[0] ? allFeeds[0].project : 'bienes-raices');
+  let currentFeed = allFeeds.find(f => f.project === targetProject) || allFeeds[0];
+
+  if (currentFeed) {
+    try {
+      currentFeed.posts = JSON.parse(currentFeed.posts_json || '[]');
+    } catch {
+      currentFeed.posts = [];
+    }
+  }
+
+  res.render('admin/instagram', {
+    page: 'instagram',
+    allFeeds,
+    currentFeed,
+    success: req.query.saved === '1'
+  });
+});
+
+instagramRouter.post('/', async (req, res) => {
+  await getDb();
+  const { project, instagram_handle, instagram_url } = req.body;
+
+  const posts = [];
+  for (let i = 0; i < 4; i++) {
+    const image = (req.body[`post_image_${i}`] || '').trim();
+    const link = (req.body[`post_link_${i}`] || '').trim();
+    const caption = (req.body[`post_caption_${i}`] || '').trim();
+    if (image) {
+      posts.push({ image, link, caption });
+    }
+  }
+
+  run(
+    'UPDATE social_feeds SET instagram_handle=?, instagram_url=?, posts_json=?, updated_at=datetime("now","localtime") WHERE project=?',
+    [instagram_handle || '@gsd', instagram_url || 'https://www.instagram.com/', JSON.stringify(posts), project]
+  );
+
+  res.redirect(`/admin/instagram?project=${encodeURIComponent(project)}&saved=1`);
+});
+
+app.use('/admin/instagram', instagramRouter);
+
+// Public API for Instagram feeds across projects (CORS enabled for child sites)
+app.get('/api/instagram/:project?', async (req, res) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  res.header('Cache-Control', 'public, max-age=60, s-maxage=60');
+
+  try {
+    await getDb();
+    const project = req.params.project || req.query.project || 'bienes-raices';
+    const feed = queryOne('SELECT * FROM social_feeds WHERE project = ?', [project]);
+
+    if (!feed) {
+      return res.status(404).json({ error: 'Proyecto no encontrado' });
+    }
+
+    let posts = [];
+    try {
+      posts = JSON.parse(feed.posts_json || '[]');
+    } catch {
+      posts = [];
+    }
+
+    res.json({
+      project: feed.project,
+      project_name: feed.project_name,
+      instagram_handle: feed.instagram_handle,
+      instagram_url: feed.instagram_url,
+      posts
+    });
+  } catch (e) {
+    res.status(500).json({ error: 'Error al consultar feed' });
+  }
+});
+
 // Global Error Handler
 app.use((err, req, res, next) => {
   console.error('Unhandled server error:', err);

@@ -102,6 +102,16 @@ function initSchema() {
       created_at TEXT DEFAULT (datetime('now','localtime')),
       updated_at TEXT DEFAULT (datetime('now','localtime'))
     );
+
+    CREATE TABLE IF NOT EXISTS social_feeds (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      project TEXT UNIQUE NOT NULL,
+      project_name TEXT NOT NULL,
+      instagram_handle TEXT DEFAULT '@gsd',
+      instagram_url TEXT DEFAULT 'https://www.instagram.com/',
+      posts_json TEXT DEFAULT '[]',
+      updated_at TEXT DEFAULT (datetime('now','localtime'))
+    );
   `);
 
   // Seed some sample data with real cover photos
@@ -124,6 +134,23 @@ function initSchema() {
     VALUES
     (1, 'María García', 'maria@email.com', '809-555-1234', 'Inmobiliaria', 'Busco apartamento en Piantini para inversión.', 'nuevo'),
     (2, 'Carlos Pérez', 'carlos@empresa.com', '809-555-5678', 'Legal', 'Necesito asesoría para compra de terreno.', 'contactado');
+  `);
+
+  db.run(`
+    INSERT OR IGNORE INTO social_feeds (project, project_name, instagram_handle, instagram_url, posts_json)
+    VALUES
+    ('bienes-raices', 'GSD Bienes Raíces', '@gsd.realestate', 'https://www.instagram.com/', '[
+      {"image":"https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80","link":"https://www.instagram.com/","caption":"Residencia contemporánea en Piantini"},
+      {"image":"https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80","link":"https://www.instagram.com/","caption":"Diseño de interiores y calidez"},
+      {"image":"https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=800&q=80","link":"https://www.instagram.com/","caption":"Villa de lujo en Casa de Campo"},
+      {"image":"https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=800&q=80","link":"https://www.instagram.com/","caption":"Espacios abiertos e iluminación natural"}
+    ]'),
+    ('matriz', 'GSD Matriz / Ingeniería & Legal', '@gsdsource', 'https://www.instagram.com/', '[
+      {"image":"https://images.unsplash.com/photo-1541888946425-d0fbb1862557?auto=format&fit=crop&w=800&q=80","link":"https://www.instagram.com/","caption":"Agrimensura y deslinde de precisión"},
+      {"image":"https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=800&q=80","link":"https://www.instagram.com/","caption":"Asesoría y blindaje jurídico de títulos"},
+      {"image":"https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=800&q=80","link":"https://www.instagram.com/","caption":"Proyectos de infraestructura y topografía"},
+      {"image":"https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80","link":"https://www.instagram.com/","caption":"Gestión patrimonial inmobiliaria"}
+    ]');
   `);
 }
 
