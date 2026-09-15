@@ -8,6 +8,8 @@
         "includeFiles": [
           "views/**",
           "public/**",
+          "services/**",
+          "db/**",
           "node_modules/sql.js/dist/sql-wasm.wasm"
         ]
       }
