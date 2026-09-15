@@ -189,24 +189,32 @@ app.get('/admin', requireAuth, async (req, res) => {
     const qBlogs = queryOne('SELECT COUNT(*) as n FROM blogs');
     const qLeads = queryOne('SELECT COUNT(*) as n FROM leads');
     const qNuevos = queryOne("SELECT COUNT(*) as n FROM leads WHERE estado='nuevo'");
+    const qContactados = queryOne("SELECT COUNT(*) as n FROM leads WHERE estado='contactado'");
+    const qCerrados = queryOne("SELECT COUNT(*) as n FROM leads WHERE estado='cerrado'");
 
     const totalProp = qProp?.n || 0;
     const totalBlogs = qBlogs?.n || 0;
     const totalLeads = qLeads?.n || 0;
     const leadsNuevos = qNuevos?.n || 0;
-    const latestLeads = queryAll('SELECT * FROM leads ORDER BY created_at DESC LIMIT 5') || [];
+    const leadsContactados = qContactados?.n || 0;
+    const leadsCerrados = qCerrados?.n || 0;
+
+    const latestLeads = queryAll('SELECT * FROM leads ORDER BY created_at DESC LIMIT 6') || [];
+    const leadsByService = queryAll('SELECT servicio, COUNT(*) as count FROM leads GROUP BY servicio ORDER BY count DESC') || [];
 
     res.render('admin/dashboard', {
       page: 'dashboard',
-      stats: { totalProp, totalBlogs, totalLeads, leadsNuevos },
-      latestLeads
+      stats: { totalProp, totalBlogs, totalLeads, leadsNuevos, leadsContactados, leadsCerrados },
+      latestLeads,
+      leadsByService
     });
   } catch (err) {
     console.error('Error cargando dashboard:', err);
     res.render('admin/dashboard', {
       page: 'dashboard',
-      stats: { totalProp: 3, totalBlogs: 0, totalLeads: 2, leadsNuevos: 1 },
-      latestLeads: []
+      stats: { totalProp: 3, totalBlogs: 3, totalLeads: 2, leadsNuevos: 1, leadsContactados: 1, leadsCerrados: 0 },
+      latestLeads: [],
+      leadsByService: []
     });
   }
 });

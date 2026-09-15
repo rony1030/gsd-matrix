@@ -1,32 +1,120 @@
-<%- include('partials/layout-start', { pageTitle: 'Dashboard', page: 'dashboard' }) %>
+<%- include('partials/layout-start', { pageTitle: 'Dashboard & Analítica', page: 'dashboard' }) %>
 
-<!-- Stats grid -->
-<div class="dash-grid">
-  <div class="dash-card">
-    <div class="dash-card-icon blue">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+<style>
+  .analytics-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+  }
+  .analytics-kpi-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .analytics-kpi-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+  }
+  .kpi-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .kpi-icon.blue { background: rgba(9, 23, 36, 0.08); color: #091724; }
+  .kpi-icon.green { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+  .kpi-icon.orange { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+  .kpi-icon.purple { background: rgba(99, 102, 241, 0.1); color: #6366f1; }
+  .kpi-num {
+    font-size: 1.9rem;
+    font-weight: 800;
+    color: #091724;
+    line-height: 1;
+    margin-bottom: 0.25rem;
+  }
+  .kpi-label {
+    font-size: 0.78rem;
+    color: #64748b;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .analytics-breakdown-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  @media (max-width: 960px) {
+    .analytics-breakdown-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .service-progress-bar {
+    height: 8px;
+    background: #f1f5f9;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 6px;
+  }
+  .service-progress-fill {
+    height: 100%;
+    background: #091724;
+    border-radius: 4px;
+  }
+</style>
+
+<!-- KPI Cards Analítica -->
+<div class="analytics-kpi-grid">
+  <div class="analytics-kpi-card">
+    <div class="kpi-icon blue">
+      <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
     </div>
     <div>
-      <div class="dash-card-num"><%= stats.totalProp %></div>
-      <div class="dash-card-label">Propiedades</div>
+      <div class="kpi-num"><%= stats.totalProp %></div>
+      <div class="kpi-label">Propiedades</div>
     </div>
   </div>
-  <div class="dash-card">
-    <div class="dash-card-icon green">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+
+  <div class="analytics-kpi-card">
+    <div class="kpi-icon green">
+      <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
     </div>
     <div>
-      <div class="dash-card-num"><%= stats.totalBlogs %></div>
-      <div class="dash-card-label">Artículos de Blog</div>
+      <div class="kpi-num"><%= stats.totalBlogs %></div>
+      <div class="kpi-label">Artículos Blog</div>
     </div>
   </div>
-  <div class="dash-card">
-    <div class="dash-card-icon orange">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+
+  <div class="analytics-kpi-card">
+    <div class="kpi-icon orange">
+      <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
     </div>
     <div>
-      <div class="dash-card-num"><%= stats.leadsNuevos %></div>
-      <div class="dash-card-label">Leads Nuevos</div>
+      <div class="kpi-num"><%= stats.leadsNuevos %></div>
+      <div class="kpi-label">Leads Nuevos</div>
+    </div>
+  </div>
+
+  <div class="analytics-kpi-card">
+    <div class="kpi-icon purple">
+      <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    </div>
+    <div>
+      <div class="kpi-num"><%= stats.totalLeads %></div>
+      <div class="kpi-label">Contactos Totales</div>
     </div>
   </div>
 </div>
@@ -55,43 +143,84 @@
   </a>
 </div>
 
-<!-- Latest leads table -->
-<div class="table-card">
-  <div class="table-card-header">
-    <h3>Últimos Leads Recibidos</h3>
-    <a href="/admin/leads" class="btn-add">Ver todos</a>
+<!-- Sección de Análisis & Leads -->
+<div class="analytics-breakdown-grid">
+  
+  <!-- Últimos Leads Recibidos -->
+  <div class="table-card" style="margin-bottom:0;">
+    <div class="table-card-header">
+      <h3 style="display:flex;align-items:center;gap:8px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        Últimos Leads Recibidos
+      </h3>
+      <a href="/admin/leads" class="btn-add">Ver todos</a>
+    </div>
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Servicio</th>
+            <th>Estado</th>
+            <th>Fecha</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% latestLeads.forEach(lead => { %>
+          <tr>
+            <td><strong><%= lead.nombre %></strong></td>
+            <td><%= lead.email || '—' %></td>
+            <td><%= lead.servicio || '—' %></td>
+            <td>
+              <span class="badge <%= lead.estado === 'nuevo' ? 'badge-orange' : lead.estado === 'contactado' ? 'badge-blue' : lead.estado === 'cerrado' ? 'badge-green' : 'badge-gray' %>">
+                <%= lead.estado %>
+              </span>
+            </td>
+            <td style="color:var(--gris-500);font-size:0.8rem;"><%= lead.created_at?.substring(0,16) || '' %></td>
+          </tr>
+          <% }) %>
+          <% if (latestLeads.length === 0) { %>
+          <tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--gris-500);">No hay leads aún. Los del formulario aparecerán aquí.</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
   </div>
-  <div class="table-responsive">
-    <table>
-      <thead>
-        <tr>
-          <th>Nombre</th>
-          <th>Email</th>
-          <th>Servicio</th>
-          <th>Estado</th>
-          <th>Fecha</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% latestLeads.forEach(lead => { %>
-        <tr>
-          <td><strong><%= lead.nombre %></strong></td>
-          <td><%= lead.email || '—' %></td>
-          <td><%= lead.servicio || '—' %></td>
-          <td>
-            <span class="badge <%= lead.estado === 'nuevo' ? 'badge-orange' : lead.estado === 'contactado' ? 'badge-blue' : lead.estado === 'cerrado' ? 'badge-green' : 'badge-gray' %>">
-              <%= lead.estado %>
-            </span>
-          </td>
-          <td style="color:var(--gris-500);font-size:0.8rem;"><%= lead.created_at?.substring(0,16) || '' %></td>
-        </tr>
-        <% }) %>
-        <% if (latestLeads.length === 0) { %>
-        <tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--gris-500);">No hay leads aún. Los del formulario de contacto aparecerán aquí.</td></tr>
-        <% } %>
-      </tbody>
-    </table>
+
+  <!-- Desglose por Servicio / Interés -->
+  <div class="table-card" style="margin-bottom:0;">
+    <div class="table-card-header">
+      <h3 style="display:flex;align-items:center;gap:8px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Interés por Servicio
+      </h3>
+    </div>
+    <div style="padding:1.25rem;">
+      <% if (leadsByService && leadsByService.length > 0) { %>
+        <div style="display:flex;flex-direction:column;gap:1.1rem;">
+          <% 
+            const maxVal = Math.max(...leadsByService.map(s => s.count), 1);
+            leadsByService.forEach(item => { 
+              const pct = Math.round((item.count / stats.totalLeads) * 100) || 0;
+          %>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:0.82rem;font-weight:600;color:#091724;">
+                <span><%= item.servicio || 'General / Consulta' %></span>
+                <span style="color:#64748b;"><%= item.count %> (<%= pct %>%)</span>
+              </div>
+              <div class="service-progress-bar">
+                <div class="service-progress-fill" style="width: <%= (item.count / maxVal) * 100 %>%;"></div>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      <% } else { %>
+        <p style="font-size:0.82rem;color:#64748b;text-align:center;padding:1.5rem 0;">Aún no hay suficientes solicitudes para graficar el interés.</p>
+      <% } %>
+    </div>
   </div>
+
 </div>
 
 <%- include('partials/layout-end') %>
