@@ -226,12 +226,12 @@ propRouter.get('/nueva', (req, res) => {
 });
 
 propRouter.post('/nueva', upload.array('imagenes', 5), async (req, res) => {
-  const { titulo, descripcion, precio, moneda, tipo, ubicacion, estado, destacada } = req.body;
+  const { titulo, descripcion, precio, moneda, tipo, ubicacion, estado, destacada, meta_title, meta_description, keywords, seo_score } = req.body;
   const imagenes = req.files.map(f => '/uploads/propiedades/' + f.filename);
   await getDb();
   run(
-    'INSERT INTO propiedades (titulo,descripcion,precio,moneda,tipo,ubicacion,estado,imagenes,destacada) VALUES (?,?,?,?,?,?,?,?,?)',
-    [titulo, descripcion, parseFloat(precio)||0, moneda||'USD', tipo||'', ubicacion||'', estado||'disponible', JSON.stringify(imagenes), destacada?1:0]
+    'INSERT INTO propiedades (titulo,descripcion,precio,moneda,tipo,ubicacion,estado,imagenes,destacada,meta_title,meta_description,keywords,seo_score) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)',
+    [titulo, descripcion, parseFloat(precio)||0, moneda||'USD', tipo||'', ubicacion||'', estado||'disponible', JSON.stringify(imagenes), destacada?1:0, meta_title||titulo, meta_description||'', keywords||'', parseInt(seo_score)||0]
   );
   res.redirect('/admin/propiedades');
 });
@@ -245,14 +245,14 @@ propRouter.get('/:id/editar', async (req, res) => {
 });
 
 propRouter.post('/:id/editar', upload.array('imagenes', 5), async (req, res) => {
-  const { titulo, descripcion, precio, moneda, tipo, ubicacion, estado, destacada, imagenes_existentes } = req.body;
+  const { titulo, descripcion, precio, moneda, tipo, ubicacion, estado, destacada, imagenes_existentes, meta_title, meta_description, keywords, seo_score } = req.body;
   const existentes = Array.isArray(imagenes_existentes) ? imagenes_existentes : (imagenes_existentes ? [imagenes_existentes] : []);
   const nuevas = req.files.map(f => '/uploads/propiedades/' + f.filename);
   const todas = [...existentes, ...nuevas].slice(0, 5);
   await getDb();
   run(
-    'UPDATE propiedades SET titulo=?,descripcion=?,precio=?,moneda=?,tipo=?,ubicacion=?,estado=?,imagenes=?,destacada=?,updated_at=datetime("now","localtime") WHERE id=?',
-    [titulo, descripcion, parseFloat(precio)||0, moneda||'USD', tipo||'', ubicacion||'', estado||'disponible', JSON.stringify(todas), destacada?1:0, req.params.id]
+    'UPDATE propiedades SET titulo=?,descripcion=?,precio=?,moneda=?,tipo=?,ubicacion=?,estado=?,imagenes=?,destacada=?,meta_title=?,meta_description=?,keywords=?,seo_score=?,updated_at=datetime("now","localtime") WHERE id=?',
+    [titulo, descripcion, parseFloat(precio)||0, moneda||'USD', tipo||'', ubicacion||'', estado||'disponible', JSON.stringify(todas), destacada?1:0, meta_title||titulo, meta_description||'', keywords||'', parseInt(seo_score)||0, req.params.id]
   );
   res.redirect('/admin/propiedades');
 });
@@ -280,14 +280,14 @@ blogRouter.get('/nuevo', (req, res) => {
 });
 
 blogRouter.post('/nuevo', upload.single('imagen_portada'), async (req, res) => {
-  const { titulo, slug, contenido, estado, meta_title, meta_description, keywords, autor } = req.body;
-  const imagen = req.file ? '/uploads/blog/' + req.file.filename : '';
+  const { titulo, slug, categoria, tags, contenido, estado, meta_title, meta_description, keywords, autor, imagen_url, seo_score } = req.body;
+  const imagen = req.file ? '/uploads/blog/' + req.file.filename : (imagen_url || '');
   const fechaPublicacion = estado === 'publicado' ? new Date().toISOString() : null;
   await getDb();
   try {
     run(
-      'INSERT INTO blogs (titulo,slug,contenido,imagen_portada,estado,meta_title,meta_description,keywords,autor,fecha_publicacion) VALUES (?,?,?,?,?,?,?,?,?,?)',
-      [titulo, slug, contenido, imagen, estado||'borrador', meta_title||titulo, meta_description||'', keywords||'', autor||'GSD', fechaPublicacion]
+      'INSERT INTO blogs (titulo,slug,categoria,tags,contenido,imagen_portada,estado,meta_title,meta_description,keywords,seo_score,autor,fecha_publicacion) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)',
+      [titulo, slug, categoria||'Inversión', tags||'', contenido, imagen, estado||'publicado', meta_title||titulo, meta_description||'', keywords||'', parseInt(seo_score)||0, autor||'GSD Real Estate', fechaPublicacion]
     );
     res.redirect('/admin/blog');
   } catch {
@@ -303,15 +303,15 @@ blogRouter.get('/:id/editar', async (req, res) => {
 });
 
 blogRouter.post('/:id/editar', upload.single('imagen_portada'), async (req, res) => {
-  const { titulo, slug, contenido, estado, meta_title, meta_description, keywords, autor } = req.body;
+  const { titulo, slug, categoria, tags, contenido, estado, meta_title, meta_description, keywords, autor, imagen_url, imagen_portada_actual, seo_score } = req.body;
   await getDb();
   const existing = queryOne('SELECT * FROM blogs WHERE id=?', [req.params.id]);
-  const imagen = req.file ? '/uploads/blog/' + req.file.filename : existing?.imagen_portada || '';
+  const imagen = req.file ? '/uploads/blog/' + req.file.filename : (imagen_url || imagen_portada_actual || existing?.imagen_portada || '');
   const fechaPublicacion = estado === 'publicado' && !existing?.fecha_publicacion ? new Date().toISOString() : existing?.fecha_publicacion;
   try {
     run(
-      'UPDATE blogs SET titulo=?,slug=?,contenido=?,imagen_portada=?,estado=?,meta_title=?,meta_description=?,keywords=?,autor=?,fecha_publicacion=?,updated_at=datetime("now","localtime") WHERE id=?',
-      [titulo, slug, contenido, imagen, estado, meta_title||titulo, meta_description||'', keywords||'', autor||'GSD', fechaPublicacion, req.params.id]
+      'UPDATE blogs SET titulo=?,slug=?,categoria=?,tags=?,contenido=?,imagen_portada=?,estado=?,meta_title=?,meta_description=?,keywords=?,seo_score=?,autor=?,fecha_publicacion=?,updated_at=datetime("now","localtime") WHERE id=?',
+      [titulo, slug, categoria||'Inversión', tags||'', contenido, imagen, estado, meta_title||titulo, meta_description||'', keywords||'', parseInt(seo_score)||0, autor||'GSD Real Estate', fechaPublicacion, req.params.id]
     );
     res.redirect('/admin/blog');
   } catch {

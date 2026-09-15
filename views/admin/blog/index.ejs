@@ -12,9 +12,9 @@
     <table>
       <thead>
         <tr>
-          <th>Título</th>
-          <th>Slug</th>
-          <th>Autor</th>
+          <th>Artículo</th>
+          <th>Categoría</th>
+          <th>Puntaje SEO</th>
           <th>Estado</th>
           <th>Fecha</th>
           <th>Acciones</th>
@@ -23,9 +23,26 @@
       <tbody>
         <% posts.forEach(p => { %>
         <tr>
-          <td><strong><%= p.titulo %></strong></td>
-          <td><code style="font-size:0.8rem;color:var(--gris-500);">/<%= p.slug %></code></td>
-          <td><%= p.autor || 'GSD' %></td>
+          <td>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <% if (p.imagen_portada) { %>
+                <img src="<%= p.imagen_portada %>" style="width:48px;height:36px;border-radius:6px;object-fit:cover;flex-shrink:0;" alt="">
+              <% } %>
+              <div>
+                <strong><%= p.titulo %></strong>
+                <div style="font-size:0.75rem;color:var(--gris-500);margin-top:2px;">
+                  <code>/<%= p.slug %></code> · <span><%= p.autor || 'GSD' %></span>
+                </div>
+              </div>
+            </div>
+          </td>
+          <td><span style="font-size:0.8rem;background:#f1f5f9;padding:3px 8px;border-radius:4px;color:#475569;font-weight:500;"><%= p.categoria || 'Inversión' %></span></td>
+          <td>
+            <% const sc = p.seo_score || 0; %>
+            <span class="badge <%= sc >= 80 ? 'badge-green' : sc >= 50 ? 'badge-orange' : 'badge-gray' %>" style="font-weight:700;">
+              <%= sc %>/100
+            </span>
+          </td>
           <td>
             <span class="badge <%= p.estado === 'publicado' ? 'badge-green' : 'badge-gray' %>">
               <%= p.estado %>

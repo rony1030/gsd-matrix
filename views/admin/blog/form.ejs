@@ -1,5 +1,37 @@
 <%- include('../../admin/partials/layout-start', { pageTitle: isEdit ? 'Editar Artículo' : 'Nuevo Artículo', page: 'blog' }) %>
 
+<style>
+  .seo-score-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    margin-left: auto;
+  }
+  .score-good { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+  .score-medium { background: #fef9c3; color: #a16207; border: 1px solid #fde047; }
+  .score-poor { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
+  .seo-checklist {
+    list-style: none;
+    padding: 0;
+    margin: 14px 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .seo-checklist li {
+    font-size: 0.82rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .seo-check-ok { color: #16a34a; }
+  .seo-check-warn { color: #dc2626; }
+</style>
+
 <div style="margin-bottom:1.5rem;">
   <a href="/admin/blog" style="color:var(--gris-500);font-size:0.875rem;display:flex;align-items:center;gap:0.4rem;">
     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
@@ -15,66 +47,111 @@
 <% } %>
 
 <form method="POST" action="/admin/blog/<%= isEdit ? post.id + '/editar' : 'nuevo' %>" enctype="multipart/form-data">
+  <input type="hidden" name="seo_score" id="seo_score_input" value="<%= isEdit ? (post.seo_score || 0) : 0 %>">
+
   <div class="admin-form-grid">
 
     <!-- Main content -->
     <div>
       <div class="admin-form-card">
         <h3>Contenido del Artículo</h3>
+        
         <div class="form-group">
-          <label class="form-label">Título *</label>
-          <input type="text" id="titulo" name="titulo" class="form-input" value="<%= isEdit ? post.titulo : '' %>" placeholder="Título del artículo" required>
+          <label class="form-label">Título del Artículo *</label>
+          <input type="text" id="titulo" name="titulo" class="form-input" value="<%= isEdit ? post.titulo : '' %>" placeholder="Ej: Guía completa de inversión en Punta Cana" required>
         </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Categoría</label>
+            <select name="categoria" id="categoria" class="form-select">
+              <% ['Guía','Inversión','Vivir mejor','Legal & Títulos','Mercado Inmobiliario','Arquitectura','Finanzas'].forEach(cat => { %>
+                <option value="<%= cat %>" <%= (isEdit && (post.categoria === cat || post.category === cat)) ? 'selected' : '' %>><%= cat %></option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Etiquetas / Tags</label>
+            <input type="text" id="tags" name="tags" class="form-input" value="<%= isEdit ? (post.tags || '') : '' %>" placeholder="playa, rentabilidad, deslinde">
+            <p style="font-size:0.72rem;color:var(--gris-500);margin-top:0.25rem;">Separadas por comas</p>
+          </div>
+        </div>
+
         <div class="form-group">
-          <label class="form-label">Slug (URL)</label>
+          <label class="form-label">Slug (URL amigable)</label>
           <div style="display:flex;gap:0.5rem;align-items:center;">
             <span style="color:var(--gris-500);font-size:0.875rem;">/blog/</span>
-            <input type="text" id="slug" name="slug" class="form-input" value="<%= isEdit ? post.slug : '' %>" placeholder="mi-articulo" required style="flex:1;">
+            <input type="text" id="slug" name="slug" class="form-input" value="<%= isEdit ? post.slug : '' %>" placeholder="guia-inversion-punta-cana" required style="flex:1;">
           </div>
-          <p style="font-size:0.72rem;color:var(--gris-500);margin-top:0.25rem;">Se genera automáticamente desde el título. Puedes editarlo.</p>
+          <p style="font-size:0.72rem;color:var(--gris-500);margin-top:0.25rem;">Generado automáticamente. Puedes personalizarlo.</p>
         </div>
+
         <div class="form-group">
-          <label class="form-label">Contenido (Markdown soportado)</label>
-          <textarea name="contenido" class="form-textarea" style="min-height:280px;font-family:monospace;font-size:0.875rem;" placeholder="Escribe el contenido aquí... Puedes usar **negrita**, # Títulos, - listas, etc."><%= isEdit ? post.contenido || '' : '' %></textarea>
-          <p style="font-size:0.72rem;color:var(--gris-500);margin-top:0.25rem;">Soporta formato Markdown: **negrita**, *cursiva*, # Título, ## Subtítulo, - lista</p>
+          <label class="form-label">Contenido Completo (Editor de Texto / Markdown)</label>
+          <textarea id="contenido" name="contenido" class="form-textarea" style="min-height:280px;font-family:monospace;font-size:0.875rem;" placeholder="Escribe el artículo aquí... Puedes usar títulos con #, negritas con **palabra**, listas con -"><%= isEdit ? post.contenido || '' : '' %></textarea>
         </div>
       </div>
 
       <!-- SEO Panel -->
       <div class="admin-form-card">
-        <h3>🔍 Panel SEO</h3>
-        <p style="font-size:0.8rem;color:var(--gris-500);margin-bottom:1.5rem;">Optimiza cómo aparece este artículo en Google y redes sociales.</p>
+        <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e2e8f0;padding-bottom:12px;margin-bottom:18px;">
+          <div>
+            <h3 style="margin:0;">🔍 Analizador & Optimización SEO</h3>
+            <p style="font-size:0.8rem;color:var(--gris-500);margin:4px 0 0;">Evaluación en tiempo real para Google y redes sociales.</p>
+          </div>
+          <div id="seoScoreBadge" class="seo-score-badge score-poor">
+            <span>Puntaje SEO:</span>
+            <span id="seoScoreText">0/100</span>
+          </div>
+        </div>
 
         <div class="form-group">
-          <label class="form-label">Meta Title <span style="font-weight:normal;text-transform:none;">(máx 60 caracteres)</span></label>
+          <label class="form-label">Meta Title (Título SEO Google)</label>
           <input type="text" id="meta_title" name="meta_title" class="form-input"
-                 value="<%= isEdit ? post.meta_title || '' : '' %>"
-                 placeholder="Título optimizado para Google" maxlength="80">
-          <div class="char-counter" id="meta-title-count">0/60</div>
+                 value="<%= isEdit ? (post.meta_title || post.titulo || '') : '' %>"
+                 placeholder="Título optimizado con palabra clave" maxlength="70">
+          <div class="char-counter" id="meta-title-count">0/60 caracteres recomendados</div>
         </div>
 
         <div class="form-group">
-          <label class="form-label">Meta Description <span style="font-weight:normal;text-transform:none;">(máx 155 caracteres)</span></label>
-          <textarea id="meta_description" name="meta_description" class="form-textarea" style="min-height:80px;"
-                    placeholder="Descripción breve que aparece en los resultados de Google..." maxlength="200"><%= isEdit ? post.meta_description || '' : '' %></textarea>
-          <div class="char-counter" id="meta-desc-count">0/155</div>
+          <label class="form-label">Meta Description (Descripción corta SEO - Limitador 160 caracteres) *</label>
+          <textarea id="meta_description" name="meta_description" class="form-textarea" style="min-height:85px;"
+                    placeholder="Resumen atractivo para que el usuario haga clic desde Google..." maxlength="160"><%= isEdit ? (post.meta_description || post.excerpt || '') : '' %></textarea>
+          <div class="char-counter" id="meta-desc-count">0/160 caracteres (Máximo exacto 160)</div>
         </div>
 
         <div class="form-group">
-          <label class="form-label">Keywords</label>
-          <input type="text" name="keywords" class="form-input"
-                 value="<%= isEdit ? post.keywords || '' : '' %>"
-                 placeholder="inmobiliaria, república dominicana, inversión, terrenos">
-          <p style="font-size:0.72rem;color:var(--gris-500);margin-top:0.25rem;">Separadas por coma</p>
+          <label class="form-label">Palabras Clave Principales (Keywords)</label>
+          <input type="text" id="keywords" name="keywords" class="form-input"
+                 value="<%= isEdit ? (post.keywords || '') : '' %>"
+                 placeholder="bienes raices rd, comprar villa punta cana, inversion inmobiliaria">
+        </div>
+
+        <!-- SEO Live Audit Checklist -->
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:16px;margin:20px 0;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <strong style="font-size:0.88rem;color:#0f172a;">Diagnóstico de Calidad SEO</strong>
+            <button type="button" onclick="analyzeSeo()" style="background:#091724;color:#fff;border:none;padding:5px 12px;border-radius:6px;font-size:0.75rem;cursor:pointer;">
+              ↻ Re-analizar
+            </button>
+          </div>
+          <ul class="seo-checklist">
+            <li id="chk-title"><span class="seo-check-warn">✕</span> Longitud de título SEO adecuada (40-60 caracteres).</li>
+            <li id="chk-desc"><span class="seo-check-warn">✕</span> Meta descripción corta completada (hasta 160 caracteres).</li>
+            <li id="chk-keywords"><span class="seo-check-warn">✕</span> Palabras clave (keywords) definidas.</li>
+            <li id="chk-slug"><span class="seo-check-warn">✕</span> Slug sin caracteres especiales.</li>
+            <li id="chk-content"><span class="seo-check-warn">✕</span> Longitud del contenido (mínimo 150 palabras).</li>
+            <li id="chk-image"><span class="seo-check-warn">✕</span> Imagen de portada configurada.</li>
+          </ul>
         </div>
 
         <!-- Google Preview -->
         <div>
-          <label class="form-label" style="margin-bottom:0.75rem;">Vista previa en Google</label>
+          <label class="form-label" style="margin-bottom:0.75rem;">Vista previa en Google SERP</label>
           <div class="seo-preview">
-            <div class="seo-preview-url">gsdsource.com › blog › <span id="slug-preview"><%= isEdit ? post.slug || 'mi-articulo' : 'mi-articulo' %></span></div>
+            <div class="seo-preview-url">gsdsource.com › blog › <span id="slug-preview"><%= isEdit ? (post.slug || 'articulo') : 'articulo' %></span></div>
             <div class="seo-preview-title" id="seo-title-preview"><%= isEdit ? (post.meta_title || post.titulo || 'Título del artículo') : 'Título del artículo' %></div>
-            <div class="seo-preview-desc" id="seo-desc-preview"><%= isEdit ? (post.meta_description || 'Descripción del artículo...') : 'Descripción del artículo para motores de búsqueda...' %></div>
+            <div class="seo-preview-desc" id="seo-desc-preview"><%= isEdit ? (post.meta_description || post.excerpt || 'Descripción corta para Google...') : 'Descripción corta para Google...' %></div>
           </div>
         </div>
       </div>
@@ -87,42 +164,180 @@
         <div class="form-group">
           <label class="form-label">Estado</label>
           <select name="estado" class="form-select">
-            <option value="borrador" <%= (!isEdit || post.estado === 'borrador') ? 'selected' : '' %>>Borrador</option>
-            <option value="publicado" <%= (isEdit && post.estado === 'publicado') ? 'selected' : '' %>>Publicado</option>
+            <option value="publicado" <%= (!isEdit || post.estado === 'publicado') ? 'selected' : '' %>>Publicado</option>
+            <option value="borrador" <%= (isEdit && post.estado === 'borrador') ? 'selected' : '' %>>Borrador</option>
           </select>
         </div>
         <div class="form-group">
           <label class="form-label">Autor</label>
-          <input type="text" name="autor" class="form-input" value="<%= isEdit ? post.autor || 'GSD' : 'GSD' %>" placeholder="GSD">
+          <input type="text" name="autor" class="form-input" value="<%= isEdit ? post.autor || 'GSD Real Estate' : 'GSD Real Estate' %>" placeholder="GSD">
         </div>
         <button type="submit" class="btn-submit" style="margin-top:1rem;">
-          <%= isEdit ? 'Guardar Cambios' : 'Crear Artículo' %>
+          <%= isEdit ? 'Guardar Cambios' : 'Publicar Artículo' %>
         </button>
       </div>
 
       <div class="admin-form-card" style="margin-top:1.25rem;">
-        <h3>Imagen de Portada</h3>
-        <% if (isEdit && post.imagen_portada) { %>
-        <img src="<%= post.imagen_portada %>" style="width:100%;border-radius:8px;margin-bottom:0.75rem;aspect-ratio:16/9;object-fit:cover;" alt="">
-        <% } %>
-        <input type="file" name="imagen_portada" class="form-input" accept="image/*" style="padding:0.5rem;">
-        <p style="font-size:0.72rem;color:var(--gris-500);margin-top:0.5rem;">Recomendado: 1200×630px</p>
+        <h3>Imagen de Portada / SEO</h3>
+        <p style="font-size:0.75rem;color:var(--gris-500);margin-bottom:10px;">Esta imagen se usará automáticamente en la ficha, redes sociales y Google OpenGraph.</p>
+        
+        <div id="coverImageContainer">
+          <% if (isEdit && (post.imagen_portada || post.cover_image)) { %>
+            <img id="coverPreview" src="<%= post.imagen_portada || post.cover_image %>" style="width:100%;border-radius:8px;margin-bottom:0.75rem;aspect-ratio:16/9;object-fit:cover;" alt="Portada">
+            <input type="hidden" name="imagen_portada_actual" value="<%= post.imagen_portada || post.cover_image %>">
+          <% } else { %>
+            <img id="coverPreview" src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80" style="width:100%;border-radius:8px;margin-bottom:0.75rem;aspect-ratio:16/9;object-fit:cover;" alt="Portada">
+          <% } %>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" style="font-size:0.8rem;">Pegar URL de Imagen directa:</label>
+          <input type="url" name="imagen_url" id="imagen_url" class="form-input" placeholder="https://.../portada.jpg" value="<%= isEdit ? (post.imagen_portada || post.cover_image || '') : '' %>" oninput="if(this.value){document.getElementById('coverPreview').src=this.value; analyzeSeo();}">
+        </div>
+
+        <div class="form-group" style="margin-top:10px;">
+          <label class="form-label" style="font-size:0.8rem;">O subir archivo desde el dispositivo:</label>
+          <input type="file" name="imagen_portada" class="form-input" accept="image/*" style="padding:0.5rem;" onchange="if(this.files[0]){const r=new FileReader(); r.onload=e=>{document.getElementById('coverPreview').src=e.target.result; analyzeSeo();}; r.readAsDataURL(this.files[0]);}">
+        </div>
       </div>
     </div>
   </div>
 </form>
 
 <script>
-// Update slug preview live
-document.getElementById('slug')?.addEventListener('input', function() {
-  document.getElementById('slug-preview').textContent = this.value || 'mi-articulo';
+function generateSlug(val) {
+  return val.toString().toLowerCase().trim()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9 -]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-');
+}
+
+const titleInput = document.getElementById('titulo');
+const slugInput = document.getElementById('slug');
+const metaTitleInput = document.getElementById('meta_title');
+const metaDescInput = document.getElementById('meta_description');
+const keywordsInput = document.getElementById('keywords');
+const contentInput = document.getElementById('contenido');
+
+titleInput?.addEventListener('input', function() {
+  if (!slugInput.dataset.manual) {
+    slugInput.value = generateSlug(this.value);
+    document.getElementById('slug-preview').textContent = slugInput.value || 'articulo';
+  }
+  if (!metaTitleInput.dataset.manual) {
+    metaTitleInput.value = this.value;
+  }
+  analyzeSeo();
 });
 
-// Init char counters on load
-const mt = document.getElementById('meta_title');
-const md = document.getElementById('meta_description');
-if (mt) { mt.dispatchEvent(new Event('input')); }
-if (md) { md.dispatchEvent(new Event('input')); }
+slugInput?.addEventListener('input', function() {
+  this.dataset.manual = '1';
+  document.getElementById('slug-preview').textContent = this.value || 'articulo';
+  analyzeSeo();
+});
+
+metaTitleInput?.addEventListener('input', function() {
+  this.dataset.manual = '1';
+  document.getElementById('seo-title-preview').textContent = this.value || titleInput.value || 'Título del artículo';
+  analyzeSeo();
+});
+
+metaDescInput?.addEventListener('input', function() {
+  document.getElementById('seo-desc-preview').textContent = this.value || 'Descripción corta para Google...';
+  analyzeSeo();
+});
+
+keywordsInput?.addEventListener('input', analyzeSeo);
+contentInput?.addEventListener('input', analyzeSeo);
+
+function analyzeSeo() {
+  let score = 0;
+  const title = (metaTitleInput?.value || titleInput?.value || '').trim();
+  const desc = (metaDescInput?.value || '').trim();
+  const kw = (keywordsInput?.value || '').trim();
+  const slug = (slugInput?.value || '').trim();
+  const content = (contentInput?.value || '').trim();
+  const img = document.getElementById('coverPreview')?.src || '';
+
+  // 1. Title Length
+  const chkTitle = document.getElementById('chk-title');
+  if (title.length >= 35 && title.length <= 65) {
+    score += 20;
+    chkTitle.innerHTML = '<span class="seo-check-ok">✓</span> Longitud de título SEO óptima (' + title.length + ' carac.)';
+  } else if (title.length > 0) {
+    score += 10;
+    chkTitle.innerHTML = '<span class="seo-check-warn">!</span> Longitud de título mejorable (' + title.length + ' carac. - ideal 40-60)';
+  } else {
+    chkTitle.innerHTML = '<span class="seo-check-warn">✕</span> Falta título SEO';
+  }
+  document.getElementById('meta-title-count').textContent = title.length + '/60 caracteres recomendados';
+
+  // 2. Meta Desc Length (max 160)
+  const chkDesc = document.getElementById('chk-desc');
+  if (desc.length >= 80 && desc.length <= 160) {
+    score += 25;
+    chkDesc.innerHTML = '<span class="seo-check-ok">✓</span> Meta descripción perfecta (' + desc.length + '/160 carac.)';
+  } else if (desc.length > 0) {
+    score += 12;
+    chkDesc.innerHTML = '<span class="seo-check-warn">!</span> Meta descripción (' + desc.length + '/160 carac. - ideal 120-160)';
+  } else {
+    chkDesc.innerHTML = '<span class="seo-check-warn">✕</span> Falta meta descripción (limitador a 160)';
+  }
+  document.getElementById('meta-desc-count').textContent = desc.length + '/160 caracteres (Máximo exacto 160)';
+
+  // 3. Keywords
+  const chkKw = document.getElementById('chk-keywords');
+  if (kw.length > 4) {
+    score += 15;
+    chkKw.innerHTML = '<span class="seo-check-ok">✓</span> Palabras clave configuradas (' + kw.split(',').length + ' etiquetas)';
+  } else {
+    chkKw.innerHTML = '<span class="seo-check-warn">✕</span> Sin palabras clave definidas';
+  }
+
+  // 4. Slug
+  const chkSlug = document.getElementById('chk-slug');
+  if (slug.length > 3 && /^[a-z0-9-]+$/.test(slug)) {
+    score += 15;
+    chkSlug.innerHTML = '<span class="seo-check-ok">✓</span> URL / Slug optimizado y limpio';
+  } else {
+    chkSlug.innerHTML = '<span class="seo-check-warn">✕</span> Slug inválido o vacío';
+  }
+
+  // 5. Content words
+  const words = content ? content.split(/\s+/).filter(Boolean).length : 0;
+  const chkContent = document.getElementById('chk-content');
+  if (words >= 150) {
+    score += 15;
+    chkContent.innerHTML = '<span class="seo-check-ok">✓</span> Contenido amplio (' + words + ' palabras)';
+  } else if (words > 20) {
+    score += 8;
+    chkContent.innerHTML = '<span class="seo-check-warn">!</span> Contenido algo corto (' + words + ' palabras - ideal 150+)';
+  } else {
+    chkContent.innerHTML = '<span class="seo-check-warn">✕</span> Contenido insuficiente para indexación';
+  }
+
+  // 6. Image
+  const chkImg = document.getElementById('chk-image');
+  if (img && !img.includes('undefined')) {
+    score += 10;
+    chkImg.innerHTML = '<span class="seo-check-ok">✓</span> Imagen de portada lista para OpenGraph & Google';
+  } else {
+    chkImg.innerHTML = '<span class="seo-check-warn">✕</span> Falta imagen de portada';
+  }
+
+  // Update Badge
+  const badge = document.getElementById('seoScoreBadge');
+  const scoreText = document.getElementById('seoScoreText');
+  document.getElementById('seo_score_input').value = score;
+  scoreText.textContent = score + '/100';
+
+  badge.className = 'seo-score-badge ' + (score >= 80 ? 'score-good' : score >= 50 ? 'score-medium' : 'score-poor');
+}
+
+// Initial run on page load
+setTimeout(analyzeSeo, 200);
 </script>
 
 <%- include('../../admin/partials/layout-end') %>
+

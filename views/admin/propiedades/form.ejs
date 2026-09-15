@@ -67,7 +67,7 @@
       <!-- Imágenes -->
       <div class="admin-form-card">
         <h3>Imágenes (máx. 5)</h3>
-        <input type="file" id="imagenes" name="imagenes" class="form-input" multiple accept="image/*" style="padding:0.5rem;">
+        <input type="file" id="imagenes" name="imagenes" class="form-input" multiple accept="image/*" style="padding:0.5rem;" onchange="updateCoverPreview(this)">
         <div id="img-preview-grid" class="img-preview-grid">
           <% if (isEdit) { %>
             <% let imgs = []; try { imgs = JSON.parse(prop.imagenes || '[]'); } catch(e) {} %>
@@ -79,7 +79,55 @@
             <% }) %>
           <% } %>
         </div>
-        <p style="font-size:0.75rem;color:var(--gris-500);margin-top:0.5rem;">JPG, PNG o WebP. Máx 5MB por imagen.</p>
+        <p style="font-size:0.75rem;color:var(--gris-500);margin-top:0.5rem;">JPG, PNG o WebP. Máx 5MB por imagen. La primera foto se usa como portada.</p>
+      </div>
+
+      <!-- SEO Panel -->
+      <div class="admin-form-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e2e8f0;padding-bottom:12px;margin-bottom:18px;">
+          <div>
+            <h3 style="margin:0;">🔍 Optimización & Puntuador SEO</h3>
+            <p style="font-size:0.8rem;color:var(--gris-500);margin:4px 0 0;">Toma automáticamente la foto de portada del proyecto para Google SERP y OpenGraph.</p>
+          </div>
+          <div id="seoScoreBadge" class="seo-score-badge score-poor" style="display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:20px;font-weight:700;font-size:0.9rem;">
+            <span>Puntaje SEO:</span>
+            <span id="seoScoreText">0/100</span>
+          </div>
+        </div>
+
+        <input type="hidden" name="seo_score" id="seo_score_input" value="<%= isEdit ? (prop.seo_score || 0) : 0 %>">
+
+        <div class="form-group">
+          <label class="form-label">Meta Title (Título en Google)</label>
+          <input type="text" id="meta_title" name="meta_title" class="form-input"
+                 value="<%= isEdit ? (prop.meta_title || prop.titulo || '') : '' %>"
+                 placeholder="Ej: Villa de lujo en venta en Casa de Campo | GSD" maxlength="70">
+          <div class="char-counter" id="meta-title-count">0/60 caracteres</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Meta Description (Limitador a 160 caracteres) *</label>
+          <textarea id="meta_description" name="meta_description" class="form-textarea" style="min-height:80px;"
+                    placeholder="Descripción atractiva para buscadores..." maxlength="160"><%= isEdit ? (prop.meta_description || prop.descripcion?.substring(0,160) || '') : '' %></textarea>
+          <div class="char-counter" id="meta-desc-count">0/160 caracteres (Máximo exacto 160)</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Palabras Clave (Keywords)</label>
+          <input type="text" id="keywords" name="keywords" class="form-input"
+                 value="<%= isEdit ? (prop.keywords || '') : '' %>"
+                 placeholder="villa la romana, inversion inmobiliaria rd, casa de campo">
+        </div>
+
+        <!-- Google Preview -->
+        <div style="margin-top:16px;">
+          <label class="form-label" style="margin-bottom:0.75rem;">Vista previa en Google</label>
+          <div class="seo-preview">
+            <div class="seo-preview-url">gsd-bienes-raices.com › propiedades › <span id="slug-preview"><%= isEdit ? (prop.slug || 'propiedad') : 'propiedad' %></span></div>
+            <div class="seo-preview-title" id="seo-title-preview"><%= isEdit ? (prop.meta_title || prop.titulo || 'Título de la propiedad') : 'Título de la propiedad' %></div>
+            <div class="seo-preview-desc" id="seo-desc-preview"><%= isEdit ? (prop.meta_description || 'Descripción breve de la propiedad para Google...') : 'Descripción breve de la propiedad para Google...' %></div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -109,5 +157,77 @@
     </div>
   </div>
 </form>
+
+<script>
+const titleInput = document.querySelector('input[name="titulo"]');
+const descInput = document.querySelector('textarea[name="descripcion"]');
+const metaTitleInput = document.getElementById('meta_title');
+const metaDescInput = document.getElementById('meta_description');
+const keywordsInput = document.getElementById('keywords');
+
+function updateCoverPreview(input) {
+  analyzePropertySeo();
+}
+
+titleInput?.addEventListener('input', function() {
+  if (!metaTitleInput.dataset.manual) {
+    metaTitleInput.value = this.value;
+  }
+  document.getElementById('seo-title-preview').textContent = metaTitleInput.value || this.value || 'Título de la propiedad';
+  analyzePropertySeo();
+});
+
+metaTitleInput?.addEventListener('input', function() {
+  this.dataset.manual = '1';
+  document.getElementById('seo-title-preview').textContent = this.value || titleInput.value || 'Título de la propiedad';
+  analyzePropertySeo();
+});
+
+metaDescInput?.addEventListener('input', function() {
+  document.getElementById('seo-desc-preview').textContent = this.value || 'Descripción breve de la propiedad para Google...';
+  analyzePropertySeo();
+});
+
+descInput?.addEventListener('input', function() {
+  if (!metaDescInput.value) {
+    metaDescInput.value = this.value.substring(0, 155);
+  }
+  analyzePropertySeo();
+});
+
+keywordsInput?.addEventListener('input', analyzePropertySeo);
+
+function analyzePropertySeo() {
+  let score = 0;
+  const title = (metaTitleInput?.value || titleInput?.value || '').trim();
+  const desc = (metaDescInput?.value || descInput?.value || '').trim();
+  const kw = (keywordsInput?.value || '').trim();
+
+  // 1. Title
+  if (title.length >= 30 && title.length <= 65) score += 30;
+  else if (title.length > 0) score += 15;
+  document.getElementById('meta-title-count').textContent = title.length + '/60 caracteres';
+
+  // 2. Desc (max 160)
+  if (desc.length >= 80 && desc.length <= 160) score += 35;
+  else if (desc.length > 0) score += 15;
+  document.getElementById('meta-desc-count').textContent = desc.length + '/160 caracteres (Máximo exacto 160)';
+
+  // 3. Keywords
+  if (kw.length > 4) score += 20;
+
+  // 4. Has photo
+  const hasImages = document.querySelectorAll('.img-preview-item').length > 0 || (document.getElementById('imagenes')?.files?.length || 0) > 0;
+  if (hasImages) score += 15;
+
+  document.getElementById('seo_score_input').value = score;
+  const badge = document.getElementById('seoScoreBadge');
+  const scoreText = document.getElementById('seoScoreText');
+  scoreText.textContent = score + '/100';
+  badge.className = 'seo-score-badge ' + (score >= 80 ? 'score-good' : score >= 50 ? 'score-medium' : 'score-poor');
+}
+
+setTimeout(analyzePropertySeo, 200);
+</script>
 
 <%- include('../../admin/partials/layout-end') %>
