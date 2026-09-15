@@ -221,40 +221,144 @@ propRouter.get('/', async (req, res) => {
   res.render('admin/propiedades/index', { page: 'propiedades', propiedades });
 });
 
-propRouter.get('/nueva', (req, res) => {
-  res.render('admin/propiedades/form', { page: 'propiedades', prop: null, isEdit: false, error: null });
+propRouter.get('/nueva', async (req, res) => {
+  await getDb();
+  const customAmenities = queryAll('SELECT nombre FROM amenities_catalog ORDER BY nombre ASC').map(a => a.nombre);
+  res.render('admin/propiedades/form', { page: 'propiedades', prop: null, isEdit: false, error: null, customAmenities });
 });
 
-propRouter.post('/nueva', upload.array('imagenes', 5), async (req, res) => {
-  const { titulo, descripcion, precio, moneda, tipo, ubicacion, estado, destacada, meta_title, meta_description, keywords, seo_score } = req.body;
-  const imagenes = req.files.map(f => '/uploads/propiedades/' + f.filename);
+propRouter.post('/api/amenities', async (req, res) => {
+  const { nombre } = req.body;
+  if (!nombre || !nombre.trim()) return res.status(400).json({ error: 'Nombre requerido' });
   await getDb();
-  run(
-    'INSERT INTO propiedades (titulo,descripcion,precio,moneda,tipo,ubicacion,estado,imagenes,destacada,meta_title,meta_description,keywords,seo_score) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)',
-    [titulo, descripcion, parseFloat(precio)||0, moneda||'USD', tipo||'', ubicacion||'', estado||'disponible', JSON.stringify(imagenes), destacada?1:0, meta_title||titulo, meta_description||'', keywords||'', parseInt(seo_score)||0]
-  );
-  res.redirect('/admin/propiedades');
+  try {
+    run('INSERT OR IGNORE INTO amenities_catalog (nombre) VALUES (?)', [nombre.trim()]);
+    res.json({ success: true, nombre: nombre.trim() });
+  } catch(e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+propRouter.post('/nueva', upload.array('imagenes', 20), async (req, res) => {
+  const { 
+    titulo, slug, short_description, descripcion, precio, moneda, tipo, operacion,
+    provincia, ciudad, sector, ubicacion,
+    habitaciones, banos, parqueos, area_construccion, area_solar,
+    condicion, tour_3d, amenidades,
+    estado, destacada, imagen_portada,
+    meta_title, meta_description, keywords, seo_score 
+  } = req.body;
+
+  const uploadedImgs = req.files ? req.files.map(f => '/uploads/propiedades/' + f.filename) : [];
+  let amenidadesArr = [];
+  try {
+    amenidadesArr = Array.isArray(amenidades) ? amenidades : (amenidades ? JSON.parse(amenidades) : []);
+  } catch(e) {
+    amenidadesArr = amenidades ? amenidades.split(',').map(s=>s.trim()).filter(Boolean) : [];
+  }
+
+  const portada = imagen_portada || (uploadedImgs.length > 0 ? uploadedImgs[0] : '');
+  const locFinal = ubicacion || [sector, ciudad, provincia].filter(Boolean).join(', ') || 'República Dominicana';
+  const finalSlug = (slug || titulo || 'propiedad').toLowerCase().trim()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, "-").replace(/[^\w-]+/g, "").replace(/--+/g, "-");
+
+  await getDb();
+  try {
+    run(
+      `INSERT INTO propiedades (
+        slug, titulo, short_description, descripcion, precio, moneda, tipo, operacion,
+        provincia, ciudad, sector, ubicacion,
+        habitaciones, banos, parqueos, area_construccion, area_solar,
+        condicion, tour_3d, amenidades,
+        estado, imagenes, imagen_portada, destacada,
+        meta_title, meta_description, keywords, seo_score
+      ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+      [
+        finalSlug, titulo, short_description||'', descripcion||'', parseFloat(precio)||0, moneda||'USD', tipo||'Apartamento', operacion||'Venta',
+        provincia||'', ciudad||'', sector||'', locFinal,
+        parseFloat(habitaciones)||0, parseFloat(banos)||0, parseInt(parqueos)||0, parseFloat(area_construccion)||0, parseFloat(area_solar)||0,
+        condicion||'Listo', tour_3d||'', JSON.stringify(amenidadesArr),
+        estado||'disponible', JSON.stringify(uploadedImgs), portada, destacada?1:0,
+        meta_title||titulo, meta_description||short_description||'', keywords||'', parseInt(seo_score)||0
+      ]
+    );
+    res.redirect('/admin/propiedades');
+  } catch (err) {
+    console.error('Error insertando propiedad:', err);
+    res.render('admin/propiedades/form', { 
+      page: 'propiedades', 
+      prop: req.body, 
+      isEdit: false, 
+      error: 'Error al guardar la propiedad. Comprueba que el título o slug no estén duplicados.',
+      customAmenities: []
+    });
+  }
 });
 
 propRouter.get('/:id/editar', async (req, res) => {
   await getDb();
   const prop = queryOne('SELECT * FROM propiedades WHERE id=?', [req.params.id]);
   if (!prop) return res.redirect('/admin/propiedades');
-  prop.imagenes = JSON.parse(prop.imagenes || '[]');
-  res.render('admin/propiedades/form', { page: 'propiedades', prop, isEdit: true, error: null });
+  try { prop.imagenes = JSON.parse(prop.imagenes || '[]'); } catch(e) { prop.imagenes = []; }
+  try { prop.amenidades = JSON.parse(prop.amenidades || '[]'); } catch(e) { prop.amenidades = []; }
+  const customAmenities = queryAll('SELECT nombre FROM amenities_catalog ORDER BY nombre ASC').map(a => a.nombre);
+  res.render('admin/propiedades/form', { page: 'propiedades', prop, isEdit: true, error: null, customAmenities });
 });
 
-propRouter.post('/:id/editar', upload.array('imagenes', 5), async (req, res) => {
-  const { titulo, descripcion, precio, moneda, tipo, ubicacion, estado, destacada, imagenes_existentes, meta_title, meta_description, keywords, seo_score } = req.body;
+propRouter.post('/:id/editar', upload.array('imagenes', 20), async (req, res) => {
+  const { 
+    titulo, slug, short_description, descripcion, precio, moneda, tipo, operacion,
+    provincia, ciudad, sector, ubicacion,
+    habitaciones, banos, parqueos, area_construccion, area_solar,
+    condicion, tour_3d, amenidades,
+    estado, destacada, imagen_portada, imagenes_existentes,
+    meta_title, meta_description, keywords, seo_score 
+  } = req.body;
+
   const existentes = Array.isArray(imagenes_existentes) ? imagenes_existentes : (imagenes_existentes ? [imagenes_existentes] : []);
-  const nuevas = req.files.map(f => '/uploads/propiedades/' + f.filename);
-  const todas = [...existentes, ...nuevas].slice(0, 5);
+  const nuevas = req.files ? req.files.map(f => '/uploads/propiedades/' + f.filename) : [];
+  const todas = [...existentes, ...nuevas];
+
+  let amenidadesArr = [];
+  try {
+    amenidadesArr = Array.isArray(amenidades) ? amenidades : (amenidades ? JSON.parse(amenidades) : []);
+  } catch(e) {
+    amenidadesArr = amenidades ? amenidades.split(',').map(s=>s.trim()).filter(Boolean) : [];
+  }
+
+  const portada = imagen_portada || (todas.length > 0 ? todas[0] : '');
+  const locFinal = ubicacion || [sector, ciudad, provincia].filter(Boolean).join(', ') || 'República Dominicana';
+  const finalSlug = (slug || titulo || 'propiedad').toLowerCase().trim()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, "-").replace(/[^\w-]+/g, "").replace(/--+/g, "-");
+
   await getDb();
-  run(
-    'UPDATE propiedades SET titulo=?,descripcion=?,precio=?,moneda=?,tipo=?,ubicacion=?,estado=?,imagenes=?,destacada=?,meta_title=?,meta_description=?,keywords=?,seo_score=?,updated_at=datetime("now","localtime") WHERE id=?',
-    [titulo, descripcion, parseFloat(precio)||0, moneda||'USD', tipo||'', ubicacion||'', estado||'disponible', JSON.stringify(todas), destacada?1:0, meta_title||titulo, meta_description||'', keywords||'', parseInt(seo_score)||0, req.params.id]
-  );
-  res.redirect('/admin/propiedades');
+  try {
+    run(
+      `UPDATE propiedades SET 
+        slug=?, titulo=?, short_description=?, descripcion=?, precio=?, moneda=?, tipo=?, operacion=?,
+        provincia=?, ciudad=?, sector=?, ubicacion=?,
+        habitaciones=?, banos=?, parqueos=?, area_construccion=?, area_solar=?,
+        condicion=?, tour_3d=?, amenidades=?,
+        estado=?, imagenes=?, imagen_portada=?, destacada=?,
+        meta_title=?, meta_description=?, keywords=?, seo_score=?, updated_at=datetime("now","localtime")
+      WHERE id=?`,
+      [
+        finalSlug, titulo, short_description||'', descripcion||'', parseFloat(precio)||0, moneda||'USD', tipo||'Apartamento', operacion||'Venta',
+        provincia||'', ciudad||'', sector||'', locFinal,
+        parseFloat(habitaciones)||0, parseFloat(banos)||0, parseInt(parqueos)||0, parseFloat(area_construccion)||0, parseFloat(area_solar)||0,
+        condicion||'Listo', tour_3d||'', JSON.stringify(amenidadesArr),
+        estado||'disponible', JSON.stringify(todas), portada, destacada?1:0,
+        meta_title||titulo, meta_description||short_description||'', keywords||'', parseInt(seo_score)||0,
+        req.params.id
+      ]
+    );
+    res.redirect('/admin/propiedades');
+  } catch (err) {
+    console.error('Error actualizando propiedad:', err);
+    res.redirect('/admin/propiedades/' + req.params.id + '/editar');
+  }
 });
 
 propRouter.post('/:id/eliminar', async (req, res) => {

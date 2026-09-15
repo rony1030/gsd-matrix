@@ -34,9 +34,29 @@ async function getDb() {
     db = new SQL.Database(fileBuffer);
     try {
       db.run(`
-        UPDATE propiedades SET imagenes = '["/img/propiedades/apartment.jpg"]' WHERE id = 1 AND (imagenes IS NULL OR imagenes = '[]' OR imagenes = '');
-        UPDATE propiedades SET imagenes = '["/img/propiedades/villa.jpg"]' WHERE id = 2 AND (imagenes IS NULL OR imagenes = '[]' OR imagenes = '');
-        UPDATE propiedades SET imagenes = '["/img/propiedades/home.jpg"]' WHERE id = 3 AND (imagenes IS NULL OR imagenes = '[]' OR imagenes = '');
+        ALTER TABLE propiedades ADD COLUMN slug TEXT;
+        ALTER TABLE propiedades ADD COLUMN short_description TEXT DEFAULT '';
+        ALTER TABLE propiedades ADD COLUMN operacion TEXT DEFAULT 'Venta';
+        ALTER TABLE propiedades ADD COLUMN provincia TEXT DEFAULT '';
+        ALTER TABLE propiedades ADD COLUMN ciudad TEXT DEFAULT '';
+        ALTER TABLE propiedades ADD COLUMN sector TEXT DEFAULT '';
+        ALTER TABLE propiedades ADD COLUMN habitaciones REAL DEFAULT 0;
+        ALTER TABLE propiedades ADD COLUMN banos REAL DEFAULT 0;
+        ALTER TABLE propiedades ADD COLUMN parqueos INTEGER DEFAULT 0;
+        ALTER TABLE propiedades ADD COLUMN area_construccion REAL DEFAULT 0;
+        ALTER TABLE propiedades ADD COLUMN area_solar REAL DEFAULT 0;
+        ALTER TABLE propiedades ADD COLUMN condicion TEXT DEFAULT 'Listo';
+        ALTER TABLE propiedades ADD COLUMN tour_3d TEXT DEFAULT '';
+        ALTER TABLE propiedades ADD COLUMN amenidades TEXT DEFAULT '[]';
+        ALTER TABLE propiedades ADD COLUMN imagen_portada TEXT DEFAULT '';
+      `);
+    } catch(e) {}
+    try {
+      db.run(`
+        CREATE TABLE IF NOT EXISTS amenities_catalog (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          nombre TEXT UNIQUE NOT NULL
+        );
       `);
       saveDb();
     } catch(e) {}
@@ -74,14 +94,29 @@ function initSchema() {
 
     CREATE TABLE IF NOT EXISTS propiedades (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
+      slug TEXT UNIQUE,
       titulo TEXT NOT NULL,
       descripcion TEXT,
+      short_description TEXT DEFAULT '',
       precio REAL,
       moneda TEXT DEFAULT 'USD',
       tipo TEXT,
+      operacion TEXT DEFAULT 'Venta',
       ubicacion TEXT,
+      provincia TEXT DEFAULT '',
+      ciudad TEXT DEFAULT '',
+      sector TEXT DEFAULT '',
+      habitaciones REAL DEFAULT 0,
+      banos REAL DEFAULT 0,
+      parqueos INTEGER DEFAULT 0,
+      area_construccion REAL DEFAULT 0,
+      area_solar REAL DEFAULT 0,
+      condicion TEXT DEFAULT 'Listo',
+      tour_3d TEXT DEFAULT '',
+      amenidades TEXT DEFAULT '[]',
       estado TEXT DEFAULT 'disponible',
       imagenes TEXT DEFAULT '[]',
+      imagen_portada TEXT DEFAULT '',
       destacada INTEGER DEFAULT 0,
       meta_title TEXT,
       meta_description TEXT,
@@ -89,6 +124,11 @@ function initSchema() {
       seo_score INTEGER DEFAULT 0,
       created_at TEXT DEFAULT (datetime('now','localtime')),
       updated_at TEXT DEFAULT (datetime('now','localtime'))
+    );
+
+    CREATE TABLE IF NOT EXISTS amenities_catalog (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      nombre TEXT UNIQUE NOT NULL
     );
 
     CREATE TABLE IF NOT EXISTS blogs (

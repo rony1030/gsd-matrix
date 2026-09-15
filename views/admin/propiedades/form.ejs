@@ -1,5 +1,195 @@
 <%- include('../../admin/partials/layout-start', { pageTitle: isEdit ? 'Editar Propiedad' : 'Nueva Propiedad', page: 'propiedades' }) %>
 
+<style>
+  /* Tabs styling inspirado en Solemare */
+  .prop-tabs-nav {
+    display: flex;
+    gap: 8px;
+    background: #ffffff;
+    padding: 8px;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 24px;
+    overflow-x: auto;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+  }
+  .prop-tab-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border: none;
+    background: transparent;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+  }
+  .prop-tab-btn:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+  }
+  .prop-tab-btn.active {
+    background: #091724;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(9, 23, 36, 0.15);
+  }
+  .prop-tab-content {
+    display: none;
+  }
+  .prop-tab-content.active {
+    display: block;
+    animation: fadeInTab 0.25s ease forwards;
+  }
+  @keyframes fadeInTab {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Amenidades estilo Solemare */
+  .amenities-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+    margin-top: 12px;
+  }
+  .amenity-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: #f8fafc;
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #334155;
+    transition: all 0.15s ease;
+    user-select: none;
+  }
+  .amenity-card:hover {
+    border-color: #cbd5e1;
+    background: #ffffff;
+  }
+  .amenity-card.checked {
+    border-color: #091724;
+    background: #f1f5f9;
+    color: #091724;
+    box-shadow: 0 2px 6px rgba(9, 23, 36, 0.06);
+  }
+  .amenity-card input[type="checkbox"] {
+    accent-color: #091724;
+    width: 16px;
+    height: 16px;
+  }
+
+  /* Galería interactiva con portada */
+  .gallery-manager-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 14px;
+    margin-top: 14px;
+  }
+  .gallery-card {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 2px solid #e2e8f0;
+    background: #f8fafc;
+    transition: all 0.2s ease;
+  }
+  .gallery-card.is-cover {
+    border-color: #10b981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+  }
+  .gallery-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .gallery-card .cover-badge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background: #10b981;
+    color: #ffffff;
+    font-size: 0.65rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 3px 8px;
+    border-radius: 20px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    z-index: 5;
+  }
+  .gallery-card .actions-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(9, 23, 36, 0.65);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 8px;
+    gap: 6px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    z-index: 4;
+  }
+  .gallery-card:hover .actions-overlay {
+    opacity: 1;
+  }
+  .btn-set-cover {
+    background: #ffffff;
+    color: #091724;
+    border: none;
+    padding: 6px;
+    border-radius: 8px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+  }
+  .btn-set-cover:hover {
+    background: #f1f5f9;
+  }
+  .btn-delete-photo {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: #ef4444;
+    color: #ffffff;
+    border: none;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    z-index: 6;
+  }
+  .gallery-card:hover .btn-delete-photo {
+    opacity: 1;
+  }
+</style>
+
 <div style="margin-bottom:1.5rem;">
   <a href="/admin/propiedades" style="color:var(--gris-500);font-size:0.875rem;display:flex;align-items:center;gap:0.4rem;">
     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
@@ -14,169 +204,422 @@
 </div>
 <% } %>
 
-<form method="POST" action="/admin/propiedades/<%= isEdit ? prop.id + '/editar' : 'nueva' %>" enctype="multipart/form-data">
+<!-- Navegación por Pestañas / Tabs -->
+<div class="prop-tabs-nav">
+  <button type="button" class="prop-tab-btn active" onclick="switchTab('general')">
+    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+    1. Información General
+  </button>
+  <button type="button" class="prop-tab-btn" onclick="switchTab('location')">
+    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+    2. Ubicación
+  </button>
+  <button type="button" class="prop-tab-btn" onclick="switchTab('specs')">
+    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="m9 12 2 2 4-4"/></svg>
+    3. Especificaciones & Amenidades
+  </button>
+  <button type="button" class="prop-tab-btn" onclick="switchTab('media')">
+    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+    4. Galería & Multimedia
+  </button>
+  <button type="button" class="prop-tab-btn" onclick="switchTab('seo')">
+    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+    5. Optimización SEO
+  </button>
+</div>
+
+<form method="POST" action="/admin/propiedades/<%= isEdit ? prop.id + '/editar' : 'nueva' %>" enctype="multipart/form-data" id="propertyForm">
+  <input type="hidden" name="seo_score" id="seo_score_input" value="<%= isEdit ? (prop.seo_score || 0) : 0 %>">
+  <input type="hidden" name="imagen_portada" id="imagen_portada_input" value="<%= isEdit ? (prop.imagen_portada || (prop.imagenes && prop.imagenes[0]) || '') : '' %>">
+  <input type="hidden" name="amenidades" id="amenidades_hidden_input" value="<%= isEdit ? (Array.isArray(prop.amenidades) ? JSON.stringify(prop.amenidades) : (prop.amenidades || '[]')) : '[]' %>">
 
   <div class="admin-form-grid">
 
-    <!-- Main form -->
+    <!-- Form Content Tabs Container -->
     <div>
-      <div class="admin-form-card">
-        <h3>Información de la Propiedad</h3>
+      
+      <!-- TAB 1: INFORMACIÓN GENERAL -->
+      <div id="tab-general" class="prop-tab-content active">
+        <div class="admin-form-card">
+          <h3 style="display:flex;align-items:center;gap:8px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            Detalles Generales del Inmueble
+          </h3>
 
-        <div class="form-group">
-          <label class="form-label">Título *</label>
-          <input type="text" name="titulo" class="form-input" value="<%= isEdit ? prop.titulo : '' %>" placeholder="Ej: Apartamento 3 hab. en Piantini" required>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Descripción</label>
-          <textarea name="descripcion" class="form-textarea" style="min-height:130px;" placeholder="Describe la propiedad..."><%= isEdit ? prop.descripcion || '' : '' %></textarea>
-        </div>
-
-        <div class="form-row">
           <div class="form-group">
-            <label class="form-label">Precio</label>
-            <input type="number" name="precio" class="form-input" value="<%= isEdit ? prop.precio || '' : '' %>" placeholder="0" min="0" step="0.01">
+            <label class="form-label">Nombre / Título de la propiedad *</label>
+            <input type="text" id="titulo" name="titulo" class="form-input" value="<%= isEdit ? (prop.titulo || '') : '' %>" placeholder="Ej: Villa Stella Marina — Vista al Mar" required>
           </div>
-          <div class="form-group">
-            <label class="form-label">Moneda</label>
-            <select name="moneda" class="form-select">
-              <option value="USD" <%= (!isEdit || prop.moneda === 'USD') ? 'selected' : '' %>>USD (Dólares)</option>
-              <option value="DOP" <%= (isEdit && prop.moneda === 'DOP') ? 'selected' : '' %>>DOP (Pesos)</option>
-            </select>
-          </div>
-        </div>
 
-        <div class="form-row">
           <div class="form-group">
-            <label class="form-label">Tipo</label>
-            <select name="tipo" class="form-select">
-              <option value="">Seleccionar...</option>
-              <% ['Apartamento','Casa','Villa','Terreno','Local Comercial','Oficina','Penthouse'].forEach(t => { %>
-              <option value="<%= t %>" <%= (isEdit && prop.tipo === t) ? 'selected' : '' %>><%= t %></option>
-              <% }) %>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Ubicación</label>
-            <input type="text" name="ubicacion" class="form-input" value="<%= isEdit ? prop.ubicacion || '' : '' %>" placeholder="Ej: Piantini, Santo Domingo">
-          </div>
-        </div>
-      </div>
-
-      <!-- Imágenes -->
-      <div class="admin-form-card">
-        <h3>Imágenes (máx. 5)</h3>
-        <input type="file" id="imagenes" name="imagenes" class="form-input" multiple accept="image/*" style="padding:0.5rem;" onchange="updateCoverPreview(this)">
-        <div id="img-preview-grid" class="img-preview-grid">
-          <% if (isEdit) { %>
-            <% let imgs = []; try { imgs = JSON.parse(prop.imagenes || '[]'); } catch(e) {} %>
-            <% imgs.forEach(img => { %>
-            <div class="img-preview-item">
-              <img src="<%= img %>" alt="">
-              <input type="hidden" name="imagenes_existentes" value="<%= img %>">
+            <label class="form-label">Slug URL (Auto-generado)</label>
+            <div style="display:flex;gap:0.5rem;align-items:center;">
+              <span style="color:var(--gris-500);font-size:0.875rem;">/propiedades/</span>
+              <input type="text" id="slug" name="slug" class="form-input" value="<%= isEdit ? (prop.slug || '') : '' %>" placeholder="villa-stella-marina" style="flex:1;">
             </div>
-            <% }) %>
-          <% } %>
+            <p style="font-size:0.72rem;color:var(--gris-500);margin-top:0.25rem;">Identificador único y amigable para buscadores.</p>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Tipo de Inmueble</label>
+              <select name="tipo" class="form-select">
+                <% ['Apartamento','Casa','Villa','Terreno','Local Comercial','Oficina','Penthouse'].forEach(t => { %>
+                <option value="<%= t %>" <%= (isEdit && prop.tipo === t) ? 'selected' : '' %>><%= t %></option>
+                <% }) %>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Operación</label>
+              <select name="operacion" class="form-select">
+                <option value="Venta" <%= (!isEdit || prop.operacion === 'Venta') ? 'selected' : '' %>>Venta</option>
+                <option value="Alquiler" <%= (isEdit && prop.operacion === 'Alquiler') ? 'selected' : '' %>>Alquiler</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Precio</label>
+              <input type="number" id="precio" name="precio" class="form-input" value="<%= isEdit ? (prop.precio || '') : '' %>" placeholder="0" min="0" step="0.01">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Moneda</label>
+              <select name="moneda" class="form-select">
+                <option value="USD" <%= (!isEdit || prop.moneda === 'USD') ? 'selected' : '' %>>USD ($)</option>
+                <option value="DOP" <%= (isEdit && prop.moneda === 'DOP') ? 'selected' : '' %>>DOP (RD$)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Descripción Corta (Resumen para Cards & Redes)</label>
+            <textarea id="short_description" name="short_description" class="form-textarea" style="min-height:75px;" placeholder="Resumen atractivo de 1 o 2 líneas..." maxlength="220"><%= isEdit ? (prop.short_description || '') : '' %></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Descripción Completa (Memoria descriptiva)</label>
+            <textarea id="descripcion" name="descripcion" class="form-textarea" style="min-height:180px;" placeholder="Detalla los acabados, distribución, facilidades del proyecto y entorno..."><%= isEdit ? (prop.descripcion || '') : '' %></textarea>
+          </div>
         </div>
-        <p style="font-size:0.75rem;color:var(--gris-500);margin-top:0.5rem;">JPG, PNG o WebP. Máx 5MB por imagen. La primera foto se usa como portada.</p>
       </div>
 
-      <!-- SEO Panel -->
-      <div class="admin-form-card">
-        <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e2e8f0;padding-bottom:12px;margin-bottom:18px;">
+      <!-- TAB 2: UBICACIÓN -->
+      <div id="tab-location" class="prop-tab-content">
+        <div class="admin-form-card">
+          <h3 style="display:flex;align-items:center;gap:8px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            Ubicación Geográfica
+          </h3>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Provincia</label>
+              <input type="text" id="provincia" name="provincia" class="form-input" value="<%= isEdit ? (prop.provincia || '') : '' %>" placeholder="Ej: La Altagracia">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Ciudad / Destino</label>
+              <input type="text" id="ciudad" name="ciudad" class="form-input" value="<%= isEdit ? (prop.ciudad || '') : '' %>" placeholder="Ej: Punta Cana">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Sector / Urbanización</label>
+              <input type="text" id="sector" name="sector" class="form-input" value="<%= isEdit ? (prop.sector || '') : '' %>" placeholder="Ej: Cap Cana / Los Corales">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Ubicación Completa (Etiqueta visible)</label>
+              <input type="text" id="ubicacion" name="ubicacion" class="form-input" value="<%= isEdit ? (prop.ubicacion || '') : '' %>" placeholder="Ej: Cap Cana, Punta Cana, RD">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: ESPECIFICACIONES & AMENIDADES -->
+      <div id="tab-specs" class="prop-tab-content">
+        <div class="admin-form-card">
+          <h3 style="display:flex;align-items:center;gap:8px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="m9 12 2 2 4-4"/></svg>
+            Ficha Técnica & Métricas
+          </h3>
+
+          <div class="form-row" style="grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));">
+            <div class="form-group">
+              <label class="form-label">Habitaciones</label>
+              <input type="number" step="1" min="0" name="habitaciones" class="form-input" value="<%= isEdit ? (prop.habitaciones ?? prop.beds ?? 0) : 0 %>">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Baños (ej: 2.5)</label>
+              <input type="number" step="0.5" min="0" name="banos" class="form-input" value="<%= isEdit ? (prop.banos ?? prop.baths ?? 0) : 0 %>">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Parqueos</label>
+              <input type="number" step="1" min="0" name="parqueos" class="form-input" value="<%= isEdit ? (prop.parqueos ?? prop.parkinglot ?? 0) : 0 %>">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Construcción m²</label>
+              <input type="number" step="any" min="0" name="area_construccion" class="form-input" value="<%= isEdit ? (prop.area_construccion ?? prop.area ?? 0) : 0 %>">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Solar m²</label>
+              <input type="number" step="any" min="0" name="area_solar" class="form-input" value="<%= isEdit ? (prop.area_solar ?? prop.terrain_area ?? 0) : 0 %>">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Estado de la Construcción</label>
+              <select name="condicion" class="form-select">
+                <% ['Listo para entrega','En Construcción','En Planos','Para Remodelar','Nuevo a Estrenar'].forEach(c => { %>
+                <option value="<%= c %>" <%= (isEdit && prop.condicion === c) ? 'selected' : '' %>><%= c %></option>
+                <% }) %>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Enlace Tour Virtual 3D / Matterport</label>
+              <input type="url" name="tour_3d" class="form-input" value="<%= isEdit ? (prop.tour_3d || '') : '' %>" placeholder="https://my.matterport.com/show/?m=...">
+            </div>
+          </div>
+
+          <!-- Selector Inteligente de Amenidades estilo Solemare -->
+          <div style="margin-top:24px;border-top:1px solid #e2e8f0;padding-top:20px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+              <div>
+                <strong style="font-size:0.95rem;color:#091724;">Amenidades & Características</strong>
+                <p style="font-size:0.75rem;color:var(--gris-500);margin:2px 0 0;">Selecciona las bondades del inmueble o agrega nuevas al vuelo.</p>
+              </div>
+              <span id="amenities-count-badge" style="background:#f1f5f9;color:#091724;font-size:0.75rem;font-weight:700;padding:4px 10px;border-radius:20px;">
+                0 seleccionadas
+              </span>
+            </div>
+
+            <!-- Buscador y creador de amenidades -->
+            <div style="display:flex;gap:8px;margin-bottom:14px;">
+              <input type="text" id="amenity-search-input" class="form-input" placeholder="Buscar amenidad o escribir una nueva..." style="flex:1;">
+              <button type="button" id="btn-add-amenity" onclick="createCustomAmenity()" class="btn-submit" style="white-space:nowrap;padding:0 16px;display:none;background:#091724;">
+                + Crear Amenidad
+              </button>
+            </div>
+
+            <% 
+              const standardAmenities = [
+                "Piscina", "Gimnasio", "Seguridad 24/7", "Ascensor", "Lobby Climatizado", 
+                "Terraza Techada", "Vista al Mar", "Jacuzzi", "Parqueo Techado", 
+                "Planta Eléctrica Full", "Balcón", "Área de Juegos", "Pet Friendly", 
+                "Cancha de Tenis / Pádel", "Acceso a Playa", "Cerca de Golf", "Línea Blanca", "Amueblado"
+              ];
+              const selectedAnims = isEdit ? (Array.isArray(prop.amenidades) ? prop.amenidades : []) : [];
+              const allCustom = customAmenities || [];
+              const combinedAmenities = Array.from(new Set([...standardAmenities, ...allCustom, ...selectedAnims]));
+            %>
+
+            <div class="amenities-grid" id="amenities-container">
+              <% combinedAmenities.forEach(item => { %>
+                <% const isChecked = selectedAnims.includes(item); %>
+                <label class="amenity-card <%= isChecked ? 'checked' : '' %>" data-name="<%= item.toLowerCase() %>">
+                  <input type="checkbox" value="<%= item %>" <%= isChecked ? 'checked' : '' %> onchange="toggleAmenity(this)">
+                  <span><%= item %></span>
+                </label>
+              <% }) %>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- TAB 4: MULTIMEDIA & GALERÍA -->
+      <div id="tab-media" class="prop-tab-content">
+        <div class="admin-form-card">
+          <h3 style="display:flex;align-items:center;gap:8px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            Gestor de Galería & Portada
+          </h3>
+          <p style="font-size:0.8rem;color:var(--gris-500);margin-bottom:14px;">
+            Sube múltiples imágenes. Puedes hacer clic en <strong>"Hacer Portada"</strong> sobre cualquier fotografía para destacarla como imagen principal.
+          </p>
+
+          <div style="border:2px dashed #cbd5e1;padding:24px;border-radius:16px;text-align:center;background:#f8fafc;position:relative;cursor:pointer;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" style="margin:0 auto 8px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <strong style="display:block;font-size:0.88rem;color:#091724;">Arrastra o selecciona imágenes</strong>
+            <span style="font-size:0.75rem;color:#64748b;">JPG, PNG o WebP de alta resolución</span>
+            <input type="file" id="imagenes" name="imagenes" multiple accept="image/*" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;" onchange="handleNewImagesUpload(this)">
+          </div>
+
+          <div class="gallery-manager-grid" id="gallery-manager-grid">
+            <% if (isEdit && prop.imagenes && prop.imagenes.length > 0) { %>
+              <% prop.imagenes.forEach((img, idx) => { %>
+                <% const isCover = (prop.imagen_portada === img) || (!prop.imagen_portada && idx === 0); %>
+                <div class="gallery-card <%= isCover ? 'is-cover' : '' %>" data-src="<%= img %>">
+                  <img src="<%= img %>" alt="">
+                  <% if (isCover) { %>
+                    <div class="cover-badge">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                      Portada
+                    </div>
+                  <% } %>
+                  <button type="button" class="btn-delete-photo" onclick="deleteExistingPhoto(this, '<%= img %>')" title="Eliminar foto">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  </button>
+                  <div class="actions-overlay">
+                    <button type="button" class="btn-set-cover" onclick="setAsCover('<%= img %>', this)">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                      Hacer Portada
+                    </button>
+                  </div>
+                  <input type="hidden" name="imagenes_existentes" value="<%= img %>">
+                </div>
+              <% }) %>
+            <% } %>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 5: OPTIMIZACIÓN SEO -->
+      <div id="tab-seo" class="prop-tab-content">
+        <div class="admin-form-card">
+          <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e2e8f0;padding-bottom:12px;margin-bottom:18px;">
+            <div>
+              <h3 style="margin:0;display:flex;align-items:center;gap:8px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                Auditor & Puntuador SEO en Vivo
+              </h3>
+              <p style="font-size:0.8rem;color:var(--gris-500);margin:4px 0 0;">Optimización para Google SERP y OpenGraph sin emojis.</p>
+            </div>
+            <div id="seoScoreBadge" class="seo-score-badge score-poor" style="display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:20px;font-weight:700;font-size:0.9rem;">
+              <span>Puntaje SEO:</span>
+              <span id="seoScoreText">0/100</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Meta Title (Título en Google)</label>
+            <input type="text" id="meta_title" name="meta_title" class="form-input"
+                   value="<%= isEdit ? (prop.meta_title || prop.titulo || '') : '' %>"
+                   placeholder="Ej: Villa Stella Marina en Venta en Cap Cana | GSD" maxlength="70">
+            <div class="char-counter" id="meta-title-count">0/60 caracteres recomendados</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Meta Description (Limitador a 160 caracteres) *</label>
+            <textarea id="meta_description" name="meta_description" class="form-textarea" style="min-height:80px;"
+                      placeholder="Descripción atractiva para que hagan clic en Google..." maxlength="160"><%= isEdit ? (prop.meta_description || prop.short_description || '') : '' %></textarea>
+            <div class="char-counter" id="meta-desc-count">0/160 caracteres (Máximo exacto 160)</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Palabras Clave (Keywords)</label>
+            <input type="text" id="keywords" name="keywords" class="form-input"
+                   value="<%= isEdit ? (prop.keywords || '') : '' %>"
+                   placeholder="villa punta cana, cap cana marina, inversion inmobiliaria rd">
+          </div>
+
+          <!-- Diagnóstico de checklist SEO -->
+          <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:16px;margin:20px 0;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+              <strong style="font-size:0.88rem;color:#091724;">Checklist de Calidad</strong>
+              <button type="button" onclick="analyzePropertySeo()" style="background:#091724;color:#fff;border:none;padding:4px 10px;border-radius:6px;font-size:0.72rem;cursor:pointer;">
+                ↻ Re-auditar
+              </button>
+            </div>
+            <ul class="seo-checklist">
+              <li id="chk-title"><span class="seo-check-warn">✕</span> Título claro (30-65 caracteres).</li>
+              <li id="chk-desc"><span class="seo-check-warn">✕</span> Meta descripción definida (80-160 caracteres).</li>
+              <li id="chk-keywords"><span class="seo-check-warn">✕</span> Palabras clave registradas.</li>
+              <li id="chk-cover"><span class="seo-check-warn">✕</span> Fotografía de portada establecida.</li>
+              <li id="chk-specs"><span class="seo-check-warn">✕</span> Métricas completas (habitaciones, baños, área).</li>
+            </ul>
+          </div>
+
+          <!-- Google SERP Simulator -->
           <div>
-            <h3 style="margin:0;display:flex;align-items:center;gap:8px;">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-              Optimización & Puntuador SEO
-            </h3>
-            <p style="font-size:0.8rem;color:var(--gris-500);margin:4px 0 0;">Toma automáticamente la fotografía de portada del proyecto para Google SERP y OpenGraph.</p>
-          </div>
-          <div id="seoScoreBadge" class="seo-score-badge score-poor" style="display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:20px;font-weight:700;font-size:0.9rem;">
-            <span>Puntaje SEO:</span>
-            <span id="seoScoreText">0/100</span>
-          </div>
-        </div>
-
-        <input type="hidden" name="seo_score" id="seo_score_input" value="<%= isEdit ? (prop.seo_score || 0) : 0 %>">
-
-        <div class="form-group">
-          <label class="form-label">Meta Title (Título en Google)</label>
-          <input type="text" id="meta_title" name="meta_title" class="form-input"
-                 value="<%= isEdit ? (prop.meta_title || prop.titulo || '') : '' %>"
-                 placeholder="Ej: Villa de lujo en venta en Casa de Campo | GSD" maxlength="70">
-          <div class="char-counter" id="meta-title-count">0/60 caracteres</div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Meta Description (Limitador a 160 caracteres) *</label>
-          <textarea id="meta_description" name="meta_description" class="form-textarea" style="min-height:80px;"
-                    placeholder="Descripción atractiva para buscadores..." maxlength="160"><%= isEdit ? (prop.meta_description || prop.descripcion?.substring(0,160) || '') : '' %></textarea>
-          <div class="char-counter" id="meta-desc-count">0/160 caracteres (Máximo exacto 160)</div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Palabras Clave (Keywords)</label>
-          <input type="text" id="keywords" name="keywords" class="form-input"
-                 value="<%= isEdit ? (prop.keywords || '') : '' %>"
-                 placeholder="villa la romana, inversion inmobiliaria rd, casa de campo">
-        </div>
-
-        <!-- Google Preview -->
-        <div style="margin-top:16px;">
-          <label class="form-label" style="margin-bottom:0.75rem;">Vista previa en Google</label>
-          <div class="seo-preview">
-            <div class="seo-preview-url">gsd-bienes-raices.com › propiedades › <span id="slug-preview"><%= isEdit ? (prop.slug || 'propiedad') : 'propiedad' %></span></div>
-            <div class="seo-preview-title" id="seo-title-preview"><%= isEdit ? (prop.meta_title || prop.titulo || 'Título de la propiedad') : 'Título de la propiedad' %></div>
-            <div class="seo-preview-desc" id="seo-desc-preview"><%= isEdit ? (prop.meta_description || 'Descripción breve de la propiedad para Google...') : 'Descripción breve de la propiedad para Google...' %></div>
+            <label class="form-label" style="margin-bottom:0.75rem;">Simulador de Búsqueda Google (SERP)</label>
+            <div class="seo-preview">
+              <div class="seo-preview-url">gsd-bienes-raices.com › propiedades › <span id="slug-preview"><%= isEdit ? (prop.slug || 'propiedad') : 'propiedad' %></span></div>
+              <div class="seo-preview-title" id="seo-title-preview"><%= isEdit ? (prop.meta_title || prop.titulo || 'Título de la propiedad') : 'Título de la propiedad' %></div>
+              <div class="seo-preview-desc" id="seo-desc-preview"><%= isEdit ? (prop.meta_description || prop.short_description || 'Descripción corta para Google...') : 'Descripción corta para Google...' %></div>
+            </div>
           </div>
         </div>
       </div>
+
     </div>
 
-    <!-- Sidebar -->
+    <!-- Sidebar de Publicación -->
     <div>
-      <div class="admin-form-card">
-        <h3>Publicación</h3>
+      <div class="admin-form-card" style="position:sticky;top:20px;">
+        <h3>Estado de Publicación</h3>
+        
         <div class="form-group">
           <label class="form-label">Estado</label>
           <select name="estado" class="form-select">
-            <option value="disponible" <%= (!isEdit || prop.estado === 'disponible') ? 'selected' : '' %>>Disponible</option>
+            <option value="disponible" <%= (!isEdit || prop.estado === 'disponible') ? 'selected' : '' %>>Disponible / Activo</option>
             <option value="en_negociacion" <%= (isEdit && prop.estado === 'en_negociacion') ? 'selected' : '' %>>En Negociación</option>
             <option value="vendida" <%= (isEdit && prop.estado === 'vendida') ? 'selected' : '' %>>Vendida</option>
+            <option value="borrador" <%= (isEdit && prop.estado === 'borrador') ? 'selected' : '' %>>Borrador Interno</option>
           </select>
         </div>
+
         <div class="form-group">
           <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;">
             <input type="checkbox" name="destacada" value="1" <%= (isEdit && prop.destacada) ? 'checked' : '' %>
-                   style="width:16px;height:16px;accent-color:var(--verde);">
-            <span class="form-label" style="margin:0;">Propiedad destacada</span>
+                   style="width:16px;height:16px;accent-color:#091724;">
+            <span class="form-label" style="margin:0;">Propiedad destacada en portada</span>
           </label>
         </div>
-        <button type="submit" class="btn-submit" style="margin-top:1rem;">
-          <%= isEdit ? 'Guardar Cambios' : 'Crear Propiedad' %>
+
+        <button type="submit" class="btn-submit" style="margin-top:1rem;width:100%;padding:14px;font-size:0.9rem;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;display:inline-block;vertical-align:middle;"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          <%= isEdit ? 'Guardar Cambios' : 'Publicar Propiedad' %>
         </button>
       </div>
     </div>
+
   </div>
 </form>
 
 <script>
-const titleInput = document.querySelector('input[name="titulo"]');
-const descInput = document.querySelector('textarea[name="descripcion"]');
+// Manejo de pestañas
+function switchTab(tabId) {
+  document.querySelectorAll('.prop-tab-btn').forEach(btn => btn.classList.remove('active'));
+  document.querySelectorAll('.prop-tab-content').forEach(content => content.classList.remove('active'));
+  
+  event.currentTarget.classList.add('active');
+  const target = document.getElementById('tab-' + tabId);
+  if (target) target.classList.add('active');
+}
+
+// Slug Generator
+const titleInput = document.getElementById('titulo');
+const slugInput = document.getElementById('slug');
 const metaTitleInput = document.getElementById('meta_title');
 const metaDescInput = document.getElementById('meta_description');
+const shortDescInput = document.getElementById('short_description');
 const keywordsInput = document.getElementById('keywords');
 
-function updateCoverPreview(input) {
-  analyzePropertySeo();
+function generateSlug(text) {
+  return text.toString().toLowerCase().trim()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/[^\w\-]+/g, '')
+    .replace(/\-\-+/g, '-');
 }
 
 titleInput?.addEventListener('input', function() {
+  if (!slugInput.dataset.manual) {
+    slugInput.value = generateSlug(this.value);
+    document.getElementById('slug-preview').textContent = slugInput.value || 'propiedad';
+  }
   if (!metaTitleInput.dataset.manual) {
     metaTitleInput.value = this.value;
+    document.getElementById('seo-title-preview').textContent = this.value || 'Título de la propiedad';
   }
-  document.getElementById('seo-title-preview').textContent = metaTitleInput.value || this.value || 'Título de la propiedad';
+  analyzePropertySeo();
+});
+
+slugInput?.addEventListener('input', function() {
+  this.dataset.manual = '1';
+  document.getElementById('slug-preview').textContent = this.value || 'propiedad';
   analyzePropertySeo();
 });
 
@@ -187,41 +630,206 @@ metaTitleInput?.addEventListener('input', function() {
 });
 
 metaDescInput?.addEventListener('input', function() {
-  document.getElementById('seo-desc-preview').textContent = this.value || 'Descripción breve de la propiedad para Google...';
+  document.getElementById('seo-desc-preview').textContent = this.value || 'Descripción corta para Google...';
   analyzePropertySeo();
 });
 
-descInput?.addEventListener('input', function() {
+shortDescInput?.addEventListener('input', function() {
   if (!metaDescInput.value) {
-    metaDescInput.value = this.value.substring(0, 155);
+    metaDescInput.value = this.value.substring(0, 160);
+    document.getElementById('seo-desc-preview').textContent = metaDescInput.value;
   }
   analyzePropertySeo();
 });
 
 keywordsInput?.addEventListener('input', analyzePropertySeo);
 
+// Amenidades dinámicas
+function updateAmenitiesHidden() {
+  const checked = Array.from(document.querySelectorAll('#amenities-container input[type="checkbox"]:checked')).map(c => c.value);
+  document.getElementById('amenidades_hidden_input').value = JSON.stringify(checked);
+  document.getElementById('amenities-count-badge').textContent = checked.length + ' seleccionadas';
+}
+
+function toggleAmenity(checkbox) {
+  const card = checkbox.closest('.amenity-card');
+  if (checkbox.checked) {
+    card.classList.add('checked');
+  } else {
+    card.classList.remove('checked');
+  }
+  updateAmenitiesHidden();
+}
+
+const amenitySearchInput = document.getElementById('amenity-search-input');
+const btnAddAmenity = document.getElementById('btn-add-amenity');
+
+amenitySearchInput?.addEventListener('input', function() {
+  const term = this.value.toLowerCase().trim();
+  let exactMatch = false;
+  document.querySelectorAll('.amenity-card').forEach(card => {
+    const name = card.getAttribute('data-name') || '';
+    if (name === term) exactMatch = true;
+    if (!term || name.includes(term)) {
+      card.style.display = 'flex';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+
+  if (term.length > 1 && !exactMatch) {
+    btnAddAmenity.style.display = 'inline-block';
+    btnAddAmenity.textContent = '+ Crear "' + this.value.trim() + '"';
+  } else {
+    btnAddAmenity.style.display = 'none';
+  }
+});
+
+async function createCustomAmenity() {
+  const name = amenitySearchInput.value.trim();
+  if (!name) return;
+  
+  // Agregar inmediatamente a la vista
+  const container = document.getElementById('amenities-container');
+  const label = document.createElement('label');
+  label.className = 'amenity-card checked';
+  label.setAttribute('data-name', name.toLowerCase());
+  label.innerHTML = `
+    <input type="checkbox" value="${name}" checked onchange="toggleAmenity(this)">
+    <span>${name}</span>
+  `;
+  container.prepend(label);
+  
+  amenitySearchInput.value = '';
+  btnAddAmenity.style.display = 'none';
+  document.querySelectorAll('.amenity-card').forEach(c => c.style.display = 'flex');
+  updateAmenitiesHidden();
+
+  // Guardar en backend
+  try {
+    await fetch('/admin/propiedades/api/amenities', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nombre: name })
+    });
+  } catch(e) {}
+}
+
+// Galería & Portada
+function handleNewImagesUpload(input) {
+  const files = Array.from(input.files);
+  const grid = document.getElementById('gallery-manager-grid');
+  
+  files.forEach((file, i) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const card = document.createElement('div');
+      card.className = 'gallery-card' + (grid.children.length === 0 ? ' is-cover' : '');
+      card.dataset.src = e.target.result;
+      card.innerHTML = `
+        <img src="${e.target.result}" alt="">
+        ${grid.children.length === 0 ? '<div class="cover-badge"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Portada</div>' : ''}
+        <div class="actions-overlay">
+          <button type="button" class="btn-set-cover" onclick="setAsCover('${e.target.result}', this)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            Hacer Portada
+          </button>
+        </div>
+      `;
+      grid.appendChild(card);
+      if (grid.children.length === 1) {
+        document.getElementById('imagen_portada_input').value = e.target.result;
+      }
+      analyzePropertySeo();
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function setAsCover(src, btn) {
+  document.querySelectorAll('.gallery-card').forEach(card => {
+    card.classList.remove('is-cover');
+    const badge = card.querySelector('.cover-badge');
+    if (badge) badge.remove();
+  });
+  
+  const targetCard = btn.closest('.gallery-card');
+  targetCard.classList.add('is-cover');
+  
+  const badge = document.createElement('div');
+  badge.className = 'cover-badge';
+  badge.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Portada';
+  targetCard.appendChild(badge);
+
+  document.getElementById('imagen_portada_input').value = src;
+  analyzePropertySeo();
+}
+
+function deleteExistingPhoto(btn, src) {
+  const card = btn.closest('.gallery-card');
+  const wasCover = card.classList.contains('is-cover');
+  card.remove();
+  
+  if (wasCover) {
+    const firstRemaining = document.querySelector('.gallery-card');
+    if (firstRemaining) {
+      const firstBtn = firstRemaining.querySelector('.btn-set-cover');
+      if (firstBtn) firstBtn.click();
+    } else {
+      document.getElementById('imagen_portada_input').value = '';
+    }
+  }
+  analyzePropertySeo();
+}
+
+// Analizador SEO Real 0-100
+function setCheck(id, ok) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const span = el.querySelector('span');
+  if (ok) {
+    span.className = 'seo-check-ok';
+    span.textContent = '✓';
+  } else {
+    span.className = 'seo-check-warn';
+    span.textContent = '✕';
+  }
+}
+
 function analyzePropertySeo() {
   let score = 0;
   const title = (metaTitleInput?.value || titleInput?.value || '').trim();
-  const desc = (metaDescInput?.value || descInput?.value || '').trim();
+  const desc = (metaDescInput?.value || shortDescInput?.value || '').trim();
   const kw = (keywordsInput?.value || '').trim();
 
-  // 1. Title
-  if (title.length >= 30 && title.length <= 65) score += 30;
-  else if (title.length > 0) score += 15;
-  document.getElementById('meta-title-count').textContent = title.length + '/60 caracteres';
+  // 1. Título
+  const titleOk = title.length >= 30 && title.length <= 65;
+  setCheck('chk-title', titleOk);
+  if (titleOk) score += 25;
+  else if (title.length > 0) score += 10;
+  document.getElementById('meta-title-count').textContent = title.length + '/60 caracteres recomendados';
 
-  // 2. Desc (max 160)
-  if (desc.length >= 80 && desc.length <= 160) score += 35;
+  // 2. Descripción
+  const descOk = desc.length >= 80 && desc.length <= 160;
+  setCheck('chk-desc', descOk);
+  if (descOk) score += 30;
   else if (desc.length > 0) score += 15;
   document.getElementById('meta-desc-count').textContent = desc.length + '/160 caracteres (Máximo exacto 160)';
 
   // 3. Keywords
-  if (kw.length > 4) score += 20;
+  const kwOk = kw.length > 5;
+  setCheck('chk-keywords', kwOk);
+  if (kwOk) score += 15;
 
-  // 4. Has photo
-  const hasImages = document.querySelectorAll('.img-preview-item').length > 0 || (document.getElementById('imagenes')?.files?.length || 0) > 0;
-  if (hasImages) score += 15;
+  // 4. Portada / Galería
+  const hasCover = !!document.getElementById('imagen_portada_input').value || document.querySelectorAll('.gallery-card').length > 0;
+  setCheck('chk-cover', hasCover);
+  if (hasCover) score += 15;
+
+  // 5. Specs
+  const hasSpecs = parseFloat(document.querySelector('input[name="area_construccion"]')?.value || 0) > 0;
+  setCheck('chk-specs', hasSpecs);
+  if (hasSpecs) score += 15;
 
   document.getElementById('seo_score_input').value = score;
   const badge = document.getElementById('seoScoreBadge');
@@ -230,7 +838,10 @@ function analyzePropertySeo() {
   badge.className = 'seo-score-badge ' + (score >= 80 ? 'score-good' : score >= 50 ? 'score-medium' : 'score-poor');
 }
 
-setTimeout(analyzePropertySeo, 200);
+setTimeout(() => {
+  updateAmenitiesHidden();
+  analyzePropertySeo();
+}, 200);
 </script>
 
 <%- include('../../admin/partials/layout-end') %>

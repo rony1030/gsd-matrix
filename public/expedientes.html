@@ -178,29 +178,11 @@ tr.row:hover td{background:var(--bg);cursor:pointer}
 @media (max-width:1600px){.flow{display:none}}
 @media (max-width:1400px){body{grid-template-columns:220px 1fr}.kpis{grid-template-columns:repeat(3,1fr)}.hdr .search{width:220px}.prog{grid-template-columns:2fr 1fr 1fr 1fr}}
 @media (max-width:1200px){body{grid-template-columns:64px 1fr}.side .logo img,.side .logo .prod,.side .grp,.side a span:not(.n),.side .me div{display:none}.side .logo{padding:14px 10px}.side a{padding:12px 0;justify-content:center;border-left:0}.side .me{justify-content:center}.g2,.g3,.alerts{grid-template-columns:1fr}.hdr .mods{display:none}.task{grid-template-columns:20px 1fr 110px 90px}.task .due,.task .btn{display:none}.gal{grid-template-columns:repeat(2,1fr)}.main{padding:18px}}
-@media (max-width:768px){
-  body{display:flex;flex-direction:column;height:auto;min-height:100vh;overflow-x:hidden}
-  .side{display:none}
-  .hdr{grid-column:1;height:auto;padding:12px 14px;flex-wrap:wrap;gap:8px}
-  .hdr .search{width:100%;order:3}
-  .main{padding:14px 10px;overflow:visible}
-  .kpis{grid-template-columns:repeat(2,1fr);gap:8px}
-  .alerts{grid-template-columns:1fr;gap:8px}
-  .prog{grid-template-columns:1fr 1fr;gap:10px}
-  .g2,.g3{grid-template-columns:1fr}
-  .gal{grid-template-columns:1fr 1fr}
-  .exp-head{flex-direction:column;align-items:flex-start;gap:10px}
-  .exp-head .acts{justify-content:flex-start}
-  .card{padding:14px 12px}
-  .card>div{overflow-x:auto;-webkit-overflow-scrolling:touch}
-  .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
-}
 </style>
 </head>
 <body>
 
 <header class="hdr">
-  <a href="/admin" class="quoter" style="text-decoration:none;font-weight:600;font-size:12px;">← Admin CRM</a>
   <div class="mods"><span class="m" onclick="window.location.href='/admin/cotizaciones'">GSD QUOTER</span><span class="sep">|</span><span class="m on">GSD EXPEDIENTES</span></div><div class="flow" id="flow"><span>Cotizar</span>→<span>Aprobar</span>→<span class="on">Expediente</span>→<span class="on">Gestionar</span>→<span>Cerrar</span></div>
   <span class="sp"></span>
   <input class="search" id="search" placeholder="Buscar expediente, cliente o parcela">

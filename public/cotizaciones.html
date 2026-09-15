@@ -221,31 +221,12 @@ tr.row:hover td{background:var(--bg);cursor:pointer}
 .email{border:1px solid var(--line);border-radius:8px;padding:16px 18px;font-size:12.5px;line-height:1.6;background:#fff}
 @media (max-width:1500px){.editor{grid-template-columns:220px 1fr 1fr}}
 @media (max-width:1250px){.editor{grid-template-columns:1fr}.svcbox{position:static}.svcbox .list{max-height:220px}.pv-actions{grid-template-columns:1fr 1fr}}
-@media (max-width:768px){
-  body{display:flex;flex-direction:column;height:auto;min-height:100vh;overflow-x:hidden}
-  .side{display:none}
-  .hdr{flex-wrap:wrap;height:auto;padding:12px 14px;gap:8px}
-  .hdr .search{width:100%;order:3}
-  .main{padding:14px 10px;overflow:visible}
-  .editor{grid-template-columns:1fr;gap:14px}
-  .pv-actions{grid-template-columns:1fr 1fr}
-  .paper{padding:16px 14px;overflow-x:auto}
-  .p-head{flex-direction:column;gap:8px}
-  .p-doc{text-align:left}
-  .cols{grid-template-columns:1fr}
-  .kpis{grid-template-columns:repeat(2,1fr)}
-  .chain{flex-wrap:wrap}
-  .steps3{grid-template-columns:1fr}
-  .sign{grid-template-columns:1fr;gap:12px}
-  .tarifa{grid-template-columns:1fr}
-}
 @media print{body{display:block}.side,.hdr,.main>*:not(#v-editor),#v-editor>*:not(.editor),.editor>*:not(.pvwrap),.pvwrap>*:not(.paper),.toast{display:none!important}.main{padding:0;overflow:visible}.editor{display:block}.paper{border:0;padding:0}.p-foot{margin:22px 0 0}@page{size:letter;margin:16mm}}
 </style>
 </head>
 <body>
 
 <header class="hdr">
-  <a href="/admin" class="quoter" style="text-decoration:none;font-weight:600;font-size:12px;">← Admin CRM</a>
   <div class="mods"><span class="m on">GSD QUOTER</span><span class="sep">|</span><span class="m" onclick="window.location.href='/admin/expedientes'">GSD EXPEDIENTES</span></div>
   <div class="flow"><span class="on">Cotizar</span>→<span class="on">Aprobar</span>→<span>Expediente</span>→<span>Gestionar</span>→<span>Cerrar</span></div>
   <span class="sp"></span>
