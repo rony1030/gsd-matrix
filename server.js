@@ -195,22 +195,75 @@ app.get('/admin/logout', (req, res) => {
   res.redirect('/admin/login');
 });
 
+// Helper: Convert DB row to CRM format
+function formatExpedienteRow(row) {
+  if (!row) return null;
+  let objeto = {}, ubic = {}, linderos = {}, tecnico = {}, docs = [], tasks = [], avances = [], notas = [], evid = [], log = [];
+  try { objeto = JSON.parse(row.objeto_json || '{}'); } catch(e) {}
+  try { ubic = JSON.parse(row.ubicacion_json || '{}'); } catch(e) {}
+  try { linderos = JSON.parse(row.linderos_json || '{}'); } catch(e) {}
+  try { tecnico = JSON.parse(row.tecnico_json || '{}'); } catch(e) {}
+  try { docs = JSON.parse(row.docs_json || '[]'); } catch(e) {}
+  try { tasks = JSON.parse(row.tasks_json || '[]'); } catch(e) {}
+  try { avances = JSON.parse(row.avances_json || '[]'); } catch(e) {}
+  try { notas = JSON.parse(row.notas_json || '[]'); } catch(e) {}
+  try { evid = JSON.parse(row.evidencias_json || '[]'); } catch(e) {}
+  try { log = JSON.parse(row.log_json || '[]'); } catch(e) {}
+
+  return {
+    id: row.codigo,
+    quote: row.cotizacion_ref || '',
+    svc: row.servicio_tipo,
+    cliente: {
+      nombre: row.cliente_nombre,
+      cedula: row.cliente_doc || '',
+      tel: row.cliente_tel || '',
+      email: row.cliente_email || '',
+      dir: row.cliente_dir || ''
+    },
+    honorario: parseFloat(row.honorario) || 0,
+    mon: row.moneda || 'USD',
+    pagos: [],
+    aprob: row.fecha_inicio,
+    inicio: row.fecha_inicio,
+    fin: row.fecha_fin,
+    resp: row.responsable || 'Esteban Mejía',
+    tec: row.tecnico || '',
+    pri: row.prioridad || 'Media',
+    estado: row.estado || 'proc',
+    objeto,
+    ubic,
+    linderos,
+    tecnico,
+    docs,
+    tasks,
+    avances,
+    notas,
+    evid,
+    log
+  };
+}
+
 // Dashboard CRM Unificado
 app.get('/admin', requireAuth, async (req, res) => {
   try {
     await getDb();
-    const expedientes = queryAll('SELECT * FROM expedientes ORDER BY created_at DESC') || [];
+    const rawExp = queryAll('SELECT * FROM expedientes ORDER BY created_at DESC') || [];
+    const expedientes = rawExp.map(formatExpedienteRow).filter(Boolean);
+    const cotizaciones = queryAll('SELECT referencia as ref, cliente_nombre as cli, servicio_tipo as svc, total as hon, moneda as mon, observaciones as obj FROM cotizaciones ORDER BY created_at DESC') || [];
     res.render('admin/expedientes/index', {
       page: 'dashboard',
       initialView: 'dash',
-      expedientes
+      expedientes,
+      cotizaciones
     });
   } catch (err) {
     console.error('Error cargando dashboard CRM:', err);
     res.render('admin/expedientes/index', {
       page: 'dashboard',
       initialView: 'dash',
-      expedientes: []
+      expedientes: [],
+      cotizaciones: []
     });
   }
 });
@@ -229,10 +282,12 @@ crmSubmodules.forEach(({ path: subPath, view, page }) => {
   app.get(subPath, requireAuth, async (req, res) => {
     try {
       await getDb();
-      const expedientes = queryAll('SELECT * FROM expedientes ORDER BY created_at DESC') || [];
-      res.render('admin/expedientes/index', { page, initialView: view, expedientes });
+      const rawExp = queryAll('SELECT * FROM expedientes ORDER BY created_at DESC') || [];
+      const expedientes = rawExp.map(formatExpedienteRow).filter(Boolean);
+      const cotizaciones = queryAll('SELECT referencia as ref, cliente_nombre as cli, servicio_tipo as svc, total as hon, moneda as mon, observaciones as obj FROM cotizaciones ORDER BY created_at DESC') || [];
+      res.render('admin/expedientes/index', { page, initialView: view, expedientes, cotizaciones });
     } catch (err) {
-      res.render('admin/expedientes/index', { page, initialView: view, expedientes: [] });
+      res.render('admin/expedientes/index', { page, initialView: view, expedientes: [], cotizaciones: [] });
     }
   });
 });

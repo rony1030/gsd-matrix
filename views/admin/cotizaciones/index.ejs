@@ -155,21 +155,21 @@
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
           <div class="f">
             <label>Nombre del Cliente / Razón Social *</label>
-            <input type="text" id="client_name" value="Juan Pérez García" required oninput="renderPreview()">
+            <input type="text" id="client_name" value="" placeholder="Ej. Inversiones Pérez, S.R.L." required oninput="renderPreview()">
           </div>
           <div class="f">
-            <label>Cédula / RNC *</label>
-            <input type="text" id="client_doc" value="001-1234567-8" required oninput="renderPreview()">
+            <label>Cédula / RNC</label>
+            <input type="text" id="client_doc" value="" placeholder="001-0000000-0 o RNC" oninput="renderPreview()">
           </div>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px;">
           <div class="f">
             <label>Email de Contacto</label>
-            <input type="email" id="client_email" value="juan.perez@correo.com" oninput="renderPreview()">
+            <input type="email" id="client_email" value="" placeholder="cliente@correo.com" oninput="renderPreview()">
           </div>
           <div class="f">
             <label>Teléfono</label>
-            <input type="tel" id="client_tel" value="+1 (829) 555-0148" oninput="renderPreview()">
+            <input type="tel" id="client_tel" value="" placeholder="+1 (829) 000-0000" oninput="renderPreview()">
           </div>
         </div>
 
@@ -178,7 +178,7 @@
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px;">
           <div class="f">
             <label>Número de Referencia *</label>
-            <input type="text" id="doc_ref" value="GSD-PRO-2026-015" required oninput="renderPreview()">
+            <input type="text" id="doc_ref" value="GSD-PRO-<%= new Date().getFullYear() %>-<%= String(Math.floor(Math.random()*900)+100) %>" required oninput="renderPreview()">
           </div>
           <div class="f">
             <label>Fecha de Emisión *</label>
@@ -191,7 +191,7 @@
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
           <div class="f">
             <label>Monto Base *</label>
-            <input type="number" id="monto_base" value="35000" step="any" min="0" required oninput="renderPreview()">
+            <input type="number" id="monto_base" value="" placeholder="0.00" step="any" min="0" required oninput="renderPreview()">
           </div>
           <div class="f">
             <label>Moneda</label>
@@ -212,7 +212,7 @@
         <!-- 4. Observaciones -->
         <div class="f" style="margin-bottom:18px;">
           <label>Observaciones y Alcance Específico</label>
-          <textarea id="observaciones" rows="3" placeholder="Términos especiales, alcances, etc." oninput="renderPreview()">Asistencia jurídica y redacción de contratos con revisión mensual.</textarea>
+          <textarea id="observaciones" rows="3" placeholder="Términos especiales, alcance del servicio, entregables..." oninput="renderPreview()"></textarea>
         </div>
 
         <div style="display:flex;gap:8px;justify-content:flex-end;">
@@ -240,15 +240,15 @@
             <span style="font-size:0.65rem;color:#6B7280;">Geosolutions Source</span>
           </div>
           <div style="text-align:right;">
-            <strong style="font-size:0.75rem;color:#4A9B6F;" id="pvRef">GSD-PRO-2026-015</strong>
-            <div style="font-size:0.65rem;color:#9CA3AF;" id="pvDate">Fecha: 09/09/2026</div>
+            <strong style="font-size:0.75rem;color:#4A9B6F;" id="pvRef">GSD-PRO-<%= new Date().getFullYear() %>-001</strong>
+            <div style="font-size:0.65rem;color:#9CA3AF;" id="pvDate">Fecha: <%= new Date().toLocaleDateString('es-DO') %></div>
           </div>
         </div>
 
         <div style="margin-bottom:10px;">
           <div style="font-size:0.68rem;color:#6B7280;">CLIENTE:</div>
-          <strong style="color:#1F2937;font-size:0.82rem;" id="pvClient">Juan Pérez García</strong>
-          <div style="font-size:0.7rem;color:#6B7280;" id="pvDoc">RNC: 001-1234567-8</div>
+          <strong style="color:#1F2937;font-size:0.82rem;" id="pvClient">Nombre del Cliente</strong>
+          <div style="font-size:0.7rem;color:#6B7280;" id="pvDoc">Cédula/RNC: —</div>
         </div>
 
         <table class="preview-table">
@@ -261,22 +261,22 @@
           <tbody>
             <tr>
               <td id="pvSvcTitle">Iguala Legal</td>
-              <td style="text-align:right;font-weight:600;" id="pvLineTotal">RD$ 35,000.00</td>
+              <td style="text-align:right;font-weight:600;" id="pvLineTotal">RD$ 0.00</td>
             </tr>
           </tbody>
         </table>
 
         <div style="display:flex;justify-content:space-between;border-top:1px solid #E5E7EB;padding-top:6px;margin-top:6px;">
           <span style="color:#6B7280;font-size:0.75rem;">Subtotal:</span>
-          <span id="pvSubtotal" style="font-weight:600;">RD$ 35,000.00</span>
+          <span id="pvSubtotal" style="font-weight:600;">RD$ 0.00</span>
         </div>
         <div id="pvItbisRow" style="display:none;justify-content:space-between;">
           <span style="color:#6B7280;font-size:0.75rem;">ITBIS (18%):</span>
-          <span id="pvItbis" style="font-weight:600;">RD$ 6,300.00</span>
+          <span id="pvItbis" style="font-weight:600;">RD$ 0.00</span>
         </div>
         <div style="display:flex;justify-content:space-between;background:#E8F4EF;padding:6px 8px;border-radius:6px;margin-top:6px;">
           <strong style="color:#2F6B4A;font-size:0.8rem;">TOTAL:</strong>
-          <strong style="color:#2F6B4A;font-size:0.88rem;" id="pvTotal">RD$ 35,000.00</strong>
+          <strong style="color:#2F6B4A;font-size:0.88rem;" id="pvTotal">RD$ 0.00</strong>
         </div>
       </div>
     </div>

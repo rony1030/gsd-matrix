@@ -29,13 +29,14 @@ i[data-lucide],svg.lucide{width:16px;height:16px;vertical-align:-3px}
 .side .logo a{display:flex;align-items:center;gap:8px;text-decoration:none;width:100%}
 .side .logo img{max-height:36px;max-width:130px;width:auto;object-fit:contain;display:block}
 .side .logo .prod{font-size:9.5px;letter-spacing:1.5px;color:var(--green);font-weight:600;white-space:nowrap;text-transform:uppercase}
-.side .grp{font-size:10.5px;letter-spacing:1px;text-transform:uppercase;color:var(--gray);padding:16px 22px 6px}
-.side nav{flex:1;overflow-y:auto}
-.side a{display:flex;align-items:center;gap:10px;padding:9px 22px;color:var(--navy);font-weight:500;cursor:pointer;font-size:12.5px;border-left:3px solid transparent;text-decoration:none;transition:background .15s,border-color .15s,color .15s}
+.side .grp{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--gray);padding:14px 20px 4px;font-weight:600}
+.side nav{flex:1;overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none}
+.side nav::-webkit-scrollbar{display:none}
+.side a{display:flex;align-items:center;gap:10px;padding:8px 20px;color:var(--navy);font-weight:500;cursor:pointer;font-size:12.5px;border-left:3px solid transparent;text-decoration:none;transition:background .15s,border-color .15s,color .15s;line-height:1.3}
 .side a:hover{background:var(--bg)}
 .side a.on{background:var(--green-l);border-left-color:var(--green);color:var(--green)}
 .side a .n{margin-left:auto;background:var(--red);color:#fff;font-size:10px;padding:1px 7px;border-radius:10px}
-.side .me{padding:14px 22px;border-top:1px solid var(--line);display:flex;gap:10px;align-items:center}
+.side .me{padding:12px 20px;border-top:1px solid var(--line);display:flex;gap:10px;align-items:center;box-sizing:border-box}
 .side .me .av{width:34px;height:34px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;position:relative}
 .side .me .av:after{content:'';position:absolute;right:-1px;bottom:-1px;width:10px;height:10px;border-radius:50%;background:var(--green);border:2px solid #fff}
 .side .me b{display:block;font-weight:500;color:var(--navy);font-size:12.5px}
@@ -318,32 +319,30 @@ const TPL={
   fases:[['Diagnóstico',['Reunión inicial','Relevar asuntos abiertos','Definir nivel de iguala']],['Contrato',['Redacción del contrato','Firma','Primer pago']],['Servicio',['Informe mensual 1','Informe mensual 2','Informe mensual 3']],['Renovación',['Evaluación','Renovación o cierre']]]}
 };
 
-// ===== DATA: datos de demostración =====
-// ===== LOCAL STORAGE / STATE =====
-const SEED_KEY='gsd_exp_v2';
-function mkTasks(t,doneUpTo,proc){let id=1,out=[];t.fases.forEach((f,fi)=>f[1].forEach((n,ti)=>{const k=`${fi}.${ti}`;let st='pend';if(k<doneUpTo||(fi<parseInt(doneUpTo)))st='done';if(k===doneUpTo)st='proc';if(proc&&proc.includes(k))st='proc';out.push({id:id++,phase:fi,name:n,who:fi<=1||fi>=4?'Esteban Mejía':'Carlos Rodríguez',due:'',pri:'Media',st,desc:''});}));return out;}
-function seed(){
- const e027={id:'EXP-2026-027',quote:'GSD-PRO-2026-027',svc:'deslinde',cliente:{nombre:'Ramón E. de la Cruz',cedula:'001-1234567-8',tel:'+1 (829) 555-0148',email:'ramon.delacruz@correo.com',dir:'Calle Principal 14, Verón'},honorario:2000,mon:'US$',pagos:[{d:'2026-09-10',c:'Primer pago (50%)',m:1000,st:'Pagado'},{d:'',c:'Segundo pago contra aprobación del plano',m:1000,st:'Pendiente'}],aprob:'2026-09-10',inicio:'2026-09-10',fin:'2027-01-10',resp:'Esteban Mejía',tec:'Carlos Rodríguez',pri:'Alta',estado:'proc',
-  objeto:{provincia:'La Altagracia',municipio:'Higüey',dm:'Verón-Punta Cana',sector:'Verón',parcela:'112-A',dc:'01',areaReg:'860 m²',areaLev:'858.73 m²',matricula:'3000254871',titulo:'Constancia anotada',propietario:'Ramón E. de la Cruz'},
-  ubic:{coord:'18.5812, -68.4103',ref:'A 300 m del cruce de Verón, lado norte de la carretera',dir:'Sector Verón, Higüey'},linderos:{Norte:'Parcela 112-B',Sur:'Camino vecinal',Este:'Parcela 113',Oeste:'Parcela 111'},tecnico:{tipo:'GNSS RTK',equipo:'Apeks',sist:'UTM',zona:'19N',datum:'WGS84',prec:'±2 cm horizontal'},
-  docs:[],tasks:mkTasks(TPL.deslinde,'3.2'),avances:[{date:'2026-09-15',title:'Levantamiento de campo completado',who:'Carlos Rodríguez',desc:'Se realizó levantamiento georreferenciado de la parcela y se verificaron los linderos físicos.',client:true},{date:'2026-09-13',title:'Documentación revisada',who:'Esteban Mejía',desc:'Título y antecedentes verificados en el Registro de Títulos. Sin cargas ni oposiciones.',client:true}],
-  notas:[{date:'2026-09-15',who:'Esteban Mejía',txt:'Existe diferencia aproximada de 1.27 m² entre superficie registral y levantamiento. Verificar antes de preparar plano definitivo.'}],
-  log:[{d:'2026-09-15 10:43',w:'Carlos Rodríguez',t:'Levantamiento de campo completado. Se cargaron fotografías y archivos GNSS.'},{d:'2026-09-15 09:15',w:'Ana Martínez',t:'Documento "Certificado de título" verificado.'},{d:'2026-09-14 16:30',w:'Esteban Mejía',t:'Se agregó nota interna.'},{d:'2026-09-13 11:20',w:'Sistema',t:'Expediente avanzado automáticamente a "Campo".'},{d:'2026-09-10 09:02',w:'Sistema',t:'Expediente creado desde cotización GSD-PRO-2026-027.'}],
-  evid:[{t:'Mojón noreste',d:'2026-09-15 10:43',c:'18.5815, -68.4098',w:'Carlos Rodríguez'},{t:'Mojón sureste',d:'2026-09-15 10:51',c:'18.5808, -68.4097',w:'Carlos Rodríguez'},{t:'Lindero oeste · camino',d:'2026-09-15 11:05',c:'18.5810, -68.4109',w:'Carlos Rodríguez'},{t:'Vista general de la parcela',d:'2026-09-15 11:20',c:'18.5812, -68.4103',w:'Carlos Rodríguez'}]};
- e027.docs=TPL.deslinde.docs.map((d,i)=>({cat:d[0],name:d[1],by:d[2],share:[3,4,6].includes(i),st:[0,1,3,4,6,7,10].includes(i)?'ok':(i===5?'wait':'miss'),file:[0,1,3,4,6,7,10].includes(i)?d[1].replace(/ /g,'_')+'.pdf':'',size:[0,1,3,4,6,7,10].includes(i)?(1+i*0.3).toFixed(1)+' MB':'',date:[0,1,3,4,6,7,10].includes(i)?'2026-09-1'+(i%5):'',who:i>=6?'Carlos Rodríguez':'Esteban Mejía'}));
- e027.tasks.find(t=>t.name==='Plano').due='2026-09-18';e027.tasks.find(t=>t.name==='Notificación a colindantes').due='2026-09-13';e027.tasks.find(t=>t.name==='Notificación a colindantes').who='Ana Martínez';e027.tasks.find(t=>t.name==='Informe técnico').due='2026-09-25';e027.tasks.find(t=>t.name==='Plano').pri='Alta';
- const mk=(id,quote,svc,cli,ced,hon,mon,resp,tec,pri,estado,doneUpTo,inicio,objeto,extra)=>{const t=TPL[svc];const e={id,quote,svc,cliente:{nombre:cli,cedula:ced,tel:'+1 (809) 555-0100',email:cli.toLowerCase().replace(/[^a-z]/g,'')+'@correo.com',dir:'Punta Cana'},honorario:hon,mon,pagos:[{d:inicio,c:'Pago inicial',m:hon/2,st:'Pagado'},{d:'',c:'Saldo',m:hon/2,st:'Pendiente'}],aprob:inicio,inicio,fin:addDays(inicio,t.plazo),resp,tec,pri,estado,objeto,ubic:{coord:'18.60, -68.40',ref:'',dir:''},linderos:{Norte:'',Sur:'',Este:'',Oeste:''},tecnico:{tipo:'GNSS RTK',equipo:'Apeks',sist:'UTM',zona:'19N',datum:'WGS84',prec:''},docs:t.docs.map((d,i)=>({cat:d[0],name:d[1],by:d[2],st:i<3?'ok':'miss',file:i<3?d[1].replace(/ /g,'_')+'.pdf':'',size:i<3?'1.2 MB':'',date:i<3?inicio:'',who:resp})),tasks:mkTasks(t,doneUpTo),avances:[{date:inicio,title:'Expediente abierto',who:resp,desc:'Se recibió la documentación inicial y se abrió el expediente.',client:true}],notas:[],log:[{d:inicio+' 09:00',w:'Sistema',t:`Expediente creado desde cotización ${quote}.`}],evid:[],...extra};return e;};
- const e026=mk('EXP-2026-026','GSD-PRO-2026-026','iguala','Juan Pérez García','131-45678-9',5000,'US$','Esteban Mejía','','Media','proc','2.0','2026-09-09',{empresa:'Inversiones JPG, S.R.L.',rnc:'131-45678-9',nivel:'Business',sede:'Bávaro',contacto:'Juan Pérez García',vigencia:'6 meses'});
- const e024=mk('EXP-2026-024','GSD-PRO-2026-024','deslinde','Inversiones del Este, S.R.L.','130-98765-4',2000,'US$','Carlos Rodríguez','Carlos Rodríguez','Media','rev','4.2','2026-08-08',{provincia:'La Altagracia',municipio:'Higüey',dm:'Verón-Punta Cana',sector:'Bávaro',parcela:'88-C',dc:'01',areaReg:'950 m²',areaLev:'949.10 m²',matricula:'3000198442',titulo:'Constancia anotada',propietario:'Inversiones del Este, S.R.L.'});
- const e029=mk('EXP-2026-029','GSD-PRO-2026-029','transferencia','María López','001-7654321-0',800,'US$','Brenda Laureano','','Media','wait','0.2','2026-09-07',{provincia:'La Altagracia',municipio:'Higüey',sector:'Cortecito',matricula:'3000311209',titulo:'',dc:'Parcela 45, DC 11/3',areaReg:'120 m²',vendedor:'Pedro Ureña',comprador:'María López',precio:'US$85,000'});
- e029.docs[3].st='wait';
- const e031=mk('EXP-2026-031','GSD-PRO-2026-031','deslinde','Villa Marina, S.R.L.','131-22334-5',2000,'US$','Esteban Mejía','Rafael Peña','Alta','proc','1.0','2026-09-05',{provincia:'La Altagracia',municipio:'Higüey',dm:'Verón-Punta Cana',sector:'Cap Cana',parcela:'201-B',dc:'01',areaReg:'1,000 m²',areaLev:'',matricula:'3000402771',titulo:'Constancia anotada',propietario:'Villa Marina, S.R.L.'});
- e031.tasks.find(t=>t.name==='Certificación de estado jurídico').due='2026-09-14';
- return [e027,e026,e024,e029,e031];
-}
+// ===== DATA / REAL STATE =====
+const SEED_KEY='gsd_exp_v5';
+try {
+  localStorage.removeItem('gsd_exp_v2');
+  localStorage.removeItem('gsd_exp_v3');
+  localStorage.removeItem('gsd_exp_v4');
+} catch(e) {}
+
+const SERVER_EXPEDIENTES = <%- JSON.stringify(typeof expedientes !== 'undefined' ? expedientes : []) %>;
+const SERVER_QUOTES = <%- JSON.stringify(typeof cotizaciones !== 'undefined' ? cotizaciones : []) %>;
+
+let localStored = null;
+try {
+  localStored = JSON.parse(localStorage.getItem(SEED_KEY) || 'null');
+} catch(e) {}
+
+let DB = (SERVER_EXPEDIENTES && SERVER_EXPEDIENTES.length > 0)
+  ? SERVER_EXPEDIENTES
+  : (Array.isArray(localStored) ? localStored : []);
+
+let quotes = Array.isArray(SERVER_QUOTES) ? SERVER_QUOTES : [];
+
 function addDays(s,n){const d=new Date(s+'T00:00:00');d.setDate(d.getDate()+n);return d.toISOString().slice(0,10);}
-let DB=JSON.parse(localStorage.getItem(SEED_KEY)||'null')||seed();
-let quotes=[{ref:'GSD-PRO-2026-032',cli:'Sr. Luis Herrera',svc:'transferencia',hon:800,mon:'US$',obj:'Matrícula 3000512300 · Bávaro'},{ref:'GSD-PRO-2026-033',cli:'Cana Bay Investments, LLC',svc:'deslinde',hon:2000,mon:'US$',obj:'Parcela 77-A · 1,000 m² · Macao'},{ref:'GSD-PRO-2026-034',cli:'Grupo Arrecife, S.R.L.',svc:'iguala',hon:5000,mon:'US$',obj:'Iguala Business · Punta Cana'}];
+function mkTasks(t,doneUpTo,proc){let id=1,out=[];t.fases.forEach((f,fi)=>f[1].forEach((n,ti)=>{const k=`${fi}.${ti}`;let st='pend';if(k<doneUpTo||(fi<parseInt(doneUpTo)))st='done';if(k===doneUpTo)st='proc';if(proc&&proc.includes(k))st='proc';out.push({id:id++,phase:fi,name:n,who:fi<=1||fi>=4?'Esteban Mejía':'Carlos Rodríguez',due:'',pri:'Media',st,desc:''});}));return out;}
 const save=()=>{
   localStorage.setItem(SEED_KEY,JSON.stringify(DB));
   if (cur) {
@@ -354,7 +353,7 @@ const save=()=>{
     }).catch(e=>console.log('Background sync error:',e));
   }
 };
-const TODAY='2026-09-15';
+const TODAY=new Date().toISOString().slice(0,10);
 const $=id=>document.getElementById(id);
 const fmt=n=>Number(n).toLocaleString('en-US');
 const M=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
@@ -415,22 +414,24 @@ document.querySelectorAll('.side a[data-view]').forEach(a => {
   });
 });
 function rowHTML(e,withDate){const p=progress(e),es=ESTADO[e.estado];return `<tr class="row" onclick="openExp('${e.id}')"><td><b style="color:var(--navy);font-weight:500">${e.id}</b></td><td>${e.cliente.nombre}</td><td>${TPL[e.svc].nombre}</td><td>${e.tec&&e.tec!==e.resp?e.resp.split(' ')[0]+' / '+e.tec.split(' ')[0]:e.resp}</td>${withDate?`<td>${fd(e.inicio)}</td>`:''}<td><div style="display:flex;align-items:center;gap:8px"><div class="bar" style="flex:1"><i style="width:${p.pct}%"></i></div><span style="font-size:11.5px;color:var(--gray);min-width:32px">${p.pct}%</span></div></td><td><span class="tag ${es[1]}">${es[0]}</span></td></tr>`;}
-function renderDash(){const al=alerts(),act=DB.filter(e=>e.estado!=='done');const late=al.filter(a=>a.c==='r').length,soon=DB.flatMap(e=>e.tasks).filter(t=>t.due&&t.st!=='done'&&days(t.due)>=0&&days(t.due)<=14).length;
- $('kpis').innerHTML=[['folder-open','Expedientes activos',act.length],['alert-circle','Requieren atención',al.length,'warn'],['clock','Tareas vencidas',late,late?'warn':''],['calendar','Próximos vencimientos',soon],['check-circle','Completados este mes',DB.filter(e=>e.estado==='done').length]].map(k=>`<div class="kpi ${k[3]||''}"><div class="l"><i data-lucide="${k[0]}"></i>${k[1]}</div><div class="v">${k[2]}</div></div>`).join('');
- $('dashAlerts').innerHTML=al.slice(0,3).map(a=>`<div class="alert" onclick="openExp('${a.e}')"><span class="dot ${a.c}"></span><div><b>${a.n}</b><small>${a.e} · ${a.s}</small><small>Responsable: ${a.w.split(' ')[0]}</small></div></div>`).join('')||'<div class="empty">Sin alertas.</div>';
- $('dashRows').innerHTML=DB.slice(0,4).map(e=>rowHTML(e)).join('');}
+function renderDash(){const al=alerts(),act=DB.filter(e=>e.estado!=='done');const late=al.filter(a=>a.c==='r').length,soon=DB.flatMap(e=>e.tasks||[]).filter(t=>t.due&&t.st!=='done'&&days(t.due)>=0&&days(t.due)<=14).length;
+ $('kpis').innerHTML=[['folder-open','Expedientes activos',act.length],['alert-circle','Requieren atención',al.length,al.length?'warn':''],['clock','Tareas vencidas',late,late?'warn':''],['calendar','Próximos vencimientos',soon],['check-circle','Completados este mes',DB.filter(e=>e.estado==='done').length]].map(k=>`<div class="kpi ${k[3]||''}"><div class="l"><i data-lucide="${k[0]}"></i>${k[1]}</div><div class="v">${k[2]}</div></div>`).join('');
+ $('dashAlerts').innerHTML=al.slice(0,3).map(a=>`<div class="alert" onclick="openExp('${a.e}')"><span class="dot ${a.c}"></span><div><b>${a.n}</b><small>${a.e} · ${a.s}</small><small>Responsable: ${a.w.split(' ')[0]}</small></div></div>`).join('')||'<div class="empty" style="text-align:center;padding:18px;color:var(--gray);">Sin alertas pendientes. Todo al día.</div>';
+ $('dashRows').innerHTML=DB.slice(0,4).map(e=>rowHTML(e)).join('')||'<tr><td colspan="6" class="empty" style="text-align:center;padding:24px;color:var(--gray);">No hay expedientes registrados aún. Haz clic en "Nuevo expediente" para crear el primero.</td></tr>';}
 let listF='all';
 $('listFilters').onclick=ev=>{if(ev.target.dataset.f){listF=ev.target.dataset.f;[...$('listFilters').children].forEach(b=>b.classList.toggle('on',b===ev.target));renderList();}};
-function renderList(){const q=$('search').value.toLowerCase();const rows=DB.filter(e=>(listF==='all'||e.estado===listF)&&(!q||JSON.stringify(e).toLowerCase().includes(q)));$('listCount').textContent=`${rows.length} expediente${rows.length!==1?'s':''}`;$('listRows').innerHTML=rows.map(e=>rowHTML(e,true)).join('')||'<tr><td colspan="7" class="empty">Sin resultados.</td></tr>';}
+function renderList(){const q=$('search').value.toLowerCase();const rows=DB.filter(e=>(listF==='all'||e.estado===listF)&&(!q||JSON.stringify(e).toLowerCase().includes(q)));$('listCount').textContent=`${rows.length} expediente${rows.length!==1?'s':''}`;$('listRows').innerHTML=rows.map(e=>rowHTML(e,true)).join('')||'<tr><td colspan="7" class="empty" style="text-align:center;padding:28px;color:var(--gray);">No hay expedientes registrados en esta vista.</td></tr>';}
 $('search').addEventListener('input',()=>{go('list');});
 let mtF='all';$('mtFilters').onclick=ev=>{if(ev.target.dataset.f){mtF=ev.target.dataset.f;[...$('mtFilters').children].forEach(b=>b.classList.toggle('on',b===ev.target));renderMy();}};
-function allTasks(){return DB.flatMap(e=>e.tasks.map(t=>({...t,e})));}
+function allTasks(){return DB.flatMap(e=>(e.tasks||[]).map(t=>({...t,e})));}
 function renderMy(){let ts=allTasks().filter(t=>t.st!=='done'&&t.st!=='na');if(mtF==='mine')ts=ts.filter(t=>t.who==='Esteban Mejía');if(mtF==='late')ts=ts.filter(t=>t.due&&days(t.due)<0);if(mtF==='week')ts=ts.filter(t=>t.due&&days(t.due)>=0&&days(t.due)<=7);ts.sort((a,b)=>(a.due||'9')>(b.due||'9')?1:-1);
- $('mtRows').innerHTML=ts.map(t=>`<tr class="row" onclick="openExp('${t.e.id}','tareas')"><td>${t.name}</td><td>${t.e.id}</td><td>${TPL[t.e.svc].fases[t.phase][0]}</td><td>${t.who}</td><td class="${t.due&&days(t.due)<0?'st-block':''}">${fd(t.due)}</td><td class="${ST[t.st][1]}">● ${ST[t.st][0]}</td></tr>`).join('')||'<tr><td colspan="6" class="empty">Sin tareas.</td></tr>';
- $('nMy').textContent=allTasks().filter(t=>t.who==='Esteban Mejía'&&t.due&&t.st!=='done'&&t.st!=='na'&&days(t.due)<=3).length;}
-function renderCal(){const ts=allTasks().filter(t=>t.due&&t.st!=='done'&&t.st!=='na').sort((a,b)=>a.due>b.due?1:-1);const g={};ts.forEach(t=>{(g[t.due]=g[t.due]||[]).push(t);});$('calBox').innerHTML=Object.keys(g).map(d=>`<div style="display:grid;grid-template-columns:110px 1fr;gap:14px;padding:10px 0;border-bottom:1px solid var(--line)"><div><b style="color:${days(d)<0?'var(--red)':'var(--navy)'};font-weight:500">${fd(d)}</b><br><small style="color:var(--gray)">${days(d)<0?'vencido':days(d)===0?'hoy':'en '+days(d)+' días'}</small></div><div>${g[d].map(t=>`<div style="padding:3px 0"><span class="link" onclick="openExp('${t.e.id}','tareas')">${t.name}</span> <small style="color:var(--gray)">· ${t.e.id} · ${t.who}</small></div>`).join('')}</div></div>`).join('')||'<div class="empty">Sin vencimientos programados.</div>';}
-function renderCli(){const g={};DB.forEach(e=>{(g[e.cliente.nombre]=g[e.cliente.nombre]||{c:e.cliente,ex:[]}).ex.push(e.id);});$('cliRows').innerHTML=Object.values(g).map(x=>`<tr><td><b style="font-weight:500;color:var(--navy)">${x.c.nombre}</b></td><td>${x.c.cedula}</td><td>${x.c.email}<br><small style="color:var(--gray)">${x.c.tel}</small></td><td>${x.ex.map(i=>`<span class="link" onclick="openExp('${i}')">${i}</span>`).join(', ')}</td></tr>`).join('');}
-function renderDocsAll(){const rows=DB.flatMap(e=>e.docs.filter(d=>d.st!=='ok').map(d=>({...d,e})));$('docsAll').innerHTML=rows.map(d=>`<div class="doc"><div class="ic miss"><i data-lucide="file"></i></div><div><b>${d.name}</b><small>${d.e.id} · ${d.e.cliente.nombre} · aporta: ${d.by==='cliente'?'cliente':'GSD'}</small></div><div class="acts"><span class="tag ${d.st==='wait'?'wait':'late'}">${d.st==='wait'?'Solicitado':'Pendiente'}</span><button class="btn sm" onclick="openExp('${d.e.id}','documentos')">Abrir</button></div></div>`).join('')||'<div class="empty">Todo al día.</div>';}
+ $('mtRows').innerHTML=ts.map(t=>`<tr class="row" onclick="openExp('${t.e.id}','tareas')"><td>${t.name}</td><td>${t.e.id}</td><td>${TPL[t.e.svc]?.fases[t.phase]?.[0]||'General'}</td><td>${t.who}</td><td class="${t.due&&days(t.due)<0?'st-block':''}">${fd(t.due)}</td><td class="${ST[t.st][1]}">● ${ST[t.st][0]}</td></tr>`).join('')||'<tr><td colspan="6" class="empty" style="text-align:center;padding:28px;color:var(--gray);">No hay tareas pendientes.</td></tr>';
+ const myC = allTasks().filter(t=>t.who==='Esteban Mejía'&&t.due&&t.st!=='done'&&t.st!=='na'&&days(t.due)<=3).length;
+ $('nMy').textContent=myC;
+ $('nMy').style.display=myC>0?'inline-block':'none';}
+function renderCal(){const ts=allTasks().filter(t=>t.due&&t.st!=='done'&&t.st!=='na').sort((a,b)=>a.due>b.due?1:-1);const g={};ts.forEach(t=>{(g[t.due]=g[t.due]||[]).push(t);});$('calBox').innerHTML=Object.keys(g).map(d=>`<div style="display:grid;grid-template-columns:110px 1fr;gap:14px;padding:10px 0;border-bottom:1px solid var(--line)"><div><b style="color:${days(d)<0?'var(--red)':'var(--navy)'};font-weight:500">${fd(d)}</b><br><small style="color:var(--gray)">${days(d)<0?'vencido':days(d)===0?'hoy':'en '+days(d)+' días'}</small></div><div>${g[d].map(t=>`<div style="padding:3px 0"><span class="link" onclick="openExp('${t.e.id}','tareas')">${t.name}</span> <small style="color:var(--gray)">· ${t.e.id} · ${t.who}</small></div>`).join('')}</div></div>`).join('')||'<div class="empty" style="text-align:center;padding:28px;color:var(--gray);">Sin vencimientos programados.</div>';}
+function renderCli(){const g={};DB.forEach(e=>{if(e.cliente?.nombre){(g[e.cliente.nombre]=g[e.cliente.nombre]||{c:e.cliente,ex:[]}).ex.push(e.id);}});$('cliRows').innerHTML=Object.values(g).map(x=>`<tr><td><b style="font-weight:500;color:var(--navy)">${x.c.nombre}</b></td><td>${x.c.cedula||'—'}</td><td>${x.c.email||'—'}<br><small style="color:var(--gray)">${x.c.tel||'—'}</small></td><td>${x.ex.map(i=>`<span class="link" onclick="openExp('${i}')">${i}</span>`).join(', ')}</td></tr>`).join('')||'<tr><td colspan="4" class="empty" style="text-align:center;padding:28px;color:var(--gray);">No hay clientes registrados aún.</td></tr>';}
+function renderDocsAll(){const rows=DB.flatMap(e=>(e.docs||[]).filter(d=>d.st!=='ok').map(d=>({...d,e})));$('docsAll').innerHTML=rows.map(d=>`<div class="doc"><div class="ic miss"><i data-lucide="file"></i></div><div><b>${d.name}</b><small>${d.e.id} · ${d.e.cliente?.nombre||'Cliente'} · aporta: ${d.by==='cliente'?'cliente':'GSD'}</small></div><div class="acts"><span class="tag ${d.st==='wait'?'wait':'late'}">${d.st==='wait'?'Solicitado':'Pendiente'}</span><button class="btn sm" onclick="openExp('${d.e.id}','documentos')">Abrir</button></div></div>`).join('')||'<div class="empty" style="text-align:center;padding:28px;color:var(--gray);">No hay documentos pendientes. Todo al día.</div>';}
 function renderTpl(){$('tplCards').innerHTML=Object.entries(TPL).map(([k,t])=>`<div class="card"><h2>${t.nombre}</h2><p class="sub">${t.div} · plazo estimado ${t.plazo} días</p><div class="kv" style="margin-top:12px;grid-template-columns:110px 1fr"><span class="k">Campos</span><span class="v">${Object.keys(t.objeto).length} del objeto</span><span class="k">Documentos</span><span class="v">${t.docs.length}</span><span class="k">Etapas</span><span class="v">${t.fases.length}</span><span class="k">Tareas</span><span class="v">${t.fases.reduce((a,f)=>a+f[1].length,0)}</span></div><div style="margin-top:12px;font-size:11.5px;color:var(--gray)">${t.fases.map(f=>f[0]).join(' → ')}</div></div>`).join('');}
 
 // ===== EXPEDIENTE: control center =====
@@ -519,15 +520,89 @@ function finanzas(e,T,b){const pag=e.pagos.filter(p=>p.st==='Pagado').reduce((a,
  <div class="card"><div class="ch"><h2>Historial de pagos</h2></div><table><thead><tr><th>Fecha</th><th>Concepto</th><th>Monto</th><th>Estado</th><th></th></tr></thead><tbody>${e.pagos.map((p,i)=>`<tr><td>${fd(p.d)}</td><td>${p.c}</td><td>${e.mon}${fmt(p.m)}</td><td><span class="tag ${p.st==='Pagado'?'proc':'wait'}">${p.st}</span></td><td>${p.st!=='Pagado'?`<button class="btn sm" onclick="cur.pagos[${i}].st='Pagado';cur.pagos[${i}].d='${TODAY}';log(cur,'Pago registrado: ${p.c}.');save();renderTab();toast('Pago registrado')">Registrar pago</button>`:''}</td></tr>`).join('')}</tbody></table></div>`;}
 
 // ===== MODALS: nuevo expediente =====
-$('btnNewExp').onclick=()=>{$('nQuote').innerHTML=quotes.map(q=>`<option value="${q.ref}">${q.ref} — ${q.cli}</option>`).join('');$('nSvc').innerHTML=Object.entries(TPL).map(([k,t])=>`<option value="${k}">${t.nombre}</option>`).join('');$('nResp').innerHTML=TEAM.map(n=>`<option>${n}</option>`).join('');quoteInfo();openM('mNew');};
+$('btnNewExp').onclick=()=>{
+  $('nQuote').innerHTML=quotes.length ? quotes.map(q=>`<option value="${q.ref}">${q.ref} — ${q.cli}</option>`).join('') : '<option value="">(Sin cotizaciones aprobadas)</option>';
+  $('nSvc').innerHTML=Object.entries(TPL).map(([k,t])=>`<option value="${k}">${t.nombre}</option>`).join('');
+  $('nResp').innerHTML=TEAM.map(n=>`<option>${n}</option>`).join('');
+  if (!quotes.length) {
+    const rM = document.querySelector('input[name=orig][value="m"]');
+    if (rM) { rM.checked = true; rM.dispatchEvent(new Event('change')); }
+  } else {
+    const rQ = document.querySelector('input[name=orig][value="q"]');
+    if (rQ) { rQ.checked = true; rQ.dispatchEvent(new Event('change')); }
+  }
+  quoteInfo();
+  openM('mNew');
+};
 $('nQuote').onchange=quoteInfo;
-function quoteInfo(){const q=quotes.find(x=>x.ref===$('nQuote').value);if(!q){$('nQuoteInfo').innerHTML='<span class="sub">No hay cotizaciones aprobadas pendientes.</span>';return;}$('nQuoteInfo').innerHTML=`<div class="kv" style="grid-template-columns:100px 1fr"><span class="k">Cliente</span><span class="v">${q.cli}</span><span class="k">Servicio</span><span class="v">${TPL[q.svc].nombre}</span><span class="k">Honorario</span><span class="v">${q.mon}${fmt(q.hon)}</span><span class="k">Objeto</span><span class="v">${q.obj}</span></div>`;}
-document.querySelectorAll('input[name=orig]').forEach(r=>r.onchange=()=>{document.querySelectorAll('.radio label').forEach(l=>l.classList.toggle('on',l.querySelector('input').checked));const q=r.value==='q';$('newQ').classList.toggle('hidden',!q);$('newM').classList.toggle('hidden',q);});
-function createExp(){const fromQ=document.querySelector('input[name=orig]:checked').value==='q';let cli,svc,hon,mon='US$',quote,obj;if(fromQ){const q=quotes.find(x=>x.ref===$('nQuote').value);if(!q){toast('Sin cotización');return;}cli=q.cli;svc=q.svc;hon=q.hon;mon=q.mon;quote=q.ref;obj=q.obj;quotes=quotes.filter(x=>x!==q);}else{cli=$('nCli').value.trim();svc=$('nSvc').value;hon=parseFloat(($('nHon').value||'0').replace(/[^\d.]/g,''))||0;quote='Manual';obj=$('nObj').value;if(!cli){toast('Ingrese el cliente');return;}}
- const T=TPL[svc];const n=Math.max(...DB.map(e=>+e.id.split('-')[2]),...quotes.map(q=>+q.ref.split('-')[3]),0)+1;const id=`EXP-2026-${String(fromQ?+quote.split('-')[3]:n).padStart(3,'0')}`;const resp=$('nResp').value;
- const objeto={};Object.keys(T.objeto).forEach(k=>objeto[k]='');if(svc==='deslinde'){const m=obj.match(/Parcela ([\w-]+)/);objeto.parcela=m?m[1]:'';const a=obj.match(/([\d,]+ m²)/);objeto.areaReg=a?a[1]:'';objeto.provincia='La Altagracia';objeto.municipio='Higüey';objeto.sector=obj.split('·').pop().trim();objeto.propietario=cli;}if(svc==='transferencia'){const m=obj.match(/Matrícula (\d+)/);objeto.matricula=m?m[1]:'';objeto.comprador=cli;objeto.sector=obj.split('·').pop().trim();}if(svc==='iguala'){objeto.empresa=cli;objeto.nivel=obj.includes('Business')?'Business':'Essential';objeto.sede=obj.split('·').pop().trim();}
- const e={id,quote,svc,cliente:{nombre:cli,cedula:'',tel:'',email:'',dir:''},honorario:hon,mon,pagos:[{d:'',c:'Pago inicial',m:hon/2,st:'Pendiente'},{d:'',c:'Saldo',m:hon/2,st:'Pendiente'}],aprob:TODAY,inicio:TODAY,fin:addDays(TODAY,T.plazo),resp,tec:T.tec?'Carlos Rodríguez':'',pri:$('nPri').value,estado:'proc',objeto,ubic:{coord:'',ref:'',dir:''},linderos:{Norte:'',Sur:'',Este:'',Oeste:''},tecnico:{tipo:'GNSS RTK',equipo:'Apeks',sist:'UTM',zona:'19N',datum:'WGS84',prec:''},docs:T.docs.map(d=>({cat:d[0],name:d[1],by:d[2],share:false,st:'miss',file:'',size:'',date:'',who:resp})),tasks:mkTasks(T,'-1'),avances:[{date:TODAY,title:'Expediente abierto',who:resp,desc:'Se abrió el expediente y se solicitó la documentación inicial.',client:true}],notas:[],log:[{d:TODAY+' '+new Date().toTimeString().slice(0,5),w:'Sistema',t:fromQ?`Expediente creado desde cotización ${quote}. Datos importados automáticamente.`:'Expediente creado manualmente.'}],evid:[]};
- e.tasks[0].due=addDays(TODAY,5);DB.unshift(e);save();closeM('mNew');openExp(id);toast(`${id} creado`);}
+function quoteInfo(){
+  const q=quotes.find(x=>x.ref===$('nQuote').value);
+  if(!q){$('nQuoteInfo').innerHTML='<span class="sub" style="display:block;padding:6px 0;">No hay cotizaciones aprobadas registradas. Puede seleccionar "Creación manual" arriba para crear el expediente directamente.</span>';return;}
+  $('nQuoteInfo').innerHTML=`<div class="kv" style="grid-template-columns:100px 1fr"><span class="k">Cliente</span><span class="v">${q.cli}</span><span class="k">Servicio</span><span class="v">${TPL[q.svc]?.nombre||'Servicio'}</span><span class="k">Honorario</span><span class="v">${q.mon||'USD'}${fmt(q.hon||0)}</span><span class="k">Objeto</span><span class="v">${q.obj||'—'}</span></div>`;
+}
+document.querySelectorAll('input[name=orig]').forEach(r=>r.onchange=()=>{
+  document.querySelectorAll('.radio label').forEach(l=>l.classList.toggle('on',l.querySelector('input').checked));
+  const q=r.value==='q';
+  $('newQ').classList.toggle('hidden',!q);
+  $('newM').classList.toggle('hidden',q);
+});
+function createExp(){
+  const fromQ=document.querySelector('input[name=orig]:checked')?.value==='q';
+  let cli='',svc='deslinde',hon=0,mon='US$',quote='',obj='';
+  if(fromQ){
+    const q=quotes.find(x=>x.ref===$('nQuote').value);
+    if(!q){toast('Seleccione una cotización válida o elija Creación manual');return;}
+    cli=q.cli;svc=q.svc||'deslinde';hon=parseFloat(q.hon)||0;mon=q.mon||'US$';quote=q.ref;obj=q.obj||'';
+    quotes=quotes.filter(x=>x!==q);
+  } else {
+    cli=$('nCli').value.trim();
+    svc=$('nSvc').value||'deslinde';
+    hon=parseFloat(($('nHon').value||'0').replace(/[^\d.]/g,''))||0;
+    quote='Manual';
+    obj=$('nObj').value.trim()||'Inmueble / Asunto general';
+    if(!cli){toast('Por favor ingrese el nombre del cliente');return;}
+  }
+  const T=TPL[svc]||TPL.deslinde;
+  const nSeq = (DB.length > 0 ? Math.max(...DB.map(e => parseInt((e.id||'').split('-')[2])||0)) : 0) + 1;
+  const id = (fromQ && quote && quote.includes('-')) ? `EXP-2026-${String(parseInt(quote.split('-')[3]) || nSeq).padStart(3, '0')}` : `EXP-2026-${String(nSeq).padStart(3, '0')}`;
+  const resp=$('nResp').value||TEAM[0];
+  const objeto={};
+  Object.keys(T.objeto).forEach(k=>objeto[k]='');
+  if(svc==='deslinde'){
+    const m=obj.match(/Parcela ([\w-]+)/);objeto.parcela=m?m[1]:'';
+    const a=obj.match(/([\d,]+ m²)/);objeto.areaReg=a?a[1]:'';
+    objeto.provincia='La Altagracia';objeto.municipio='Higüey';objeto.sector=obj.split('·').pop().trim()||'Punta Cana';
+    objeto.propietario=cli;
+  }
+  if(svc==='transferencia'){
+    const m=obj.match(/Matrícula (\d+)/);objeto.matricula=m?m[1]:'';
+    objeto.comprador=cli;objeto.sector=obj.split('·').pop().trim()||'Punta Cana';
+  }
+  if(svc==='iguala'){
+    objeto.empresa=cli;objeto.nivel=obj.includes('Business')?'Business':'Essential';objeto.sede=obj.split('·').pop().trim()||'Punta Cana';
+  }
+  const e={
+    id,quote,svc,cliente:{nombre:cli,cedula:'',tel:'',email:'',dir:''},honorario:hon,mon,
+    pagos:[{d:'',c:'Pago inicial',m:hon/2,st:'Pendiente'},{d:'',c:'Saldo',m:hon/2,st:'Pendiente'}],
+    aprob:TODAY,inicio:TODAY,fin:addDays(TODAY,T.plazo||90),resp,tec:T.tec?'Carlos Rodríguez':'',
+    pri:$('nPri').value||'Media',estado:'proc',objeto,ubic:{coord:'',ref:'',dir:''},
+    linderos:{Norte:'',Sur:'',Este:'',Oeste:''},
+    tecnico:{tipo:'GNSS RTK',equipo:'Apeks',sist:'UTM',zona:'19N',datum:'WGS84',prec:''},
+    docs:(T.docs||[]).map(d=>({cat:d[0],name:d[1],by:d[2],share:false,st:'miss',file:'',size:'',date:'',who:resp})),
+    tasks:mkTasks(T,'-1'),
+    avances:[{date:TODAY,title:'Expediente abierto',who:resp,desc:'Se abrió el expediente y se inició el proceso.',client:true}],
+    notas:[],
+    log:[{d:TODAY+' '+new Date().toTimeString().slice(0,5),w:'Sistema',t:fromQ?`Expediente creado desde cotización ${quote}.`:'Expediente creado manualmente.'}],
+    evid:[]
+  };
+  if (e.tasks && e.tasks.length > 0) e.tasks[0].due=addDays(TODAY,5);
+  DB.unshift(e);
+  cur = e;
+  save();
+  closeM('mNew');
+  openExp(id);
+  toast(`${id} creado`);
+}
 
 // ===== INIT =====
 const h=new Date().getHours();
