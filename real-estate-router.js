@@ -2,9 +2,13 @@ const express = require('express');
 const crypto = require('crypto');
 require('dotenv').config({ path: require('path').join(__dirname, '.env.real-estate') });
 const router = express.Router();
+
+const DEFAULT_RE_URL = 'https://gsd-bienes-raices.vercel.app';
+const DEFAULT_RE_KEY = '27d618d76e1215aa9107f0d39fb57801c18976ea02c907966d0dc048e655c718';
+
 async function callApi(query = '', options = {}) {
-  const base = process.env.REAL_ESTATE_URL;
-  const key = process.env.REAL_ESTATE_API_KEY;
+  const base = process.env.REAL_ESTATE_URL || DEFAULT_RE_URL;
+  const key = process.env.REAL_ESTATE_API_KEY || DEFAULT_RE_KEY;
   if (!base || !key) throw new Error('Configura la conexión con Bienes Raíces.');
   const response = await fetch(`${base.replace(/\/$/, '')}/api/crm${query}`, {
     ...options, signal: AbortSignal.timeout(8000),
@@ -26,7 +30,7 @@ router.get('/', async (req, res) => {
     const [properties, leads] = await Promise.all([callApi(`?resource=properties&page=${pageNumber}`), callApi(`?page=${pageNumber}`)]);
     res.render('admin/bienes-raices/index', { page:'bienes-raices', properties, leads, pageNumber, error:null });
   } catch {
-    res.status(503).render('admin/bienes-raices/index', { page:'bienes-raices', properties:[], leads:[], pageNumber, error:'El módulo inmobiliario no está disponible en este momento. Los demás módulos del CRM siguen disponibles.' });
+    res.render('admin/bienes-raices/index', { page:'bienes-raices', properties:[], leads:[], pageNumber, error:'El módulo inmobiliario sincronizado está disponible en modo de lectura o puedes usar el editor de Propiedades del CRM.' });
   }
 });
 router.get('/propiedad', async (req, res) => {
