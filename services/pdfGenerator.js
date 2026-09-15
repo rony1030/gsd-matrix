@@ -1,6 +1,20 @@
 // services/pdfGenerator.js — Generador de PDF institucional GSD
 const PDFDocument = require('pdfkit');
 
+// Static requires to guarantee inclusion in Vercel Serverless bundle
+try {
+  require('pdfkit/js/standard-fonts/Helvetica.cjs');
+  require('pdfkit/js/standard-fonts/HelveticaBold.cjs');
+  require('pdfkit/js/standard-fonts/HelveticaOblique.cjs');
+  require('pdfkit/js/standard-fonts/HelveticaBoldOblique.cjs');
+  require('pdfkit/js/standard-fonts/TimesRoman.cjs');
+  require('pdfkit/js/standard-fonts/TimesBold.cjs');
+  require('pdfkit/js/standard-fonts/TimesItalic.cjs');
+  require('pdfkit/js/standard-fonts/TimesBoldItalic.cjs');
+  require('pdfkit/js/standard-fonts/Courier.cjs');
+  require('pdfkit/js/standard-fonts/CourierBold.cjs');
+} catch (e) {}
+
 function generateQuotationPDF(data) {
   return new Promise((resolve, reject) => {
     try {
