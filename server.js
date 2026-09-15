@@ -80,14 +80,6 @@ function requireAuth(req, res, next) {
 
 app.use('/admin/bienes-raices', requireAuth, require('./real-estate-router'));
 
-// Cotizaciones & Expedientes CRM
-app.get('/admin/cotizaciones', requireAuth, (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'cotizaciones.html'));
-});
-
-app.get('/admin/expedientes', requireAuth, (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'expedientes.html'));
-});
 
 // ─── Initialize DB ────────────────────────────────────
 let dbReady = false;
