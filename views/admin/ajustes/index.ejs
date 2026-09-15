@@ -110,12 +110,12 @@
     }
   }
 
-  input[type="text"],
-  input[type="password"],
-  input[type="email"],
-  input[type="number"],
-  textarea,
-  select {
+  .settings-container input[type="text"],
+  .settings-container input[type="password"],
+  .settings-container input[type="email"],
+  .settings-container input[type="number"],
+  .settings-container textarea,
+  .settings-container select {
     width: 100% !important;
     box-sizing: border-box !important;
     padding: 11px 14px !important;
@@ -129,20 +129,20 @@
     box-shadow: 0 1px 2px rgba(0,0,0,0.02) !important;
     display: block !important;
   }
-  input[type="text"]:focus,
-  input[type="password"]:focus,
-  input[type="email"]:focus,
-  input[type="number"]:focus,
-  textarea:focus,
-  select:focus {
+  .settings-container input[type="text"]:focus,
+  .settings-container input[type="password"]:focus,
+  .settings-container input[type="email"]:focus,
+  .settings-container input[type="number"]:focus,
+  .settings-container textarea:focus,
+  .settings-container select:focus {
     border-color: #4a9b6f !important;
     box-shadow: 0 0 0 3.5px rgba(74, 155, 111, 0.18) !important;
     outline: none !important;
     background: #ffffff !important;
   }
 
-  /* Buttons */
-  .btn {
+  /* Buttons inside settings */
+  .settings-container .btn {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -158,34 +158,34 @@
     text-decoration: none !important;
     box-sizing: border-box !important;
   }
-  .btn-p {
+  .settings-container .btn-p {
     background: #1a3a52 !important;
     color: #ffffff !important;
     border-color: #1a3a52 !important;
     box-shadow: 0 2px 6px rgba(26, 58, 82, 0.2) !important;
   }
-  .btn-p:hover {
+  .settings-container .btn-p:hover {
     background: #0f2434 !important;
     transform: translateY(-1px) !important;
     box-shadow: 0 4px 12px rgba(26, 58, 82, 0.28) !important;
   }
-  .btn-green {
+  .settings-container .btn-green {
     background: #4a9b6f !important;
     color: #ffffff !important;
     border-color: #4a9b6f !important;
     box-shadow: 0 2px 6px rgba(74, 155, 111, 0.2) !important;
   }
-  .btn-green:hover {
+  .settings-container .btn-green:hover {
     background: #3d825c !important;
     transform: translateY(-1px) !important;
     box-shadow: 0 4px 12px rgba(74, 155, 111, 0.3) !important;
   }
-  .btn-secondary {
+  .settings-container .btn-secondary {
     background: #f8fafc !important;
     color: #334155 !important;
     border: 1px solid #cbd5e1 !important;
   }
-  .btn-secondary:hover {
+  .settings-container .btn-secondary:hover {
     background: #f1f5f9 !important;
     color: #0f172a !important;
     border-color: #94a3b8 !important;
