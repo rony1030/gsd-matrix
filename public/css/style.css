@@ -1044,9 +1044,9 @@ footer {
    ADMIN / CRM
    ============================================= */
 .admin-body {
-  font-family: 'Inter', sans-serif;
-  background: var(--gris-100);
-  color: var(--gris-900);
+  font-family: 'Poppins', 'Inter', system-ui, sans-serif;
+  background: var(--bg, #F9FAFB);
+  color: var(--ink, #1F2937);
   min-height: 100vh;
 }
 
@@ -1054,7 +1054,8 @@ footer {
   position: fixed;
   top: 0; left: 0; bottom: 0;
   width: 240px;
-  background: var(--azul);
+  background: #ffffff;
+  border-right: 1px solid #E5E7EB;
   display: flex;
   flex-direction: column;
   z-index: 100;
@@ -1062,68 +1063,75 @@ footer {
 }
 
 .sidebar-logo {
-  padding: 1.5rem;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
+  padding: 1.25rem 1.4rem 1rem;
+  border-bottom: 1px solid #E5E7EB;
 }
 
-.sidebar-logo img { height: 36px; filter: brightness(0) invert(1); }
+.sidebar-logo img { height: 32px; filter: none; }
 
 .sidebar-nav {
   flex: 1;
-  padding: 1rem 0;
+  padding: 0.75rem 0;
 }
 
 .sidebar-section {
-  padding: 0.75rem 1.5rem 0.25rem;
+  padding: 1rem 1.4rem 0.35rem;
   font-size: 0.65rem;
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.4);
+  color: #6B7280;
 }
 
 .sidebar-link {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.7rem 1.5rem;
-  color: rgba(255,255,255,0.75);
-  font-size: 0.875rem;
+  padding: 0.65rem 1.4rem;
+  color: #1A3A52;
+  font-size: 0.82rem;
   font-weight: 500;
-  transition: all 0.2s;
+  transition: all 0.15s;
   border-left: 3px solid transparent;
 }
 
 .sidebar-link svg {
-  width: 18px; height: 18px;
+  width: 17px; height: 17px;
   stroke: currentColor; flex-shrink: 0;
 }
 
-.sidebar-link:hover,
-.sidebar-link.active {
-  color: var(--blanco);
-  background: rgba(255,255,255,0.08);
-  border-left-color: var(--verde);
+.sidebar-link:hover {
+  background: #F9FAFB;
+  color: #1A3A52;
 }
-.sidebar-link.sidebar-soon { cursor: default; color: var(--gris-500); justify-content: space-between; }
-.sidebar-link.sidebar-soon:hover { background: transparent; color: var(--gris-500); }
-.sidebar-link.sidebar-soon small { font-size: 0.62rem; font-weight: 600; color: var(--verde); }
+
+.sidebar-link.active {
+  color: #4A9B6F;
+  background: #E8F4EF;
+  border-left-color: #4A9B6F;
+  font-weight: 600;
+}
+.sidebar-link.sidebar-soon { cursor: default; color: #9CA3AF; justify-content: space-between; }
+.sidebar-link.sidebar-soon:hover { background: transparent; color: #9CA3AF; }
+.sidebar-link.sidebar-soon small { font-size: 0.62rem; font-weight: 600; color: #4A9B6F; }
 
 .sidebar-footer {
-  padding: 1.5rem;
-  border-top: 1px solid rgba(255,255,255,0.1);
+  padding: 1.25rem 1.4rem;
+  border-top: 1px solid #E5E7EB;
+  background: #ffffff;
 }
 
 .sidebar-footer a {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  color: rgba(255,255,255,0.6);
+  color: #6B7280;
   font-size: 0.8rem;
-  transition: color 0.2s;
+  font-weight: 500;
+  transition: color 0.15s;
 }
 
-.sidebar-footer a:hover { color: white; }
+.sidebar-footer a:hover { color: #C0392B; }
 
 .admin-main {
   margin-left: 240px;
@@ -1133,9 +1141,9 @@ footer {
 }
 
 .admin-topbar {
-  background: var(--blanco);
-  border-bottom: 1px solid var(--gris-200);
-  padding: 1rem 2rem;
+  background: #ffffff;
+  border-bottom: 1px solid #E5E7EB;
+  padding: 0.85rem 1.75rem;
   display: flex;
   align-items: center;
   justify-content: space-between;

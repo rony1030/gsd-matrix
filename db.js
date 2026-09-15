@@ -53,9 +53,75 @@ async function getDb() {
     } catch(e) {}
     try {
       db.run(`
-        CREATE TABLE IF NOT EXISTS amenities_catalog (
+        ALTER TABLE leads ADD COLUMN tipo_cliente TEXT DEFAULT 'General';
+        ALTER TABLE leads ADD COLUMN is_real_estate INTEGER DEFAULT 0;
+        ALTER TABLE leads ADD COLUMN tags TEXT DEFAULT '';
+      `);
+    } catch(e) {}
+    try {
+      db.run(`
+        CREATE TABLE IF NOT EXISTS client_types (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
-          nombre TEXT UNIQUE NOT NULL
+          nombre TEXT UNIQUE NOT NULL,
+          color TEXT DEFAULT '#1A3A52'
+        );
+
+        CREATE TABLE IF NOT EXISTS cotizaciones (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          referencia TEXT UNIQUE NOT NULL,
+          cliente_nombre TEXT NOT NULL,
+          cliente_doc TEXT,
+          cliente_email TEXT,
+          cliente_tel TEXT,
+          cliente_dir TEXT,
+          servicio_tipo TEXT NOT NULL,
+          servicio_titulo TEXT NOT NULL,
+          monto_base REAL DEFAULT 0,
+          moneda TEXT DEFAULT 'USD',
+          duracion_meses INTEGER DEFAULT 1,
+          superficie_m2 REAL DEFAULT 0,
+          items_json TEXT DEFAULT '[]',
+          condiciones_json TEXT DEFAULT '[]',
+          itbis REAL DEFAULT 0,
+          total REAL DEFAULT 0,
+          estado TEXT DEFAULT 'borrador',
+          observaciones TEXT,
+          fecha TEXT DEFAULT (date('now')),
+          vigencia_dias INTEGER DEFAULT 30,
+          created_at TEXT DEFAULT (datetime('now','localtime')),
+          updated_at TEXT DEFAULT (datetime('now','localtime'))
+        );
+
+        CREATE TABLE IF NOT EXISTS expedientes (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          codigo TEXT UNIQUE NOT NULL,
+          cotizacion_ref TEXT,
+          servicio_tipo TEXT NOT NULL,
+          cliente_nombre TEXT NOT NULL,
+          cliente_doc TEXT,
+          cliente_tel TEXT,
+          cliente_email TEXT,
+          cliente_dir TEXT,
+          honorario REAL DEFAULT 0,
+          moneda TEXT DEFAULT 'USD',
+          responsable TEXT DEFAULT 'Esteban Mejía',
+          tecnico TEXT,
+          prioridad TEXT DEFAULT 'Media',
+          estado TEXT DEFAULT 'proc',
+          fecha_inicio TEXT DEFAULT (date('now')),
+          fecha_fin TEXT,
+          objeto_json TEXT DEFAULT '{}',
+          ubicacion_json TEXT DEFAULT '{}',
+          linderos_json TEXT DEFAULT '{}',
+          tecnico_json TEXT DEFAULT '{}',
+          docs_json TEXT DEFAULT '[]',
+          tasks_json TEXT DEFAULT '[]',
+          avances_json TEXT DEFAULT '[]',
+          notas_json TEXT DEFAULT '[]',
+          evidencias_json TEXT DEFAULT '[]',
+          log_json TEXT DEFAULT '[]',
+          created_at TEXT DEFAULT (datetime('now','localtime')),
+          updated_at TEXT DEFAULT (datetime('now','localtime'))
         );
       `);
       saveDb();
@@ -79,15 +145,82 @@ function saveDb() {
 
 function initSchema() {
   db.run(`
+    CREATE TABLE IF NOT EXISTS client_types (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      nombre TEXT UNIQUE NOT NULL,
+      color TEXT DEFAULT '#1A3A52'
+    );
+
     CREATE TABLE IF NOT EXISTS leads (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       nombre TEXT NOT NULL,
       email TEXT,
       telefono TEXT,
       servicio TEXT,
+      tipo_cliente TEXT DEFAULT 'General',
+      is_real_estate INTEGER DEFAULT 0,
+      tags TEXT DEFAULT '',
       mensaje TEXT,
       estado TEXT DEFAULT 'nuevo',
       origen TEXT DEFAULT 'web',
+      created_at TEXT DEFAULT (datetime('now','localtime')),
+      updated_at TEXT DEFAULT (datetime('now','localtime'))
+    );
+
+    CREATE TABLE IF NOT EXISTS cotizaciones (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      referencia TEXT UNIQUE NOT NULL,
+      cliente_nombre TEXT NOT NULL,
+      cliente_doc TEXT,
+      cliente_email TEXT,
+      cliente_tel TEXT,
+      cliente_dir TEXT,
+      servicio_tipo TEXT NOT NULL,
+      servicio_titulo TEXT NOT NULL,
+      monto_base REAL DEFAULT 0,
+      moneda TEXT DEFAULT 'USD',
+      duracion_meses INTEGER DEFAULT 1,
+      superficie_m2 REAL DEFAULT 0,
+      items_json TEXT DEFAULT '[]',
+      condiciones_json TEXT DEFAULT '[]',
+      itbis REAL DEFAULT 0,
+      total REAL DEFAULT 0,
+      estado TEXT DEFAULT 'borrador',
+      observaciones TEXT,
+      fecha TEXT DEFAULT (date('now')),
+      vigencia_dias INTEGER DEFAULT 30,
+      created_at TEXT DEFAULT (datetime('now','localtime')),
+      updated_at TEXT DEFAULT (datetime('now','localtime'))
+    );
+
+    CREATE TABLE IF NOT EXISTS expedientes (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      codigo TEXT UNIQUE NOT NULL,
+      cotizacion_ref TEXT,
+      servicio_tipo TEXT NOT NULL,
+      cliente_nombre TEXT NOT NULL,
+      cliente_doc TEXT,
+      cliente_tel TEXT,
+      cliente_email TEXT,
+      cliente_dir TEXT,
+      honorario REAL DEFAULT 0,
+      moneda TEXT DEFAULT 'USD',
+      responsable TEXT DEFAULT 'Esteban Mejía',
+      tecnico TEXT,
+      prioridad TEXT DEFAULT 'Media',
+      estado TEXT DEFAULT 'proc',
+      fecha_inicio TEXT DEFAULT (date('now')),
+      fecha_fin TEXT,
+      objeto_json TEXT DEFAULT '{}',
+      ubicacion_json TEXT DEFAULT '{}',
+      linderos_json TEXT DEFAULT '{}',
+      tecnico_json TEXT DEFAULT '{}',
+      docs_json TEXT DEFAULT '[]',
+      tasks_json TEXT DEFAULT '[]',
+      avances_json TEXT DEFAULT '[]',
+      notas_json TEXT DEFAULT '[]',
+      evidencias_json TEXT DEFAULT '[]',
+      log_json TEXT DEFAULT '[]',
       created_at TEXT DEFAULT (datetime('now','localtime')),
       updated_at TEXT DEFAULT (datetime('now','localtime'))
     );

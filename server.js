@@ -446,21 +446,46 @@ leadsRouter.use(requireAuth);
 leadsRouter.get('/', async (req, res) => {
   await getDb();
   const leads = queryAll('SELECT * FROM leads ORDER BY created_at DESC');
-  res.render('admin/leads/index', { page: 'leads', leads });
+  const clientTypes = queryAll('SELECT * FROM client_types ORDER BY nombre ASC');
+  res.render('admin/leads/index', { page: 'leads', leads, clientTypes });
 });
 
-leadsRouter.get('/nuevo', (req, res) => {
-  res.render('admin/leads/form', { page: 'leads', lead: null, isEdit: false });
+leadsRouter.get('/nuevo', async (req, res) => {
+  await getDb();
+  const clientTypes = queryAll('SELECT * FROM client_types ORDER BY nombre ASC');
+  res.render('admin/leads/form', { page: 'leads', lead: null, isEdit: false, clientTypes });
 });
 
 leadsRouter.post('/nuevo', async (req, res) => {
-  const { nombre, email, telefono, servicio, mensaje, estado, origen } = req.body;
+  const { nombre, email, telefono, servicio, mensaje, estado, origen, tipo_cliente, is_real_estate, tags } = req.body;
   await getDb();
   run(
-    'INSERT INTO leads (nombre,email,telefono,servicio,mensaje,estado,origen) VALUES (?,?,?,?,?,?,?)',
-    [nombre, email||'', telefono||'', servicio||'', mensaje||'', estado||'nuevo', origen||'manual']
+    'INSERT INTO leads (nombre,email,telefono,servicio,mensaje,estado,origen,tipo_cliente,is_real_estate,tags) VALUES (?,?,?,?,?,?,?,?,?,?)',
+    [nombre, email||'', telefono||'', servicio||'', mensaje||'', estado||'nuevo', origen||'manual', tipo_cliente||'General', is_real_estate?1:0, tags||'']
   );
   res.redirect('/admin/leads');
+});
+
+leadsRouter.post('/api/client-types', async (req, res) => {
+  const { nombre, color } = req.body;
+  if (!nombre || !nombre.trim()) return res.status(400).json({ error: 'Nombre requerido' });
+  await getDb();
+  try {
+    run('INSERT OR IGNORE INTO client_types (nombre, color) VALUES (?,?)', [nombre.trim(), color || '#1A3A52']);
+    res.json({ ok: true, nombre: nombre.trim() });
+  } catch(e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+leadsRouter.post('/:id/etiquetar', async (req, res) => {
+  const { tipo_cliente, is_real_estate, tags } = req.body;
+  await getDb();
+  run(
+    'UPDATE leads SET tipo_cliente=?, is_real_estate=?, tags=?, updated_at=datetime("now","localtime") WHERE id=?',
+    [tipo_cliente||'General', is_real_estate?1:0, tags||'', req.params.id]
+  );
+  res.json({ ok: true });
 });
 
 leadsRouter.post('/:id/estado', async (req, res) => {
@@ -479,8 +504,8 @@ leadsRouter.get('/exportar', async (req, res) => {
   await getDb();
   const leads = queryAll('SELECT * FROM leads ORDER BY created_at DESC');
   const csv = [
-    'ID,Nombre,Email,Teléfono,Servicio,Mensaje,Estado,Origen,Fecha',
-    ...leads.map(l => `${l.id},"${l.nombre}","${l.email}","${l.telefono}","${l.servicio}","${l.mensaje?.replace(/"/g,'""')}","${l.estado}","${l.origen}","${l.created_at}"`)
+    'ID,Nombre,Email,Teléfono,Servicio,Tipo_Cliente,Real_Estate,Etiquetas,Mensaje,Estado,Origen,Fecha',
+    ...leads.map(l => `${l.id},"${l.nombre}","${l.email}","${l.telefono}","${l.servicio}","${l.tipo_cliente||'General'}","${l.is_real_estate?'SI':'NO'}","${l.tags||''}","${l.mensaje?.replace(/"/g,'""')}","${l.estado}","${l.origen}","${l.created_at}"`)
   ].join('\n');
   res.header('Content-Type', 'text/csv');
   res.header('Content-Disposition', 'attachment; filename=leads-gsd.csv');
@@ -488,6 +513,117 @@ leadsRouter.get('/exportar', async (req, res) => {
 });
 
 app.use('/admin/leads', leadsRouter);
+
+// ─── COTIZACIONES & GSD QUOTER ────────────────────────
+const { generateQuotationPDF } = require('./services/pdfGenerator');
+const cotiRouter = express.Router();
+cotiRouter.use(requireAuth);
+
+cotiRouter.get('/', async (req, res) => {
+  await getDb();
+  const cotizaciones = queryAll('SELECT * FROM cotizaciones ORDER BY created_at DESC');
+  res.render('admin/cotizaciones/index', { page: 'cotizaciones', cotizaciones });
+});
+
+cotiRouter.post('/guardar', async (req, res) => {
+  const { 
+    referencia, cliente_nombre, cliente_doc, cliente_email, cliente_tel, cliente_dir,
+    servicio_tipo, servicio_titulo, monto_base, moneda, duracion_meses, superficie_m2,
+    items, itbis, total, observaciones, fecha, vigencia_dias 
+  } = req.body;
+
+  const ref = referencia || `GSD-PRO-${new Date().getFullYear()}-${String(Math.floor(Math.random()*900)+100)}`;
+  await getDb();
+
+  try {
+    run(
+      `INSERT INTO cotizaciones (
+        referencia, cliente_nombre, cliente_doc, cliente_email, cliente_tel, cliente_dir,
+        servicio_tipo, servicio_titulo, monto_base, moneda, duracion_meses, superficie_m2,
+        items_json, itbis, total, observaciones, fecha, vigencia_dias
+      ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+      [
+        ref, cliente_nombre||'Cliente', cliente_doc||'', cliente_email||'', cliente_tel||'', cliente_dir||'',
+        servicio_tipo||'legal', servicio_titulo||'Cotización de Servicios', parseFloat(monto_base)||0, moneda||'USD',
+        parseInt(duracion_meses)||1, parseFloat(superficie_m2)||0, JSON.stringify(items||[]),
+        parseFloat(itbis)||0, parseFloat(total)||parseFloat(monto_base)||0, observaciones||'',
+        fecha||new Date().toISOString().substring(0,10), parseInt(vigencia_dias)||30
+      ]
+    );
+    res.json({ ok: true, referencia: ref });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+cotiRouter.post('/generar-pdf', async (req, res) => {
+  try {
+    const pdfBuffer = await generateQuotationPDF(req.body);
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `inline; filename="Cotizacion_${req.body.referencia || 'GSD'}.pdf"`);
+    res.send(pdfBuffer);
+  } catch (err) {
+    res.status(500).send('Error generando PDF: ' + err.message);
+  }
+});
+
+cotiRouter.get('/:id/pdf', async (req, res) => {
+  await getDb();
+  const coti = queryOne('SELECT * FROM cotizaciones WHERE id=? OR referencia=?', [req.params.id, req.params.id]);
+  if (!coti) return res.status(404).send('Cotización no encontrada');
+  try {
+    coti.items = JSON.parse(coti.items_json || '[]');
+  } catch(e) { coti.items = []; }
+  
+  try {
+    const pdfBuffer = await generateQuotationPDF(coti);
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="Cotizacion_${coti.referencia}.pdf"`);
+    res.send(pdfBuffer);
+  } catch (err) {
+    res.status(500).send('Error generando PDF: ' + err.message);
+  }
+});
+
+app.use('/admin/cotizaciones', cotiRouter);
+
+// ─── EXPEDIENTES (GSD EXPEDIENTES INTEGRADO) ──────────
+const expeRouter = express.Router();
+expeRouter.use(requireAuth);
+
+expeRouter.get('/', async (req, res) => {
+  await getDb();
+  const expedientes = queryAll('SELECT * FROM expedientes ORDER BY created_at DESC');
+  res.render('admin/expedientes/index', { page: 'expedientes', expedientes });
+});
+
+expeRouter.post('/api/guardar', async (req, res) => {
+  const d = req.body;
+  await getDb();
+  try {
+    run(
+      `INSERT OR REPLACE INTO expedientes (
+        codigo, cotizacion_ref, servicio_tipo, cliente_nombre, cliente_doc, cliente_tel, cliente_email, cliente_dir,
+        honorario, moneda, responsable, tecnico, prioridad, estado, fecha_inicio, fecha_fin,
+        objeto_json, ubicacion_json, linderos_json, tecnico_json, docs_json, tasks_json, avances_json, notas_json, evidencias_json, log_json
+      ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+      [
+        d.id || d.codigo, d.quote||'', d.svc||'deslinde', d.cliente?.nombre||d.cliente_nombre||'Cliente',
+        d.cliente?.cedula||d.cliente_doc||'', d.cliente?.tel||d.cliente_tel||'', d.cliente?.email||d.cliente_email||'', d.cliente?.dir||d.cliente_dir||'',
+        parseFloat(d.honorario)||0, d.mon||d.moneda||'USD', d.resp||d.responsable||'Esteban Mejía', d.tec||d.tecnico||'',
+        d.pri||d.prioridad||'Media', d.estado||'proc', d.inicio||d.fecha_inicio||new Date().toISOString().substring(0,10), d.fin||d.fecha_fin||'',
+        JSON.stringify(d.objeto||{}), JSON.stringify(d.ubic||{}), JSON.stringify(d.linderos||{}), JSON.stringify(d.tecnico||{}),
+        JSON.stringify(d.docs||[]), JSON.stringify(d.tasks||[]), JSON.stringify(d.avances||[]), JSON.stringify(d.notas||[]),
+        JSON.stringify(d.evid||[]), JSON.stringify(d.log||[])
+      ]
+    );
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.use('/admin/expedientes', expeRouter);
 
 // ─── INSTAGRAM & REDES (MULTIMARCA / PROYECTOS) ──────
 const instagramRouter = express.Router();

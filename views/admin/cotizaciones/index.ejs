@@ -1,0 +1,441 @@
+<%- include('../../admin/partials/layout-start', { pageTitle: 'GSD Quoter — Generador de Cotizaciones', page: 'cotizaciones' }) %>
+
+<style>
+  .quoter-layout {
+    display: grid;
+    grid-template-columns: 240px 1fr 340px;
+    gap: 16px;
+    align-items: start;
+  }
+  @media (max-width: 1200px) {
+    .quoter-layout {
+      grid-template-columns: 220px 1fr;
+    }
+    .quoter-preview-col {
+      grid-column: 1 / -1;
+    }
+  }
+  @media (max-width: 768px) {
+    .quoter-layout {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .svc-menu-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid #E5E7EB;
+    background: #ffffff;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: #1A3A52;
+    text-align: left;
+    margin-bottom: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .svc-menu-btn:hover {
+    background: #F9FAFB;
+    border-color: #CBD5E1;
+  }
+  .svc-menu-btn.active {
+    background: #E8F4EF;
+    border-color: #4A9B6F;
+    color: #2F6B4A;
+    font-weight: 600;
+  }
+
+  /* Paper Preview */
+  .paper-preview-box {
+    background: #ffffff;
+    border: 1px solid #E5E7EB;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+    font-size: 0.78rem;
+    line-height: 1.5;
+    color: #1F2937;
+  }
+  .preview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 1px solid #E5E7EB;
+    padding-bottom: 10px;
+    margin-bottom: 12px;
+  }
+  .preview-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+  }
+  .preview-table th {
+    background: #1A3A52;
+    color: #ffffff;
+    padding: 6px 8px;
+    font-size: 0.7rem;
+    text-align: left;
+  }
+  .preview-table td {
+    padding: 6px 8px;
+    border-bottom: 1px solid #F1F3F5;
+    font-size: 0.75rem;
+  }
+</style>
+
+<div class="quoter-layout">
+  
+  <!-- COLUMNA 1: CATÁLOGO DE SERVICIOS -->
+  <div>
+    <div class="card" style="padding:14px;">
+      <h3 style="font-size:0.75rem;letter-spacing:1px;text-transform:uppercase;color:#6B7280;margin-bottom:12px;">Servicios GSD</h3>
+      
+      <div id="serviceList">
+        <button type="button" class="svc-menu-btn active" onclick="selectService('iguala', 'Iguala Legal (Cartera & Contratos)', 35000, 'DOP')">
+          <span>Iguala Legal</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <button type="button" class="svc-menu-btn" onclick="selectService('deslinde', 'Deslinde Catastral con Título', 2000, 'USD')">
+          <span>Deslinde Catastral</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <button type="button" class="svc-menu-btn" onclick="selectService('transferencia', 'Transferencia Inmobiliaria CONFOTUR', 1500, 'USD')">
+          <span>Transferencia Inmobiliaria</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <button type="button" class="svc-menu-btn" onclick="selectService('investigacion', 'Investigación Parcelaria & Títulos', 800, 'USD')">
+          <span>Investigación Parcelaria</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <button type="button" class="svc-menu-btn" onclick="selectService('topografia', 'Levantamiento Topográfico GNSS', 65000, 'DOP')">
+          <span>Levantamiento Topográfico</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <button type="button" class="svc-menu-btn" onclick="selectService('condominio', 'Constitución de Régimen de Condominio', 2500, 'USD')">
+          <span>Condominio (Constitución)</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <button type="button" class="svc-menu-btn" onclick="selectService('regularizacion', 'Regularización Parcelaria', 1200, 'USD')">
+          <span>Regularización Parcelaria</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <button type="button" class="svc-menu-btn" onclick="selectService('asesoria', 'Asesoría Inmobiliaria Estratégica', 500, 'USD')">
+          <span>Asesoría Inmobiliaria</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+
+      <button type="button" onclick="resetForm()" class="btn p" style="width:100%;margin-top:14px;justify-content:center;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        + Nueva Cotización
+      </button>
+    </div>
+  </div>
+
+  <!-- COLUMNA 2: FORMULARIO DINÁMICO -->
+  <div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #E5E7EB;padding-bottom:12px;margin-bottom:16px;">
+        <div>
+          <h2 id="formServiceTitle" style="font-size:1.25rem;color:#1A3A52;margin:0;">Iguala Legal</h2>
+          <p style="font-size:0.75rem;color:#6B7280;margin:2px 0 0;">Asesoría y representación jurídica continua en materia inmobiliaria y civil.</p>
+        </div>
+      </div>
+
+      <form id="quoterForm" onsubmit="event.preventDefault(); saveAndDownloadPDF();">
+        <input type="hidden" id="service_type" value="iguala">
+        <input type="hidden" id="service_title" value="Iguala de Servicios Legales">
+
+        <!-- 1. Datos del Cliente -->
+        <h4 style="font-size:0.8rem;text-transform:uppercase;color:#4A9B6F;margin-bottom:10px;">1. Datos del Cliente</h4>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+          <div class="f">
+            <label>Nombre del Cliente / Razón Social *</label>
+            <input type="text" id="client_name" value="Juan Pérez García" required oninput="renderPreview()">
+          </div>
+          <div class="f">
+            <label>Cédula / RNC *</label>
+            <input type="text" id="client_doc" value="001-1234567-8" required oninput="renderPreview()">
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px;">
+          <div class="f">
+            <label>Email de Contacto</label>
+            <input type="email" id="client_email" value="juan.perez@correo.com" oninput="renderPreview()">
+          </div>
+          <div class="f">
+            <label>Teléfono</label>
+            <input type="tel" id="client_tel" value="+1 (829) 555-0148" oninput="renderPreview()">
+          </div>
+        </div>
+
+        <!-- 2. Información del Documento -->
+        <h4 style="font-size:0.8rem;text-transform:uppercase;color:#4A9B6F;margin-bottom:10px;">2. Información del Documento</h4>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px;">
+          <div class="f">
+            <label>Número de Referencia *</label>
+            <input type="text" id="doc_ref" value="GSD-PRO-2026-015" required oninput="renderPreview()">
+          </div>
+          <div class="f">
+            <label>Fecha de Emisión *</label>
+            <input type="date" id="doc_date" value="<%= new Date().toISOString().substring(0,10) %>" required oninput="renderPreview()">
+          </div>
+        </div>
+
+        <!-- 3. Detalles y Honorarios -->
+        <h4 style="font-size:0.8rem;text-transform:uppercase;color:#4A9B6F;margin-bottom:10px;">3. Honorarios y Condiciones</h4>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+          <div class="f">
+            <label>Monto Base *</label>
+            <input type="number" id="monto_base" value="35000" step="any" min="0" required oninput="renderPreview()">
+          </div>
+          <div class="f">
+            <label>Moneda</label>
+            <select id="doc_currency" onchange="renderPreview()">
+              <option value="DOP">DOP (RD$)</option>
+              <option value="USD">USD (US$)</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="margin-bottom:14px;">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.82rem;font-weight:600;color:#1A3A52;">
+            <input type="checkbox" id="include_itbis" onchange="renderPreview()" style="width:auto;accent-color:#4A9B6F;">
+            <span>Aplicar ITBIS (18%)</span>
+          </label>
+        </div>
+
+        <!-- 4. Observaciones -->
+        <div class="f" style="margin-bottom:18px;">
+          <label>Observaciones y Alcance Específico</label>
+          <textarea id="observaciones" rows="3" placeholder="Términos especiales, alcances, etc." oninput="renderPreview()">Asistencia jurídica y redacción de contratos con revisión mensual.</textarea>
+        </div>
+
+        <div style="display:flex;gap:8px;justify-content:flex-end;">
+          <button type="button" class="btn" onclick="saveQuotationOnly()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/></svg>
+            Guardar en Historial
+          </button>
+          <button type="submit" class="btn p">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Generar y Descargar PDF
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- COLUMNA 3: PREVIEW EN TIEMPO REAL & HISTORIAL -->
+  <div class="quoter-preview-col">
+    <div style="margin-bottom:14px;">
+      <h3 style="font-size:0.8rem;letter-spacing:1px;text-transform:uppercase;color:#6B7280;margin-bottom:10px;">Vista Previa en Vivo</h3>
+      <div class="paper-preview-box" id="paperPreview">
+        <div class="preview-header">
+          <div>
+            <strong style="color:#1A3A52;font-size:1rem;display:block;">GSD</strong>
+            <span style="font-size:0.65rem;color:#6B7280;">Geosolutions Source</span>
+          </div>
+          <div style="text-align:right;">
+            <strong style="font-size:0.75rem;color:#4A9B6F;" id="pvRef">GSD-PRO-2026-015</strong>
+            <div style="font-size:0.65rem;color:#9CA3AF;" id="pvDate">Fecha: 09/09/2026</div>
+          </div>
+        </div>
+
+        <div style="margin-bottom:10px;">
+          <div style="font-size:0.68rem;color:#6B7280;">CLIENTE:</div>
+          <strong style="color:#1F2937;font-size:0.82rem;" id="pvClient">Juan Pérez García</strong>
+          <div style="font-size:0.7rem;color:#6B7280;" id="pvDoc">RNC: 001-1234567-8</div>
+        </div>
+
+        <table class="preview-table">
+          <thead>
+            <tr>
+              <th>Concepto</th>
+              <th style="text-align:right;">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td id="pvSvcTitle">Iguala Legal</td>
+              <td style="text-align:right;font-weight:600;" id="pvLineTotal">RD$ 35,000.00</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div style="display:flex;justify-content:space-between;border-top:1px solid #E5E7EB;padding-top:6px;margin-top:6px;">
+          <span style="color:#6B7280;font-size:0.75rem;">Subtotal:</span>
+          <span id="pvSubtotal" style="font-weight:600;">RD$ 35,000.00</span>
+        </div>
+        <div id="pvItbisRow" style="display:none;justify-content:space-between;">
+          <span style="color:#6B7280;font-size:0.75rem;">ITBIS (18%):</span>
+          <span id="pvItbis" style="font-weight:600;">RD$ 6,300.00</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;background:#E8F4EF;padding:6px 8px;border-radius:6px;margin-top:6px;">
+          <strong style="color:#2F6B4A;font-size:0.8rem;">TOTAL:</strong>
+          <strong style="color:#2F6B4A;font-size:0.88rem;" id="pvTotal">RD$ 35,000.00</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- Historial de Cotizaciones -->
+    <div class="card" style="padding:14px;">
+      <h3 style="font-size:0.75rem;letter-spacing:1px;text-transform:uppercase;color:#6B7280;margin-bottom:10px;">Historial Reciente</h3>
+      
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <% (cotizaciones || []).slice(0, 5).forEach(c => { %>
+          <div style="border:1px solid #E5E7EB;border-radius:8px;padding:8px 10px;background:#F9FAFB;display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <strong style="font-size:0.8rem;color:#1A3A52;display:block;"><%= c.cliente_nombre %></strong>
+              <small style="font-size:0.7rem;color:#6B7280;"><%= c.referencia %> · <%= c.moneda === 'DOP' ? 'RD$' : 'US$' %><%= Number(c.total||0).toLocaleString() %></small>
+            </div>
+            <a href="/admin/cotizaciones/<%= c.id %>/pdf" class="btn sm" style="padding:4px 8px;" title="Descargar PDF">
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            </a>
+          </div>
+        <% }) %>
+        <% if (!cotizaciones || cotizaciones.length === 0) { %>
+          <p style="font-size:0.75rem;color:#9CA3AF;text-align:center;padding:10px 0;">No hay cotizaciones guardadas aún.</p>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function selectService(type, title, basePrice, currency) {
+  document.querySelectorAll('.svc-menu-btn').forEach(b => b.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+
+  document.getElementById('service_type').value = type;
+  document.getElementById('service_title').value = title;
+  document.getElementById('formServiceTitle').textContent = title;
+  document.getElementById('monto_base').value = basePrice;
+  document.getElementById('doc_currency').value = currency;
+  renderPreview();
+}
+
+function renderPreview() {
+  const name = document.getElementById('client_name').value || 'Cliente';
+  const doc = document.getElementById('client_doc').value || '';
+  const ref = document.getElementById('doc_ref').value || 'GSD-PRO-2026-001';
+  const date = document.getElementById('doc_date').value || '';
+  const title = document.getElementById('service_title').value;
+  const base = parseFloat(document.getElementById('monto_base').value) || 0;
+  const cur = document.getElementById('doc_currency').value === 'DOP' ? 'RD$' : 'US$';
+  const hasItbis = document.getElementById('include_itbis').checked;
+  
+  const itbis = hasItbis ? base * 0.18 : 0;
+  const total = base + itbis;
+
+  document.getElementById('pvRef').textContent = ref;
+  document.getElementById('pvDate').textContent = 'Fecha: ' + date;
+  document.getElementById('pvClient').textContent = name;
+  document.getElementById('pvDoc').textContent = doc ? 'Cédula/RNC: ' + doc : '';
+  document.getElementById('pvSvcTitle').textContent = title;
+  document.getElementById('pvLineTotal').textContent = `${cur} ${base.toLocaleString('en-US', {minimumFractionDigits:2})}`;
+  document.getElementById('pvSubtotal').textContent = `${cur} ${base.toLocaleString('en-US', {minimumFractionDigits:2})}`;
+  
+  const itbisRow = document.getElementById('pvItbisRow');
+  if (hasItbis) {
+    itbisRow.style.display = 'flex';
+    document.getElementById('pvItbis').textContent = `${cur} ${itbis.toLocaleString('en-US', {minimumFractionDigits:2})}`;
+  } else {
+    itbisRow.style.display = 'none';
+  }
+
+  document.getElementById('pvTotal').textContent = `${cur} ${total.toLocaleString('en-US', {minimumFractionDigits:2})}`;
+}
+
+async function saveQuotationOnly() {
+  const payload = getFormData();
+  try {
+    const res = await fetch('/admin/cotizaciones/guardar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const json = await res.json();
+    if (json.ok) {
+      alert('Cotización guardada exitosamente en el historial con referencia: ' + json.referencia);
+      window.location.reload();
+    }
+  } catch(e) {
+    alert('Error al guardar cotización.');
+  }
+}
+
+async function saveAndDownloadPDF() {
+  const payload = getFormData();
+  // 1. Guardar
+  fetch('/admin/cotizaciones/guardar', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  }).catch(()=>{});
+
+  // 2. Descargar PDF generado al vuelo
+  const res = await fetch('/admin/cotizaciones/generar-pdf', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  
+  if (res.ok) {
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Cotizacion_${payload.referencia}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  } else {
+    alert('Error al generar el documento PDF.');
+  }
+}
+
+function getFormData() {
+  const base = parseFloat(document.getElementById('monto_base').value) || 0;
+  const hasItbis = document.getElementById('include_itbis').checked;
+  const itbis = hasItbis ? base * 0.18 : 0;
+
+  return {
+    referencia: document.getElementById('doc_ref').value,
+    cliente_nombre: document.getElementById('client_name').value,
+    cliente_doc: document.getElementById('client_doc').value,
+    cliente_email: document.getElementById('client_email').value,
+    cliente_tel: document.getElementById('client_tel').value,
+    servicio_tipo: document.getElementById('service_type').value,
+    servicio_titulo: document.getElementById('service_title').value,
+    monto_base: base,
+    moneda: document.getElementById('doc_currency').value,
+    itbis: itbis,
+    total: base + itbis,
+    observaciones: document.getElementById('observaciones').value,
+    fecha: document.getElementById('doc_date').value,
+    items: [{
+      desc: document.getElementById('service_title').value,
+      cant: 1,
+      precio: base
+    }]
+  };
+}
+
+function resetForm() {
+  document.getElementById('doc_ref').value = `GSD-PRO-${new Date().getFullYear()}-${String(Math.floor(Math.random()*900)+100)}`;
+  document.getElementById('client_name').value = '';
+  document.getElementById('client_doc').value = '';
+  document.getElementById('client_email').value = '';
+  document.getElementById('client_tel').value = '';
+  renderPreview();
+}
+
+setTimeout(renderPreview, 200);
+</script>
+
+<%- include('../../admin/partials/layout-end') %>

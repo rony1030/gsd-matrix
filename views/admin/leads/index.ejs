@@ -1,30 +1,80 @@
-<%- include('../../admin/partials/layout-start', { pageTitle: 'Leads / CRM', page: 'leads' }) %>
+<%- include('../../admin/partials/layout-start', { pageTitle: 'Leads & Clientes / CRM', page: 'leads' }) %>
 
-<div style="display:flex;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap;align-items:center;">
-  <a href="/admin/leads/nuevo" class="btn-add">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-    Nuevo Lead
-  </a>
-  <a href="/admin/leads/exportar" class="btn-add" style="background:var(--azul);">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-    Exportar CSV
-  </a>
-  <span style="margin-left:auto;font-size:0.875rem;color:var(--gris-500);">
-    Total: <strong><%= leads.length %></strong> leads |
-    Nuevos: <strong style="color:var(--verde);"><%= leads.filter(l=>l.estado==='nuevo').length %></strong>
-  </span>
+<style>
+  .leads-topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .tag-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.72rem;
+    font-weight: 600;
+  }
+  .tag-re {
+    background: #E8F4EF;
+    color: #2F6B4A;
+    border: 1px solid #C6E2D5;
+  }
+  .tag-custom {
+    background: #F1F5F9;
+    color: #1E293B;
+    border: 1px solid #E2E8F0;
+  }
+  .modal-lead-tag {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.5);
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  .modal-lead-tag.open { display: flex; }
+</style>
+
+<div class="leads-topbar">
+  <div style="display:flex;gap:0.6rem;align-items:center;flex-wrap:wrap;">
+    <a href="/admin/leads/nuevo" class="btn" style="background:#4A9B6F;color:#fff;border:none;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Nuevo Lead
+    </a>
+    <button type="button" onclick="openNewClientTypeModal()" class="btn" style="background:#ffffff;border:1px solid #E5E7EB;color:#1A3A52;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      + Tipo de Cliente
+    </button>
+    <a href="/admin/leads/exportar" class="btn" style="background:#1A3A52;color:#fff;border:none;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Exportar CSV
+    </a>
+  </div>
+
+  <div style="display:flex;gap:12px;align-items:center;font-size:0.8rem;color:#6B7280;">
+    <span>Total: <strong style="color:#1A3A52;"><%= leads.length %></strong></span>
+    <span>|</span>
+    <span>Real Estate: <strong style="color:#4A9B6F;"><%= leads.filter(l=>l.is_real_estate).length %></strong></span>
+    <span>|</span>
+    <span>Nuevos: <strong style="color:#B7791F;"><%= leads.filter(l=>l.estado==='nuevo').length %></strong></span>
+  </div>
 </div>
 
-<div class="table-card">
+<div class="card" style="padding:0;overflow:hidden;">
   <div class="table-responsive">
     <table>
       <thead>
         <tr>
           <th>#</th>
-          <th>Nombre</th>
-          <th>Contacto</th>
-          <th>Servicio</th>
-          <th>Mensaje</th>
+          <th>Cliente / Contacto</th>
+          <th>Tipo & Clasificación</th>
+          <th>Servicio Solicitado</th>
+          <th>Mensaje / Notas</th>
           <th>Estado</th>
           <th>Origen</th>
           <th>Fecha</th>
@@ -34,44 +84,127 @@
       <tbody>
         <% leads.forEach(lead => { %>
         <tr id="lead-row-<%= lead.id %>">
-          <td style="color:var(--gris-500);font-size:0.8rem;">#<%= lead.id %></td>
-          <td><strong><%= lead.nombre %></strong></td>
+          <td style="color:#9CA3AF;font-size:0.78rem;">#<%= lead.id %></td>
           <td>
-            <% if (lead.email) { %><div style="font-size:0.85rem;"><%= lead.email %></div><% } %>
-            <% if (lead.telefono) { %><div style="font-size:0.8rem;color:var(--gris-500);"><%= lead.telefono %></div><% } %>
+            <strong style="color:#1A3A52;font-size:0.88rem;"><%= lead.nombre %></strong>
+            <div style="font-size:0.78rem;color:#6B7280;margin-top:2px;">
+              <% if (lead.email) { %><span><%= lead.email %></span><% } %>
+              <% if (lead.email && lead.telefono) { %> · <% } %>
+              <% if (lead.telefono) { %><span><%= lead.telefono %></span><% } %>
+            </div>
           </td>
-          <td><%= lead.servicio || '—' %></td>
-          <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--gris-500);font-size:0.85rem;" title="<%= lead.mensaje %>">
+          <td>
+            <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-start;">
+              <span class="tag-pill tag-custom" style="font-weight:700;">
+                <%= lead.tipo_cliente || 'General' %>
+              </span>
+              <% if (lead.is_real_estate) { %>
+                <span class="tag-pill tag-re">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+                  Real Estate
+                </span>
+              <% } %>
+              <% if (lead.tags) { %>
+                <small style="color:#6B7280;font-size:0.7rem;"><%= lead.tags %></small>
+              <% } %>
+            </div>
+          </td>
+          <td>
+            <span style="font-weight:500;color:#1A3A52;"><%= lead.servicio || 'General' %></span>
+          </td>
+          <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#6B7280;font-size:0.82rem;" title="<%= lead.mensaje %>">
             <%= lead.mensaje || '—' %>
           </td>
           <td>
-            <select class="form-select" style="padding:0.3rem 0.6rem;font-size:0.8rem;width:auto;"
+            <select style="padding:4px 8px;font-size:0.78rem;width:auto;border-radius:6px;font-weight:600;"
                     onchange="updateLeadStatus(<%= lead.id %>, this.value)">
-              <% ['nuevo','contactado','cerrado','descartado'].forEach(s => { %>
-              <option value="<%= s %>" <%= lead.estado === s ? 'selected' : '' %>><%= s %></option>
+              <% ['nuevo','contactado','calificado','cerrado','descartado'].forEach(s => { %>
+              <option value="<%= s %>" <%= lead.estado === s ? 'selected' : '' %>><%= s.toUpperCase() %></option>
               <% }) %>
             </select>
           </td>
           <td>
-            <span class="badge <%= lead.origen === 'web' ? 'badge-blue' : 'badge-gray' %>">
+            <span class="tag" style="background:#F1F5F9;color:#475569;">
               <%= lead.origen || 'web' %>
             </span>
           </td>
-          <td style="color:var(--gris-500);font-size:0.78rem;white-space:nowrap;"><%= lead.created_at?.substring(0,16) || '' %></td>
+          <td style="color:#9CA3AF;font-size:0.75rem;white-space:nowrap;"><%= lead.created_at?.substring(0,16) || '' %></td>
           <td>
-            <form method="POST" action="/admin/leads/<%= lead.id %>/eliminar" style="display:inline" onsubmit="return confirm('¿Eliminar este lead?')">
-              <button class="btn-icon delete" type="submit" title="Eliminar">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+            <div style="display:flex;gap:4px;">
+              <button type="button" class="btn sm" onclick='openEditTagModal(<%= lead.id %>, "<%= lead.tipo_cliente || "General" %>", <%= lead.is_real_estate ? 1 : 0 %>, "<%= lead.tags || "" %>")' title="Editar Tipo y Etiquetas">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
               </button>
-            </form>
+              <form method="POST" action="/admin/leads/<%= lead.id %>/eliminar" style="display:inline" onsubmit="return confirm('¿Eliminar este lead?')">
+                <button class="btn sm" type="submit" style="color:#C0392B;" title="Eliminar">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+                </button>
+              </form>
+            </div>
           </td>
         </tr>
         <% }) %>
         <% if (leads.length === 0) { %>
-        <tr><td colspan="9" style="text-align:center;padding:2.5rem;color:var(--gris-500);">No hay leads. Los mensajes del sitio web aparecerán aquí.</td></tr>
+        <tr><td colspan="9" style="text-align:center;padding:3rem;color:#6B7280;">No hay contactos registrados aún.</td></tr>
         <% } %>
       </tbody>
     </table>
+  </div>
+</div>
+
+<!-- Modal para Etiquetar Lead -->
+<div class="modal-lead-tag" id="tagModal">
+  <div style="background:#fff;border-radius:12px;width:440px;max-width:92vw;padding:22px;box-shadow:0 10px 25px rgba(0,0,0,0.15);">
+    <h2 style="font-size:1.1rem;color:#1A3A52;margin-bottom:14px;">Clasificar y Etiquetar Lead</h2>
+    <input type="hidden" id="tagLeadId">
+    
+    <div style="margin-bottom:12px;">
+      <label style="display:block;font-size:0.75rem;font-weight:600;color:#6B7280;margin-bottom:4px;">Tipo de Cliente</label>
+      <select id="modalTipoCliente" style="width:100%;">
+        <option value="General">General</option>
+        <option value="Inversionista">Inversionista</option>
+        <option value="Comprador Residencial">Comprador Residencial</option>
+        <option value="Desarrollador / Constructor">Desarrollador / Constructor</option>
+        <option value="Propietario / Vendedor">Propietario / Vendedor</option>
+        <option value="Empresarial / Corporativo">Empresarial / Corporativo</option>
+        <% (clientTypes || []).forEach(ct => { %>
+          <option value="<%= ct.nombre %>"><%= ct.nombre %></option>
+        <% }) %>
+      </select>
+    </div>
+
+    <div style="margin-bottom:14px;">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.85rem;font-weight:600;color:#1A3A52;">
+        <input type="checkbox" id="modalIsRealEstate" style="width:auto;accent-color:#4A9B6F;">
+        <span>Marcar como Cliente de Bienes Raíces (Real Estate)</span>
+      </label>
+    </div>
+
+    <div style="margin-bottom:18px;">
+      <label style="display:block;font-size:0.75rem;font-weight:600;color:#6B7280;margin-bottom:4px;">Etiquetas Adicionales (separadas por coma)</label>
+      <input type="text" id="modalTags" placeholder="Punta Cana, Villa, Presupuesto 500k">
+    </div>
+
+    <div style="display:flex;justify-content:flex-end;gap:8px;">
+      <button type="button" class="btn" onclick="closeTagModal()">Cancelar</button>
+      <button type="button" class="btn p" onclick="saveLeadTags()">Guardar Clasificación</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para Crear Nuevo Tipo de Cliente -->
+<div class="modal-lead-tag" id="newTypeModal">
+  <div style="background:#fff;border-radius:12px;width:380px;max-width:92vw;padding:22px;box-shadow:0 10px 25px rgba(0,0,0,0.15);">
+    <h2 style="font-size:1.1rem;color:#1A3A52;margin-bottom:14px;">+ Crear Tipo de Cliente</h2>
+    
+    <div style="margin-bottom:16px;">
+      <label style="display:block;font-size:0.75rem;font-weight:600;color:#6B7280;margin-bottom:4px;">Nombre de la Categoría</label>
+      <input type="text" id="newClientTypeName" placeholder="Ej: Fondo de Inversión, Extranjero...">
+    </div>
+
+    <div style="display:flex;justify-content:flex-end;gap:8px;">
+      <button type="button" class="btn" onclick="closeNewTypeModal()">Cancelar</button>
+      <button type="button" class="btn p" onclick="saveNewClientType()">Crear Tipo</button>
+    </div>
   </div>
 </div>
 
@@ -85,12 +218,70 @@ async function updateLeadStatus(id, estado) {
     });
     const data = await res.json();
     if (!data.ok) throw new Error();
-    // Small toast feedback
     const row = document.getElementById(`lead-row-${id}`);
-    row.style.background = 'rgba(91,158,63,0.08)';
-    setTimeout(() => row.style.background = '', 1500);
+    row.style.background = '#E8F4EF';
+    setTimeout(() => row.style.background = '', 1200);
   } catch {
     alert('Error al actualizar el estado.');
+  }
+}
+
+function openEditTagModal(id, tipo, isRe, tags) {
+  document.getElementById('tagLeadId').value = id;
+  document.getElementById('modalTipoCliente').value = tipo;
+  document.getElementById('modalIsRealEstate').checked = !!isRe;
+  document.getElementById('modalTags').value = tags || '';
+  document.getElementById('tagModal').classList.add('open');
+}
+
+function closeTagModal() {
+  document.getElementById('tagModal').classList.remove('open');
+}
+
+async function saveLeadTags() {
+  const id = document.getElementById('tagLeadId').value;
+  const tipo_cliente = document.getElementById('modalTipoCliente').value;
+  const is_real_estate = document.getElementById('modalIsRealEstate').checked ? 1 : 0;
+  const tags = document.getElementById('modalTags').value;
+
+  try {
+    const res = await fetch(`/admin/leads/${id}/etiquetar`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tipo_cliente, is_real_estate, tags })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      window.location.reload();
+    }
+  } catch(e) {
+    alert('Error al guardar etiquetas.');
+  }
+}
+
+function openNewClientTypeModal() {
+  document.getElementById('newTypeModal').classList.add('open');
+}
+
+function closeNewTypeModal() {
+  document.getElementById('newTypeModal').classList.remove('open');
+}
+
+async function saveNewClientType() {
+  const nombre = document.getElementById('newClientTypeName').value.trim();
+  if (!nombre) return;
+  try {
+    const res = await fetch('/admin/leads/api/client-types', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nombre })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      window.location.reload();
+    }
+  } catch(e) {
+    alert('Error al crear tipo de cliente.');
   }
 }
 </script>

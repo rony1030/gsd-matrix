@@ -1,68 +1,97 @@
-<%- include('../../admin/partials/layout-start', { pageTitle: 'Nuevo Lead', page: 'leads' }) %>
+<%- include('../../admin/partials/layout-start', { pageTitle: 'Nuevo Lead / Contacto', page: 'leads' }) %>
 
 <div style="margin-bottom:1.5rem;">
-  <a href="/admin/leads" style="color:var(--gris-500);font-size:0.875rem;display:flex;align-items:center;gap:0.4rem;">
+  <a href="/admin/leads" style="color:#6B7280;font-size:0.875rem;display:flex;align-items:center;gap:0.4rem;">
     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-    Volver a Leads
+    Volver a Contactos
   </a>
 </div>
 
-<div style="max-width:600px;">
-  <div class="admin-form-card">
-    <h3>Crear Lead Manual</h3>
-    <p style="font-size:0.85rem;color:var(--gris-500);margin-bottom:1.5rem;">Para registrar leads que llegaron por teléfono, WhatsApp u otro canal.</p>
+<div style="max-width:680px;">
+  <div class="card">
+    <h2 style="font-size:1.15rem;color:#1A3A52;margin-bottom:6px;">Registrar Nuevo Lead</h2>
+    <p style="font-size:0.8rem;color:#6B7280;margin-bottom:1.5rem;">Registra contactos captados por WhatsApp, llamadas, referidos o prospección directa.</p>
 
     <form method="POST" action="/admin/leads/nuevo">
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Nombre *</label>
-          <input type="text" name="nombre" class="form-input" placeholder="Nombre completo" required>
+      
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:12px;">
+        <div class="f">
+          <label style="display:block;font-size:0.75rem;font-weight:600;color:#6B7280;margin-bottom:4px;">Nombre del Cliente *</label>
+          <input type="text" name="nombre" placeholder="Nombre completo" required>
         </div>
-        <div class="form-group">
-          <label class="form-label">Email</label>
-          <input type="email" name="email" class="form-input" placeholder="email@ejemplo.com">
+        <div class="f">
+          <label style="display:block;font-size:0.75rem;font-weight:600;color:#6B7280;margin-bottom:4px;">Correo Electrónico</label>
+          <input type="email" name="email" placeholder="cliente@correo.com">
         </div>
       </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Teléfono</label>
-          <input type="tel" name="telefono" class="form-input" placeholder="809-000-0000">
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:12px;">
+        <div class="f">
+          <label style="display:block;font-size:0.75rem;font-weight:600;color:#6B7280;margin-bottom:4px;">Teléfono / WhatsApp</label>
+          <input type="tel" name="telefono" placeholder="+1 (809) 000-0000">
         </div>
-        <div class="form-group">
-          <label class="form-label">Servicio</label>
-          <select name="servicio" class="form-select">
-            <option value="">Seleccionar...</option>
-            <option value="Legal">Legal</option>
-            <option value="Inmobiliaria">Inmobiliaria</option>
-            <option value="Agrimensura">Agrimensura</option>
-            <option value="Otro">Otro</option>
+        <div class="f">
+          <label style="display:block;font-size:0.75rem;font-weight:600;color:#6B7280;margin-bottom:4px;">Servicio de Interés</label>
+          <select name="servicio">
+            <option value="Inmobiliaria">Bienes Raíces / Propiedades</option>
+            <option value="Iguala Legal">Iguala Legal</option>
+            <option value="Deslinde Catastral">Deslinde Catastral</option>
+            <option value="Transferencia de Inmuebles">Transferencia Inmobiliaria</option>
+            <option value="Levantamiento Topográfico">Levantamiento Topográfico</option>
+            <option value="Otro">Otro Asunto</option>
           </select>
         </div>
       </div>
-      <div class="form-group">
-        <label class="form-label">Mensaje / Notas</label>
-        <textarea name="mensaje" class="form-textarea" placeholder="Detalles del cliente..."></textarea>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Estado</label>
-          <select name="estado" class="form-select">
-            <option value="nuevo">Nuevo</option>
-            <option value="contactado">Contactado</option>
-            <option value="cerrado">Cerrado</option>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:12px;">
+        <div class="f">
+          <label style="display:block;font-size:0.75rem;font-weight:600;color:#6B7280;margin-bottom:4px;">Tipo de Cliente</label>
+          <select name="tipo_cliente">
+            <option value="General">General</option>
+            <option value="Inversionista">Inversionista</option>
+            <option value="Comprador Residencial">Comprador Residencial</option>
+            <option value="Desarrollador / Constructor">Desarrollador / Constructor</option>
+            <option value="Propietario / Vendedor">Propietario / Vendedor</option>
+            <option value="Empresarial / Corporativo">Empresarial / Corporativo</option>
+            <% (clientTypes || []).forEach(ct => { %>
+              <option value="<%= ct.nombre %>"><%= ct.nombre %></option>
+            <% }) %>
           </select>
         </div>
-        <div class="form-group">
-          <label class="form-label">Origen</label>
-          <select name="origen" class="form-select">
-            <option value="manual">Manual</option>
-            <option value="whatsapp">WhatsApp</option>
-            <option value="telefono">Teléfono</option>
-            <option value="referido">Referido</option>
+        <div class="f">
+          <label style="display:block;font-size:0.75rem;font-weight:600;color:#6B7280;margin-bottom:4px;">Origen del Contacto</label>
+          <select name="origen">
+            <option value="whatsapp">WhatsApp Directo</option>
+            <option value="telefono">Llamada Telefónica</option>
+            <option value="referido">Referido / Recomendación</option>
+            <option value="web">Sitio Web</option>
+            <option value="manual">Prospección Manual</option>
           </select>
         </div>
       </div>
-      <button type="submit" class="btn-submit" style="margin-top:0.5rem;">Guardar Lead</button>
+
+      <div style="margin-bottom:14px;background:#F9FAFB;border:1px solid #E5E7EB;border-radius:8px;padding:12px;">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.85rem;font-weight:600;color:#1A3A52;">
+          <input type="checkbox" name="is_real_estate" value="1" style="width:auto;accent-color:#4A9B6F;">
+          <span>Pertenece a la Unidad de Bienes Raíces (Real Estate)</span>
+        </label>
+      </div>
+
+      <div class="f" style="margin-bottom:12px;">
+        <label style="display:block;font-size:0.75rem;font-weight:600;color:#6B7280;margin-bottom:4px;">Etiquetas (separadas por coma)</label>
+        <input type="text" name="tags" placeholder="Ej: Punta Cana, Presupuesto 400k, Villa...">
+      </div>
+
+      <div class="f" style="margin-bottom:16px;">
+        <label style="display:block;font-size:0.75rem;font-weight:600;color:#6B7280;margin-bottom:4px;">Notas / Mensaje del Contacto</label>
+        <textarea name="mensaje" placeholder="Detalles de lo conversado, requerimientos específicos..."></textarea>
+      </div>
+
+      <div style="display:flex;justify-content:flex-end;gap:8px;">
+        <a href="/admin/leads" class="btn">Cancelar</a>
+        <button type="submit" class="btn p">Guardar Lead</button>
+      </div>
+
     </form>
   </div>
 </div>
