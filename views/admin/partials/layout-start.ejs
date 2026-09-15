@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
@@ -18,9 +18,6 @@
     .hdr .quoter{border:1px solid var(--line);background:#fff;color:var(--navy);padding:7px 12px;border-radius:6px;font-weight:500;display:flex;align-items:center;gap:6px;font-size:12px;text-decoration:none;white-space:nowrap}
     .hdr .user{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink);white-space:nowrap}
     .hdr .av{width:30px;height:30px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:11px}
-    .flow{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--gray)}
-    .flow span{padding:2px 8px;border-radius:10px;background:var(--bg)}
-    .flow span.on{background:var(--green-l);color:#2F6B4A;font-weight:500}
     .side{background:#fff;border-right:1px solid var(--line);display:flex;flex-direction:column;overflow:hidden;height:calc(100vh - 56px)}
     .side .logo{padding:20px 22px 14px;border-bottom:1px solid var(--line)}
     .side .logo img{max-height:40px;max-width:140px;width:auto;object-fit:contain;display:block}
@@ -52,21 +49,13 @@
 
     @media (max-width:1400px){body.admin-body{grid-template-columns:220px 1fr!important}.hdr .search{width:220px}}
     @media (max-width:1200px){body.admin-body{grid-template-columns:64px 1fr!important}.side .logo img,.side .logo .prod,.side .grp,.side a span:not(.n),.side .me div{display:none}.side .logo{padding:14px 10px}.side a{padding:12px 0;justify-content:center;border-left:0}.side .me{justify-content:center}.main{padding:18px}}
-    @media (max-width:900px){.flow{display:none}}
   </style>
 </head>
 <body class="admin-body">
 
 <header class="hdr">
-  <div class="flow" id="flow">
-    <span <%= (typeof page !== 'undefined' && page === 'cotizaciones') ? 'class="on"' : '' %>>Cotizar</span>→
-    <span>Aprobar</span>→
-    <span <%= (typeof page !== 'undefined' && (page === 'expedientes' || page === 'dashboard' || page === 'tareas' || page === 'calendario' || page === 'clientes' || page === 'documentos' || page === 'plantillas')) ? 'class="on"' : '' %>>Expediente</span>→
-    <span <%= (typeof page !== 'undefined' && page === 'propiedades') ? 'class="on"' : '' %>>Gestionar</span>→
-    <span>Cerrar</span>
-  </div>
+  <input class="search" id="search" placeholder="Buscar expediente, cliente o parcela..." onkeydown="if(event.key==='Enter'){window.location.href='/admin/expedientes?q='+encodeURIComponent(this.value);}">
   <span class="sp"></span>
-  <input class="search" id="search" placeholder="Buscar expediente, cliente o parcela" onkeydown="if(event.key==='Enter'){window.location.href='/admin/expedientes?q='+encodeURIComponent(this.value);}">
   
   <% if (typeof page !== 'undefined' && page === 'propiedades') { %>
     <a href="/admin/propiedades/nueva" class="btn p"><i data-lucide="plus"></i>Nueva Propiedad</a>

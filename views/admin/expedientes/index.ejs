@@ -160,8 +160,6 @@ tr.row:hover td{background:var(--bg);cursor:pointer}
 @keyframes pop{from{transform:translateY(8px);opacity:0}to{transform:none;opacity:1}}
 .tab.on,.view.on{animation:fade .2s ease}
 @keyframes fade{from{opacity:0}to{opacity:1}}
-.flow{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--gray)}
-.flow span{padding:2px 8px;border-radius:10px;background:var(--bg)}.flow span.on{background:var(--green-l);color:#2F6B4A;font-weight:500}
 .strip{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;background:var(--navy);color:#fff;border-radius:10px;padding:12px 18px;margin:0 0 16px;font-size:12px}
 .strip b{font-weight:500;letter-spacing:.5px}.strip .ch{color:#CFE3D8;display:flex;gap:10px;flex-wrap:wrap}.strip .ch span:before{content:'·';margin-right:10px;color:var(--green)}
 .sk{background:linear-gradient(90deg,#EEF1F4 25%,#F6F8FA 50%,#EEF1F4 75%);background-size:200% 100%;animation:sk 1s infinite;border-radius:6px;height:14px;margin:8px 0}
@@ -173,7 +171,6 @@ tr.row:hover td{background:var(--bg);cursor:pointer}
 .cv .step{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--line)}
 .cv .step .n{width:22px;height:22px;border-radius:50%;background:var(--green-l);color:#2F6B4A;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0}
 [data-tip]{position:relative}[data-tip]:hover:after{content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;font-size:11px;padding:4px 8px;border-radius:4px;white-space:nowrap;z-index:20;font-weight:400}
-@media (max-width:900px){.flow{display:none}}
 @media (max-width:1400px){body{grid-template-columns:220px 1fr}.kpis{grid-template-columns:repeat(3,1fr)}.hdr .search{width:220px}.prog{grid-template-columns:2fr 1fr 1fr 1fr}}
 @media (max-width:1200px){body{grid-template-columns:64px 1fr}.side .logo img,.side .logo .prod,.side .grp,.side a span:not(.n),.side .me div{display:none}.side .logo{padding:14px 10px}.side a{padding:12px 0;justify-content:center;border-left:0}.side .me{justify-content:center}.g2,.g3,.alerts{grid-template-columns:1fr}.task{grid-template-columns:20px 1fr 110px 90px}.task .due,.task .btn{display:none}.gal{grid-template-columns:repeat(2,1fr)}.main{padding:18px}}
 </style>
@@ -181,9 +178,8 @@ tr.row:hover td{background:var(--bg);cursor:pointer}
 <body>
 
 <header class="hdr">
-  <div class="flow" id="flow"><span>Cotizar</span>→<span>Aprobar</span>→<span class="on">Expediente</span>→<span class="on">Gestionar</span>→<span>Cerrar</span></div>
+  <input class="search" id="search" placeholder="Buscar expediente, cliente o parcela...">
   <span class="sp"></span>
-  <input class="search" id="search" placeholder="Buscar expediente, cliente o parcela">
   <button class="btn" id="btnNewExp"><i data-lucide="plus"></i>Nuevo expediente</button>
   <button class="quoter" onclick="window.location.href='/admin/cotizaciones'"><i data-lucide="calculator"></i>GSD Quoter</button>
   <div class="user"><div class="av">EM</div>Esteban Mejía</div>
