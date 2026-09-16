@@ -22,6 +22,8 @@ i[data-lucide],svg.lucide{width:16px;height:16px;vertical-align:-3px}
 .hdr-search input.search:focus{background:#fff;border-color:var(--green);box-shadow:0 0 0 3px rgba(74,155,111,.15);outline:none}
 .hdr-actions{display:flex;align-items:center;gap:10px;flex-shrink:0;margin-left:auto}
 .hdr-actions .btn{height:34px;padding:0 14px;font-size:12.5px;display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:6px;white-space:nowrap;box-sizing:border-box}
+.solicitud-opt{display:flex;align-items:center;gap:10px;padding:9px 14px;color:var(--ink);text-decoration:none;font-size:13px;font-weight:500;transition:background .15s,color .15s}
+.solicitud-opt:hover{background:var(--bg);color:var(--navy)}
 .hdr .quoter{height:34px;border:1px solid var(--line);background:#fff;color:var(--navy);padding:0 12px;border-radius:6px;font-weight:500;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-size:12px;text-decoration:none;white-space:nowrap;box-sizing:border-box}
 .hdr .user{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink);white-space:nowrap}
 .hdr .av{width:30px;height:30px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:11px;flex-shrink:0}
@@ -216,7 +218,29 @@ tr.row:hover td{background:var(--bg);cursor:pointer}
     <input class="search" id="search" placeholder="Buscar expediente, cliente o parcela...">
   </div>
   <div class="hdr-actions">
-    <button class="btn p" id="btnNewExp"><i data-lucide="plus"></i>Nuevo expediente</button>
+    <div class="dropdown-solicitud" style="position:relative;">
+      <button class="btn p" id="btnNewSolicitud" onclick="toggleSolicitudDropdown(event)" type="button">
+        <i data-lucide="plus"></i><span>Nueva solicitud</span><i data-lucide="chevron-down" style="width:13px;height:13px;margin-left:2px;opacity:0.8;"></i>
+      </button>
+      <div id="dropdownMenuSolicitud" class="menu-solicitud" style="display:none;position:absolute;right:0;top:calc(100% + 6px);background:#ffffff;border:1px solid var(--line);border-radius:8px;box-shadow:0 10px 25px rgba(0,0,0,0.12);min-width:210px;z-index:999;overflow:hidden;padding:6px 0;">
+        <a href="/admin/propiedades/nueva" class="solicitud-opt">
+          <i data-lucide="home" style="color:#1E3962;"></i>
+          <span>Propiedades</span>
+        </a>
+        <a href="/admin/leads/nuevo" class="solicitud-opt">
+          <i data-lucide="user-plus" style="color:#74B241;"></i>
+          <span>Lead</span>
+        </a>
+        <a href="javascript:void(0)" onclick="closeSolicitudDropdown();openNewExpModal()" class="solicitud-opt">
+          <i data-lucide="folder-plus" style="color:#1E3962;"></i>
+          <span>Expedientes</span>
+        </a>
+        <a href="/admin/blog/nuevo" class="solicitud-opt">
+          <i data-lucide="newspaper" style="color:#D97706;"></i>
+          <span>Blog</span>
+        </a>
+      </div>
+    </div>
   </div>
 </header>
 
@@ -311,11 +335,29 @@ const TPL={
   objeto:{provincia:'Provincia',municipio:'Municipio',sector:'Sector',matricula:'Matrícula',titulo:'Certificado de título',dc:'Designación catastral',areaReg:'Área',vendedor:'Vendedor',comprador:'Comprador',precio:'Precio de venta'},
   docs:[['CLIENTE','Cédula comprador','cliente'],['CLIENTE','Cédula vendedor','cliente'],['CLIENTE','Acta de matrimonio vendedor','cliente'],['INMUEBLE','Certificado de título original','cliente'],['INMUEBLE','Certificación de estado jurídico','gsd'],['INMUEBLE','Constancia IPI','gsd'],['PROCESO','Contrato de compraventa notarizado','cliente'],['PROCESO','Recibo impuesto 3% DGII','gsd'],['PROCESO','Recibo depósito Registro','gsd'],['PROCESO','Nuevo certificado de título','gsd']],
   fases:[['Diagnóstico',['Recibir documentación','Revisar título y cargas','Verificar partes']],['Certificaciones',['Estado jurídico','Constancia IPI','Legalización de firmas']],['Impuestos',['Liquidación DGII','Pago del 3%']],['Registro',['Depósito en Registro de Títulos','Seguimiento','Emisión del nuevo título']],['Cierre',['Entrega al cliente','Cierre del expediente']]]},
- iguala:{nombre:'Iguala Legal',div:'Legal',plazo:180,tec:false,
-  objeto:{empresa:'Empresa / cliente',rnc:'RNC',nivel:'Nivel de iguala',sede:'Sede',contacto:'Contacto principal',vigencia:'Vigencia del contrato'},
-  docs:[['CLIENTE','Registro mercantil','cliente'],['CLIENTE','Estatutos sociales','cliente'],['CLIENTE','Cédula del representante','cliente'],['PROCESO','Contrato de iguala firmado','gsd'],['PROCESO','Informe mensual','gsd']],
-  fases:[['Diagnóstico',['Reunión inicial','Relevar asuntos abiertos','Definir nivel de iguala']],['Contrato',['Redacción del contrato','Firma','Primer pago']],['Servicio',['Informe mensual 1','Informe mensual 2','Informe mensual 3']],['Renovación',['Evaluación','Renovación o cierre']]]}
+  iguala:{nombre:'Iguala Legal',div:'Legal',plazo:180,tec:false,
+   objeto:{empresa:'Empresa / cliente',rnc:'RNC',nivel:'Nivel de iguala',sede:'Sede',contacto:'Contacto principal',vigencia:'Vigencia del contrato'},
+   docs:[['CLIENTE','Registro mercantil','cliente'],['CLIENTE','Estatutos sociales','cliente'],['CLIENTE','Cédula del representante','cliente'],['PROCESO','Contrato de iguala firmado','gsd'],['PROCESO','Informe mensual','gsd']],
+   fases:[['Diagnóstico',['Reunión inicial','Relevar asuntos abiertos','Definir nivel de iguala']],['Contrato',['Redacción del contrato','Firma','Primer pago']],['Servicio',['Informe mensual 1','Informe mensual 2','Informe mensual 3']],['Renovación',['Evaluación','Renovación o cierre']]]},
+  condominio:{nombre:'Constitución de Condominio',div:'Inmobiliario',plazo:90,tec:true,
+   objeto:{proyecto:'Nombre del proyecto',unidades:'Cantidad de unidades',sector:'Ubicación',parcela:'Parcela matriz',matricula:'Matrícula',areaTotal:'Área total'},
+   docs:[['CLIENTE','Certificado de título','cliente'],['CLIENTE','Planos arquitectónicos','cliente'],['CLIENTE','Licencia de construcción','cliente'],['GSD','Reglamento de régimen','gsd'],['GSD','Planos de división particular','gsd'],['PROCESO','Aprobación Mensuras Catastrales','gsd'],['PROCESO','Certificados de títulos individuales','gsd']],
+   fases:[['Diagnóstico',['Revisión de planos y título matriz','Estructura de unidades']],['Técnica',['Elaboración de planos de condominio','Memoria técnica']],['Reglamento',['Redacción del reglamento de copropiedad','Revisión legal']],['Registro',['Depósito en Mensuras y Registro de Títulos','Emisión de títulos']],['Cierre',['Entrega de carpetas de títulos a propietarios']]]},
+  subdivision:{nombre:'Subdivisión y Refundición',div:'Agrimensura',plazo:90,tec:true,
+   objeto:{parcela:'Parcela origen',provincia:'Provincia',sector:'Sector',solesResultantes:'Porciones resultantes',areaReg:'Área total'},
+   docs:[['CLIENTE','Certificado de título original','cliente'],['CLIENTE','Cédula propietario','cliente'],['TÉCNICO','Levantamiento GNSS parcelario','gsd'],['TÉCNICO','Planos de subdivisión propuestos','gsd'],['PROCESO','Aprobación Dirección Regional Mensuras','gsd']],
+   fases:[['Diagnóstico',['Revisión registral','Análisis de colindancias']],['Campo',['Levantamiento de linderos','Monumentación de vértices']],['Gabinete',['Planos individuales','Memoria técnica descriptiva']],['Aprobación',['Revisión y aprobación catastral']],['Cierre',['Entrega de nuevas constancias y planos']]]},
+  sucesiones:{nombre:'Sucesiones y Determinación Herederos',div:'Legal',plazo:60,tec:false,
+   objeto:{causante:'De cujus (Fallecido)',herederos:'Herederos identificados',bienes:'Inmuebles inventariados',radicacion:'Lugar de apertura'},
+   docs:[['CLIENTE','Acta de defunción','cliente'],['CLIENTE','Actas de nacimiento de herederos','cliente'],['CLIENTE','Acta de matrimonio del de cujus','cliente'],['CLIENTE','Títulos de propiedad de los bienes','cliente'],['GSD','Instancia de determinación de herederos','gsd'],['PROCESO','Pliego de sucesiones DGII','gsd'],['PROCESO','Resolución judicial o registral','gsd']],
+   fases:[['Recopilación',['Recepción de actas del estado civil','Certificaciones de títulos']],['Impuestos',['Declaración jurada de sucesiones ante DGII','Cálculo de impuestos']],['Partición',['Acuerdo amigable de partición o adjudicación']],['Registro',['Transferencia e inscripción registral']],['Cierre',['Entrega de títulos adjudicados']]]
 };
+// Aliases
+TPL['deslinde-catastral'] = TPL.deslinde;
+TPL['transferencia-confotur'] = TPL.transferencia;
+TPL['transferencia-ordinaria'] = TPL.transferencia;
+TPL['compra-segura'] = TPL.transferencia;
+TPL['iguala-legal'] = TPL.iguala;
 
 // ===== DATA / REAL STATE =====
 const SEED_KEY='gsd_exp_v5';
@@ -362,7 +404,7 @@ const ESTADO={proc:['EN PROCESO','proc'],rev:['EN REVISIÓN','rev'],wait:['ESPER
 const ini=n=>n.split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase();
 function progress(e){const t=e.tasks.filter(x=>x.st!=='na');const d=t.filter(x=>x.st==='done').length;return{pct:t.length?Math.round(d/t.length*100):0,done:d,total:t.length};}
 function phaseState(e,fi){const t=e.tasks.filter(x=>x.phase===fi&&x.st!=='na');if(t.length&&t.every(x=>x.st==='done'))return 'done';if(t.some(x=>x.st==='done'||x.st==='proc'))return 'cur';return 'pend';}
-function currentPhase(e){const f=TPL[e.svc].fases;for(let i=0;i<f.length;i++){if(phaseState(e,i)!=='done')return i;}return f.length-1;}
+function currentPhase(e){const f=(TPL[e.svc]||TPL.deslinde).fases;for(let i=0;i<f.length;i++){if(phaseState(e,i)!=='done')return i;}return f.length-1;}
 function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2200);}
 function confirmA(title,text,fn){$('cfTitle').textContent=title;$('cfText').textContent=text;$('cfOk').onclick=()=>{closeM('mConfirm');fn();};openM('mConfirm');}
 function openM(id){$(id).classList.add('on');icons();}function closeM(id){$(id).classList.remove('on');}
@@ -411,7 +453,7 @@ document.querySelectorAll('.side a[data-view]').forEach(a => {
     go(a.dataset.view);
   });
 });
-function rowHTML(e,withDate){const p=progress(e),es=ESTADO[e.estado];return `<tr class="row" onclick="openExp('${e.id}')"><td><b style="color:var(--navy);font-weight:500">${e.id}</b></td><td>${e.cliente.nombre}</td><td>${TPL[e.svc].nombre}</td><td>${e.tec&&e.tec!==e.resp?e.resp.split(' ')[0]+' / '+e.tec.split(' ')[0]:e.resp}</td>${withDate?`<td>${fd(e.inicio)}</td>`:''}<td><div style="display:flex;align-items:center;gap:8px"><div class="bar" style="flex:1"><i style="width:${p.pct}%"></i></div><span style="font-size:11.5px;color:var(--gray);min-width:32px">${p.pct}%</span></div></td><td><span class="tag ${es[1]}">${es[0]}</span></td></tr>`;}
+function rowHTML(e,withDate){const p=progress(e),es=ESTADO[e.estado];return `<tr class="row" onclick="openExp('${e.id}')"><td><b style="color:var(--navy);font-weight:500">${e.id}</b></td><td>${e.cliente.nombre}</td><td>${(TPL[e.svc]||TPL.deslinde).nombre}</td><td>${e.tec&&e.tec!==e.resp?e.resp.split(' ')[0]+' / '+e.tec.split(' ')[0]:e.resp}</td>${withDate?`<td>${fd(e.inicio)}</td>`:''}<td><div style="display:flex;align-items:center;gap:8px"><div class="bar" style="flex:1"><i style="width:${p.pct}%"></i></div><span style="font-size:11.5px;color:var(--gray);min-width:32px">${p.pct}%</span></div></td><td><span class="tag ${es[1]}">${es[0]}</span></td></tr>`;}
 function renderDash(){const al=alerts(),act=DB.filter(e=>e.estado!=='done');const late=al.filter(a=>a.c==='r').length,soon=DB.flatMap(e=>e.tasks||[]).filter(t=>t.due&&t.st!=='done'&&days(t.due)>=0&&days(t.due)<=14).length;
  $('kpis').innerHTML=[['folder-open','Expedientes activos',act.length],['alert-circle','Requieren atención',al.length,al.length?'warn':''],['clock','Tareas vencidas',late,late?'warn':''],['calendar','Próximos vencimientos',soon],['check-circle','Completados este mes',DB.filter(e=>e.estado==='done').length]].map(k=>`<div class="kpi ${k[3]||''}"><div class="l"><i data-lucide="${k[0]}"></i>${k[1]}</div><div class="v">${k[2]}</div></div>`).join('');
  $('dashAlerts').innerHTML=al.slice(0,3).map(a=>`<div class="alert" onclick="openExp('${a.e}')"><span class="dot ${a.c}"></span><div><b>${a.n}</b><small>${a.e} · ${a.s}</small><small>Responsable: ${a.w.split(' ')[0]}</small></div></div>`).join('')||'<div class="empty" style="text-align:center;padding:18px;color:var(--gray);">Sin alertas pendientes. Todo al día.</div>';
@@ -435,7 +477,7 @@ function renderTpl(){$('tplCards').innerHTML=Object.entries(TPL).map(([k,t])=>`<
 // ===== EXPEDIENTE: control center =====
 let cur=null,tab='resumen',openPhase=null;
 function openExp(id,t){cur=DB.find(e=>e.id===id);tab=t||'resumen';openPhase=null;$('v-exp').innerHTML='<div class="sk" style="width:180px"></div><div class="sk" style="width:320px;height:26px"></div><div class="sk" style="width:240px"></div><div class="card" style="margin-top:18px"><div class="sk"></div><div class="sk" style="width:60%"></div></div><div class="card"><div class="sk"></div><div class="sk"></div><div class="sk" style="width:40%"></div></div>';setTimeout(renderExp,260);document.querySelectorAll('.view').forEach(x=>x.classList.remove('on'));$('v-exp').classList.add('on');document.querySelectorAll('.side a').forEach(a=>a.classList.toggle('on',a.dataset.view==='list'));$('main').scrollTop=0;icons();}
-function renderExp(){const e=cur,T=TPL[e.svc],p=progress(e),es=ESTADO[e.estado];const obj=e.objeto;const sub=e.svc==='deslinde'?`Parcela ${obj.parcela} · ${obj.areaReg} · ${obj.sector}, ${obj.provincia}`:e.svc==='transferencia'?`Matrícula ${obj.matricula} · ${obj.sector} · ${obj.precio}`:`${obj.empresa} · Nivel ${obj.nivel}`;
+function renderExp(){const e=cur,T=TPL[e.svc]||TPL.deslinde,p=progress(e),es=ESTADO[e.estado];const obj=e.objeto||{};const sub=e.svc==='deslinde'?`Parcela ${obj.parcela||'—'} · ${obj.areaReg||''} · ${obj.sector||''}, ${obj.provincia||''}`:e.svc==='transferencia'?`Matrícula ${obj.matricula||'—'} · ${obj.sector||''} · ${obj.precio||''}`:`${obj.empresa||obj.proyecto||obj.parcela||'Asunto'} · Nivel ${obj.nivel||'1'}`;
  const tabs=['resumen','informacion','documentos','checklist','proceso','tareas','avances','bitacora','evidencias','finanzas'];const tn={resumen:'Resumen',informacion:'Información',documentos:'Documentos',checklist:'Checklist',proceso:'Proceso',tareas:'Tareas',avances:'Avances',bitacora:'Bitácora',evidencias:'Evidencias',finanzas:'Finanzas'};
  $('v-exp').innerHTML=`<span class="link" onclick="go('list')">← Volver a expedientes</span>
  <div class="exp-head" style="margin-top:10px"><div><div class="ref">${e.id} · desde ${e.quote}</div><h1>${T.nombre}</h1><div class="cli">${e.cliente.nombre}</div><div class="sub">${sub}</div></div>
@@ -517,8 +559,23 @@ function saveEv(){const f=$('evFile').files[0],d=$('evDesc').value.trim();if(!d)
 function finanzas(e,T,b){const pag=e.pagos.filter(p=>p.st==='Pagado').reduce((a,p)=>a+p.m,0),pct=Math.round(pag/e.honorario*100);b.innerHTML=`<div class="kpis" style="grid-template-columns:repeat(4,1fr)"><div class="kpi"><div class="l">Honorario contratado</div><div class="v">${e.mon}${fmt(e.honorario)}</div></div><div class="kpi"><div class="l">Pagado</div><div class="v" style="color:var(--green)">${e.mon}${fmt(pag)}</div></div><div class="kpi"><div class="l">Pendiente</div><div class="v" style="color:${e.honorario-pag?'var(--red)':'var(--navy)'}">${e.mon}${fmt(e.honorario-pag)}</div></div><div class="kpi"><div class="l">Progreso de pago</div><div class="v">${pct}%</div><div class="bar" style="margin-top:6px"><i style="width:${pct}%"></i></div></div></div>
  <div class="card"><div class="ch"><h2>Historial de pagos</h2></div><table><thead><tr><th>Fecha</th><th>Concepto</th><th>Monto</th><th>Estado</th><th></th></tr></thead><tbody>${e.pagos.map((p,i)=>`<tr><td>${fd(p.d)}</td><td>${p.c}</td><td>${e.mon}${fmt(p.m)}</td><td><span class="tag ${p.st==='Pagado'?'proc':'wait'}">${p.st}</span></td><td>${p.st!=='Pagado'?`<button class="btn sm" onclick="cur.pagos[${i}].st='Pagado';cur.pagos[${i}].d='${TODAY}';log(cur,'Pago registrado: ${p.c}.');save();renderTab();toast('Pago registrado')">Registrar pago</button>`:''}</td></tr>`).join('')}</tbody></table></div>`;}
 
+// ===== DROPDOWN: nueva solicitud =====
+function toggleSolicitudDropdown(e) {
+  if (e) e.stopPropagation();
+  const m = document.getElementById('dropdownMenuSolicitud');
+  if (m) m.style.display = m.style.display === 'block' ? 'none' : 'block';
+}
+function closeSolicitudDropdown() {
+  const m = document.getElementById('dropdownMenuSolicitud');
+  if (m) m.style.display = 'none';
+}
+document.addEventListener('click', (e) => {
+  const m = document.getElementById('dropdownMenuSolicitud');
+  if (m && !e.target.closest('.dropdown-solicitud')) m.style.display = 'none';
+});
+
 // ===== MODALS: nuevo expediente =====
-$('btnNewExp').onclick=()=>{
+function openNewExpModal(){
   $('nQuote').innerHTML=quotes.length ? quotes.map(q=>`<option value="${q.ref}">${q.ref} — ${q.cli}</option>`).join('') : '<option value="">(Sin cotizaciones aprobadas)</option>';
   $('nSvc').innerHTML=Object.entries(TPL).map(([k,t])=>`<option value="${k}">${t.nombre}</option>`).join('');
   $('nResp').innerHTML=TEAM.map(n=>`<option>${n}</option>`).join('');
@@ -531,7 +588,13 @@ $('btnNewExp').onclick=()=>{
   }
   quoteInfo();
   openM('mNew');
-};
+}
+if ($('btnNewExp')) $('btnNewExp').onclick = openNewExpModal;
+
+// Auto-abrir si la URL tiene ?action=new
+if (new URLSearchParams(window.location.search).get('action') === 'new') {
+  setTimeout(openNewExpModal, 300);
+}
 $('nQuote').onchange=quoteInfo;
 function quoteInfo(){
   const q=quotes.find(x=>x.ref===$('nQuote').value);

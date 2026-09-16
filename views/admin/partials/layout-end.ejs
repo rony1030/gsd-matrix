@@ -1,8 +1,17 @@
-﻿</main>
+</main>
 <script>
   if (window.lucide) {
     lucide.createIcons();
   }
+  function toggleSolicitudDropdown(e) {
+    if (e) e.stopPropagation();
+    const m = document.getElementById('dropdownMenuSolicitud');
+    if (m) m.style.display = m.style.display === 'block' ? 'none' : 'block';
+  }
+  document.addEventListener('click', (e) => {
+    const m = document.getElementById('dropdownMenuSolicitud');
+    if (m && !e.target.closest('.dropdown-solicitud')) m.style.display = 'none';
+  });
 </script>
 </body>
 </html>

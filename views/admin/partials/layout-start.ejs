@@ -22,6 +22,8 @@
     .hdr-search input.search:focus{background:#fff;border-color:var(--green);box-shadow:0 0 0 3px rgba(74,155,111,.15);outline:none}
     .hdr-actions{display:flex;align-items:center;gap:10px;flex-shrink:0;margin-left:auto}
     .hdr-actions .btn{height:34px;padding:0 14px;font-size:12.5px;display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:6px;white-space:nowrap;box-sizing:border-box}
+    .solicitud-opt{display:flex;align-items:center;gap:10px;padding:9px 14px;color:var(--ink);text-decoration:none;font-size:13px;font-weight:500;transition:background .15s,color .15s}
+    .solicitud-opt:hover{background:var(--bg);color:var(--navy)}
     .hdr .quoter{height:34px;border:1px solid var(--line);background:#fff;color:var(--navy);padding:0 12px;border-radius:6px;font-weight:500;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-size:12px;text-decoration:none;white-space:nowrap;box-sizing:border-box}
     .hdr .user{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink);white-space:nowrap}
     .hdr .av{width:30px;height:30px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:11px;flex-shrink:0}
@@ -139,7 +141,29 @@
   </div>
   
   <div class="hdr-actions">
-    <a href="/admin/expedientes" class="btn p"><i data-lucide="plus"></i>Nuevo expediente</a>
+    <div class="dropdown-solicitud" style="position:relative;">
+      <button class="btn p" id="btnNewSolicitud" onclick="toggleSolicitudDropdown(event)" type="button">
+        <i data-lucide="plus"></i><span>Nueva solicitud</span><i data-lucide="chevron-down" style="width:13px;height:13px;margin-left:2px;opacity:0.8;"></i>
+      </button>
+      <div id="dropdownMenuSolicitud" class="menu-solicitud" style="display:none;position:absolute;right:0;top:calc(100% + 6px);background:#ffffff;border:1px solid var(--line);border-radius:8px;box-shadow:0 10px 25px rgba(0,0,0,0.12);min-width:210px;z-index:999;overflow:hidden;padding:6px 0;">
+        <a href="/admin/propiedades/nueva" class="solicitud-opt">
+          <i data-lucide="home" style="color:#1E3962;"></i>
+          <span>Propiedades</span>
+        </a>
+        <a href="/admin/leads/nuevo" class="solicitud-opt">
+          <i data-lucide="user-plus" style="color:#74B241;"></i>
+          <span>Lead</span>
+        </a>
+        <a href="/admin/expedientes?action=new" class="solicitud-opt">
+          <i data-lucide="folder-plus" style="color:#1E3962;"></i>
+          <span>Expedientes</span>
+        </a>
+        <a href="/admin/blog/nuevo" class="solicitud-opt">
+          <i data-lucide="newspaper" style="color:#D97706;"></i>
+          <span>Blog</span>
+        </a>
+      </div>
+    </div>
   </div>
 </header>
 
