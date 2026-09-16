@@ -4,20 +4,36 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GSD — Geosolutions Source Dominicana</title>
-  <meta name="description" content="Estamos trabajando en nuestra nueva plataforma. Accede a GSD Real Estate o al CRM de administración.">
+  <meta name="description" content="Plataforma oficial de Geosolutions Source Dominicana. Soluciones integrales de agrimensura, ingeniería, asesoría legal e inmobiliaria.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="icon" type="image/png" href="/img/isotipo.png">
   <style>
+    :root {
+      --navy: #1A3A52;
+      --green: #4A9B6F;
+      --green-dark: #3E8A5F;
+      --green-l: #E8F4EF;
+      --slate: #475569;
+      --muted: #94A3B8;
+      --border: #E2E8F0;
+      --bg-light: #F8FAFC;
+      --white: #FFFFFF;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
     body, html {
       margin: 0;
       padding: 0;
       height: 100%;
       overflow: hidden;
-      background: #0f2438;
-      font-family: 'Inter', sans-serif;
+      background: var(--bg-light);
+      font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+      color: var(--navy);
     }
     .soon-wrapper {
       position: relative;
@@ -36,21 +52,21 @@
     .soon-bg {
       position: absolute;
       inset: 0;
-      background-image: url('https://images.unsplash.com/photo-1559827260-dc66d52bef19?auto=format&fit=crop&w=2000&q=80');
+      background-image: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=2000&q=80');
       background-size: cover;
       background-position: center;
-      transform: scale(1.05);
-      animation: slowZoom 20s infinite alternate ease-in-out;
+      transform: scale(1.04);
+      animation: slowZoom 24s infinite alternate ease-in-out;
       z-index: 0;
     }
     @keyframes slowZoom {
-      from { transform: scale(1.03); }
-      to { transform: scale(1.1); }
+      from { transform: scale(1.02); }
+      to { transform: scale(1.08); }
     }
     .soon-overlay {
       position: absolute;
       inset: 0;
-      background: linear-gradient(135deg, rgba(16, 38, 54, 0.92) 0%, rgba(26, 58, 82, 0.85) 60%, rgba(10, 25, 38, 0.95) 100%);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.92) 0%, rgba(248, 250, 252, 0.85) 50%, rgba(241, 245, 249, 0.94) 100%);
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
       z-index: 1;
@@ -58,49 +74,47 @@
     .soon-card {
       position: relative;
       z-index: 3;
-      max-width: 680px;
+      max-width: 660px;
       width: 100%;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 24px;
-      padding: 3rem 2.5rem;
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
-      animation: floatUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 3.2rem 2.8rem;
+      box-shadow: 0 25px 50px -12px rgba(26, 58, 82, 0.10), 0 4px 16px rgba(0, 0, 0, 0.03);
+      animation: floatUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
     }
     @keyframes floatUp {
-      from { opacity: 0; transform: translateY(30px); }
+      from { opacity: 0; transform: translateY(24px); }
       to { opacity: 1; transform: translateY(0); }
     }
     .soon-logo {
-      width: 230px;
+      width: 210px;
       max-width: 80%;
-      margin: 0 auto 1.8rem;
+      margin: 0 auto 1.6rem;
       display: block;
-      filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
+      object-fit: contain;
     }
     .soon-badge {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      background: rgba(91, 158, 63, 0.22);
-      border: 1px solid rgba(91, 158, 63, 0.55);
-      color: #b5db85;
+      background: var(--green-l);
+      border: 1px solid rgba(74, 155, 111, 0.35);
+      color: #2F6B4A;
       font-size: 0.75rem;
-      font-weight: 700;
-      letter-spacing: 0.18em;
+      font-weight: 600;
+      letter-spacing: 0.14em;
       text-transform: uppercase;
-      padding: 6px 18px;
+      padding: 5px 15px;
       border-radius: 50px;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.3rem;
     }
     .soon-badge-dot {
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background: #5B9E3F;
-      box-shadow: 0 0 10px #5B9E3F;
+      background: var(--green);
+      box-shadow: 0 0 8px rgba(74, 155, 111, 0.6);
       animation: blink 1.8s infinite;
     }
     @keyframes blink {
@@ -108,20 +122,25 @@
       50% { opacity: 0.4; transform: scale(0.85); }
     }
     .soon-title {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(2rem, 5vw, 3rem);
+      font-family: 'Poppins', system-ui, sans-serif;
+      font-size: clamp(1.85rem, 4.5vw, 2.45rem);
       font-weight: 700;
-      color: #ffffff;
-      line-height: 1.15;
+      color: var(--navy);
+      line-height: 1.25;
       margin: 0 0 1rem;
+      letter-spacing: -0.5px;
     }
     .soon-desc {
-      color: rgba(255, 255, 255, 0.82);
-      font-size: 1.05rem;
-      line-height: 1.6;
-      margin: 0 auto 2.5rem;
+      color: var(--slate);
+      font-size: 1rem;
+      line-height: 1.65;
+      margin: 0 auto 2.4rem;
       max-width: 520px;
       font-weight: 400;
+    }
+    .soon-desc strong {
+      color: var(--navy);
+      font-weight: 600;
     }
     .soon-actions {
       display: grid;
@@ -130,58 +149,58 @@
       width: 100%;
     }
     .btn-realestate {
-      background: #5B9E3F;
-      color: #ffffff;
-      padding: 1rem 1.5rem;
-      border-radius: 50px;
-      font-weight: 700;
-      font-size: 0.95rem;
+      background: var(--green);
+      color: var(--white);
+      padding: 0.95rem 1.4rem;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.92rem;
       text-decoration: none;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
-      transition: all 0.25s ease;
-      border: 2px solid #5B9E3F;
-      box-shadow: 0 8px 24px rgba(91, 158, 63, 0.35);
+      gap: 8px;
+      transition: all 0.2s ease;
+      border: 1px solid var(--green);
+      box-shadow: 0 4px 14px rgba(74, 155, 111, 0.25);
     }
     .btn-realestate:hover {
-      background: #4a8530;
-      border-color: #4a8530;
+      background: var(--green-dark);
+      border-color: var(--green-dark);
       transform: translateY(-2px);
-      box-shadow: 0 12px 28px rgba(91, 158, 63, 0.5);
+      box-shadow: 0 8px 20px rgba(74, 155, 111, 0.35);
     }
     .btn-crm {
-      background: rgba(255, 255, 255, 0.1);
-      color: #ffffff;
-      padding: 1rem 1.5rem;
-      border-radius: 50px;
-      font-weight: 700;
-      font-size: 0.95rem;
+      background: var(--white);
+      color: var(--navy);
+      padding: 0.95rem 1.4rem;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.92rem;
       text-decoration: none;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
-      transition: all 0.25s ease;
-      border: 2px solid rgba(255, 255, 255, 0.7);
-      backdrop-filter: blur(8px);
+      gap: 8px;
+      transition: all 0.2s ease;
+      border: 1.5px solid var(--navy);
+      box-shadow: 0 2px 8px rgba(26, 58, 82, 0.05);
     }
     .btn-crm:hover {
-      background: rgba(255, 255, 255, 0.22);
-      border-color: #ffffff;
+      background: var(--navy);
+      color: var(--white);
       transform: translateY(-2px);
-      box-shadow: 0 12px 28px rgba(255, 255, 255, 0.2);
+      box-shadow: 0 8px 20px rgba(26, 58, 82, 0.16);
     }
     .soon-footer {
-      margin-top: 2rem;
-      font-size: 0.75rem;
-      color: rgba(255, 255, 255, 0.5);
-      letter-spacing: 0.05em;
+      margin-top: 2.2rem;
+      font-size: 0.78rem;
+      color: var(--muted);
+      letter-spacing: 0.02em;
     }
     @media (max-width: 600px) {
       .soon-card {
-        padding: 2.2rem 1.5rem;
+        padding: 2.2rem 1.6rem;
       }
       .soon-actions {
         grid-template-columns: 1fr;
@@ -196,17 +215,17 @@
 
 <main class="soon-wrapper">
   <div class="soon-card">
-    <img src="/img/logo-gsd.png" alt="GSD — Geosolutions Source Dominicana" class="soon-logo">
+    <img src="<%= typeof logoUrl !== 'undefined' ? logoUrl : '/img/logo-gsd.png' %>" alt="GSD — Geosolutions Source Dominicana" class="soon-logo">
     
     <div class="soon-badge">
       <span class="soon-badge-dot"></span>
       Próximamente
     </div>
 
-    <h1 class="soon-title">Estamos trabajando en nuestra nueva página</h1>
+    <h1 class="soon-title">Estamos preparando nuestra nueva plataforma</h1>
     
     <p class="soon-desc">
-      Estamos preparando la plataforma oficial de <strong>Geosolutions Source Dominicana</strong>. Mientras tanto, puedes explorar nuestro catálogo inmobiliario o ingresar al CRM.
+      Soluciones integrales de agrimensura, ingeniería legal y bienes raíces de <strong>Geosolutions Source Dominicana</strong>. Accede a nuestro catálogo inmobiliario o ingresa al panel de control CRM.
     </p>
 
     <div class="soon-actions">
@@ -221,7 +240,7 @@
     </div>
 
     <div class="soon-footer">
-      &copy; <%= new Date().getFullYear() %> Geosolutions Source Dominicana, S.R.L.
+      &copy; <%= new Date().getFullYear() %> Geosolutions Source Dominicana, S.R.L. · Todos los derechos reservados.
     </div>
   </div>
 </main>
