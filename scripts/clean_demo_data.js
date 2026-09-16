@@ -12,7 +12,12 @@ async function clean() {
   console.log('✅ Todos los registros de ejemplo han sido eliminados correctamente.');
 }
 
-clean().catch(err => {
-  console.error('Error al limpiar datos de ejemplo:', err);
-  process.exit(1);
-});
+if (require.main === module) {
+  clean().catch(err => {
+    console.error('Error al limpiar datos de ejemplo:', err);
+    process.exit(1);
+  });
+}
+
+module.exports = { clean };
+

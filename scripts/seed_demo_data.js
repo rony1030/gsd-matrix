@@ -564,7 +564,12 @@ async function seed() {
   console.log('\n🎉 ¡8 clientes de ejemplo, cotizaciones y procesos creados exitosamente!');
 }
 
-seed().catch(err => {
-  console.error('Error al inyectar datos de ejemplo:', err);
-  process.exit(1);
-});
+if (require.main === module) {
+  seed().catch(err => {
+    console.error('Error al inyectar datos de ejemplo:', err);
+    process.exit(1);
+  });
+}
+
+module.exports = { seed, DEMO_DATA };
+

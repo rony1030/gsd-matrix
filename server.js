@@ -106,9 +106,19 @@ app.use('/admin/bienes-raices', requireAuth, require('./real-estate-router'));
 
 // ─── Initialize DB ────────────────────────────────────
 let dbReady = false;
-getDb().then(() => {
+getDb().then(async () => {
   dbReady = true;
   console.log('✅ Base de datos lista');
+  try {
+    const expCount = queryOne('SELECT count(*) as c FROM expedientes')?.c || 0;
+    if (expCount === 0) {
+      const { seed } = require('./scripts/seed_demo_data');
+      await seed();
+      console.log('✅ 8 Clientes de ejemplo con cotizaciones y procesos inyectados automáticamente.');
+    }
+  } catch(e) {
+    console.error('Error auto-seeding demo data:', e);
+  }
 });
 
 // ─── PUBLIC ROUTES ────────────────────────────────────
@@ -291,6 +301,27 @@ crmSubmodules.forEach(({ path: subPath, view, page }) => {
       res.render('admin/expedientes/index', { page, initialView: view, expedientes: [], cotizaciones: [] });
     }
   });
+});
+
+// Rutas administrativas para poblar y limpiar datos de prueba
+app.get('/admin/api/seed-demo', requireAuth, async (req, res) => {
+  try {
+    const { seed } = require('./scripts/seed_demo_data');
+    await seed();
+    res.redirect('/admin');
+  } catch(e) {
+    res.status(500).send('Error inyectando datos de prueba: ' + e.message);
+  }
+});
+
+app.get('/admin/api/clean-demo', requireAuth, async (req, res) => {
+  try {
+    const { clean } = require('./scripts/clean_demo_data');
+    await clean();
+    res.redirect('/admin');
+  } catch(e) {
+    res.status(500).send('Error limpiando datos de prueba: ' + e.message);
+  }
 });
 
 // ─── PROPIEDADES ─────────────────────────────────────
