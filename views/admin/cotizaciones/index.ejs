@@ -10,6 +10,12 @@
     max-width: 100%;
     box-sizing: border-box;
   }
+  .form-row-2col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
   @media (max-width: 1380px) {
     .quoter-layout {
       grid-template-columns: 210px minmax(0, 1fr);
@@ -19,9 +25,47 @@
       margin-top: 14px;
     }
   }
-  @media (max-width: 800px) {
+  @media (max-width: 900px) {
     .quoter-layout {
-      grid-template-columns: 1fr;
+      grid-template-columns: 1fr !important;
+      gap: 12px;
+    }
+    .quoter-services-card {
+      padding: 10px 12px !important;
+    }
+    #serviceList {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+    }
+    .svc-menu-btn {
+      flex: 0 0 auto;
+      margin-bottom: 0 !important;
+      padding: 7px 12px;
+      font-size: 0.78rem;
+    }
+    .svc-menu-btn svg {
+      display: none;
+    }
+  }
+  @media (max-width: 640px) {
+    .form-row-2col {
+      grid-template-columns: 1fr !important;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .quoter-form-card {
+      padding: 14px 12px !important;
+    }
+  }
+  @media (max-width: 480px) {
+    .quoter-form-card .btn {
+      flex: 1 1 100%;
+      justify-content: center;
+      padding: 9px 12px;
     }
   }
 
@@ -95,7 +139,7 @@
   
   <!-- COLUMNA 1: CATÁLOGO DE SERVICIOS -->
   <div>
-    <div class="card" style="padding:14px;">
+    <div class="card quoter-services-card" style="padding:14px;">
       <h3 style="font-size:0.75rem;letter-spacing:1px;text-transform:uppercase;color:#6B7280;margin-bottom:12px;">Servicios GSD</h3>
       
       <div id="serviceList">
@@ -142,7 +186,7 @@
 
   <!-- COLUMNA 2: FORMULARIO DINÁMICO -->
   <div>
-    <div class="card">
+    <div class="card quoter-form-card">
       <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #E5E7EB;padding-bottom:12px;margin-bottom:16px;">
         <div>
           <h2 id="formServiceTitle" style="font-size:1.25rem;color:#1A3A52;margin:0;">Iguala Legal</h2>
@@ -156,7 +200,7 @@
 
         <!-- 1. Datos del Cliente -->
         <h4 style="font-size:0.8rem;text-transform:uppercase;color:#4A9B6F;margin-bottom:10px;">1. Datos del Cliente</h4>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+        <div class="form-row-2col">
           <div class="f">
             <label>Nombre del Cliente / Razón Social *</label>
             <input type="text" id="client_name" value="" placeholder="Ej. Inversiones Pérez, S.R.L." required oninput="renderPreview()">
@@ -166,7 +210,7 @@
             <input type="text" id="client_doc" value="" placeholder="001-0000000-0 o RNC" oninput="renderPreview()">
           </div>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px;">
+        <div class="form-row-2col">
           <div class="f">
             <label>Email de Contacto</label>
             <input type="email" id="client_email" value="" placeholder="cliente@correo.com" oninput="renderPreview()">
@@ -179,7 +223,7 @@
 
         <!-- 2. Información del Documento -->
         <h4 style="font-size:0.8rem;text-transform:uppercase;color:#4A9B6F;margin-bottom:10px;">2. Información del Documento</h4>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px;">
+        <div class="form-row-2col">
           <div class="f">
             <label>Número de Referencia *</label>
             <input type="text" id="doc_ref" value="GSD-PRO-<%= new Date().getFullYear() %>-<%= String(Math.floor(Math.random()*900)+100) %>" required oninput="renderPreview()">
@@ -192,7 +236,7 @@
 
         <!-- 3. Detalles y Honorarios -->
         <h4 style="font-size:0.8rem;text-transform:uppercase;color:#4A9B6F;margin-bottom:10px;">3. Honorarios y Condiciones</h4>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+        <div class="form-row-2col">
           <div class="f">
             <label>Monto Base *</label>
             <input type="number" id="monto_base" value="" placeholder="0.00" step="any" min="0" required oninput="renderPreview()">

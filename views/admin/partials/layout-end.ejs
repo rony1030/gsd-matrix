@@ -46,6 +46,20 @@
     const m = document.getElementById('dropdownMenuSolicitud');
     if (m && !e.target.closest('.dropdown-solicitud')) m.style.display = 'none';
   });
+
+  /* Mobile Sidebar Toggle */
+  function toggleMobileSidebar() {
+    const side = document.querySelector('.side');
+    const backdrop = document.getElementById('sideBackdrop');
+    if (side) side.classList.toggle('open');
+    if (backdrop) backdrop.classList.toggle('open');
+  }
+  function closeMobileSidebar() {
+    const side = document.querySelector('.side');
+    const backdrop = document.getElementById('sideBackdrop');
+    if (side) side.classList.remove('open');
+    if (backdrop) backdrop.classList.remove('open');
+  }
 </script>
 </body>
 </html>

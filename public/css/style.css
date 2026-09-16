@@ -25,13 +25,14 @@
 /* Reset y base */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-html { scroll-behavior: smooth; font-size: 16px; }
+html { scroll-behavior: smooth; font-size: 16px; overflow-x: hidden; max-width: 100vw; }
 
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   color: var(--gris-900);
   background: var(--blanco);
   overflow-x: hidden;
+  max-width: 100vw;
   line-height: 1.6;
 }
 

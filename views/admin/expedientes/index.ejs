@@ -182,49 +182,138 @@ tr.row:hover td{background:var(--bg);cursor:pointer}
 .cv .step{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--line)}
 .cv .step .n{width:22px;height:22px;border-radius:50%;background:var(--green-l);color:#2F6B4A;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0}
 [data-tip]{position:relative}[data-tip]:hover:after{content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;font-size:11px;padding:4px 8px;border-radius:4px;white-space:nowrap;z-index:20;font-weight:400}
+/* Table Responsive */
+.table-responsive{width:100%;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:#CBD5E1 transparent}
+
+/* Mobile Drawer Controls */
+.btn-sidebar-toggle{display:none;background:none;border:none;color:var(--navy);padding:6px;border-radius:6px;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.btn-sidebar-toggle:hover{background:var(--bg)}
+.btn-sidebar-toggle i, .btn-sidebar-toggle svg{width:20px;height:20px}
+.side-close-btn{display:none;background:none;border:none;color:var(--gray);padding:6px;border-radius:6px;cursor:pointer;margin-left:auto;align-items:center;justify-content:center}
+.side-close-btn:hover{color:var(--navy);background:var(--bg)}
+.side-close-btn i, .side-close-btn svg{width:18px;height:18px}
+.side-backdrop{display:none;position:fixed;inset:0;background:rgba(15,23,42,0.5);backdrop-filter:blur(4px);z-index:998;opacity:0;transition:opacity .25s ease;pointer-events:none}
+.side-backdrop.open{display:block;opacity:1;pointer-events:auto}
+.btn-text-short{display:none}
+
 @media (max-width:1400px){body{grid-template-columns:220px 1fr}.kpis{grid-template-columns:repeat(3,1fr)}.hdr-search{width:280px;max-width:calc(100% - 380px)}.prog{grid-template-columns:2fr 1fr 1fr 1fr}}
-@media (max-width:1200px){body{grid-template-columns:64px 1fr}.side .logo img,.side .logo .prod,.side .grp,.side a span:not(.n),.side .me div{display:none}.side .logo{padding:0;justify-content:center}.side a{padding:12px 0;justify-content:center;border-left:0}.side .me{justify-content:center}.hdr-search{position:static;transform:none;width:200px;max-width:220px;margin:0 auto}.g2,.g3,.alerts{grid-template-columns:1fr}.task{grid-template-columns:20px 1fr 110px 90px}.task .due,.task .btn{display:none}.gal{grid-template-columns:repeat(2,1fr)}.main{padding:18px}}
+@media (max-width:1024px) and (min-width:769px){
+  body{grid-template-columns:64px 1fr}
+  .side .logo img,.side .logo .prod,.side .grp,.side a span:not(.n),.side .me div{display:none}
+  .side .logo{padding:0;justify-content:center}
+  .side a{padding:12px 0;justify-content:center;border-left:0}
+  .side .me{justify-content:center}
+  .hdr-search{width:200px;max-width:220px;margin:0 auto}
+  .g2,.g3,.alerts{grid-template-columns:1fr}
+  .task{grid-template-columns:20px 1fr 110px 90px}
+  .task .due,.task .btn{display:none}
+  .gal{grid-template-columns:repeat(2,1fr)}
+  .main{padding:18px}
+  .kpis{grid-template-columns:repeat(3,1fr)}
+}
+
+@media (max-width:768px){
+  body{display:flex;flex-direction:column;height:100vh;overflow:hidden;width:100vw;max-width:100%}
+  .btn-sidebar-toggle{display:inline-flex}
+  .side-close-btn{display:inline-flex}
+  .side{
+    position:fixed;top:0;left:0;bottom:0;width:270px;max-width:85vw;
+    height:100vh;z-index:1001;transform:translateX(-100%);
+    transition:transform .25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow:4px 0 25px rgba(0,0,0,0.25);
+  }
+  .side.open{transform:translateX(0)}
+  .side .logo img,.side .logo .prod,.side .grp,.side a span:not(.n),.side .me div{display:block}
+  .side .logo{padding:0 16px;justify-content:space-between}
+  .side a{padding:10px 16px;justify-content:flex-start;border-left:3px solid transparent}
+  .side .me{justify-content:flex-start;padding:12px 16px}
+  
+  .hdr{
+    height:52px;padding:0 12px;gap:8px;
+    width:100%;max-width:100vw;box-sizing:border-box;
+    flex-shrink:0;justify-content:space-between;
+  }
+  .hdr-search{flex:1;min-width:0;max-width:none;margin:0}
+  .hdr-search input.search{height:33px;font-size:11.5px;padding:0 10px}
+  .hdr-actions{gap:6px;margin-left:0}
+  .hdr-actions .btn{height:32px;padding:0 10px;font-size:11.5px}
+  .btn-text-full{display:none}
+  .btn-text-short{display:inline}
+
+  .main{
+    width:100%;max-width:100vw;height:calc(100vh - 52px);
+    padding:12px 10px;box-sizing:border-box;overflow-x:hidden;overflow-y:auto;
+  }
+  .card{padding:14px 12px;border-radius:8px;margin-bottom:12px}
+  
+  .kpis{grid-template-columns:repeat(2,1fr);gap:8px;margin:12px 0}
+  .alerts{grid-template-columns:1fr;gap:8px}
+  .prog{grid-template-columns:1fr 1fr;gap:10px}
+  .g2,.g3{grid-template-columns:1fr;gap:12px}
+  .gal{grid-template-columns:repeat(2,1fr);gap:8px}
+  .exp-head{flex-direction:column;align-items:stretch;gap:12px}
+  .exp-head .acts{justify-content:flex-start}
+  .task{grid-template-columns:20px 1fr 90px;gap:6px}
+  .feed .it{grid-template-columns:1fr;gap:4px}
+  .log .it{grid-template-columns:1fr;gap:4px}
+  .modal .box{width:95vw;max-width:95vw;padding:18px 14px}
+}
+
+@media (max-width:480px){
+  .kpis{grid-template-columns:1fr}
+  .prog{grid-template-columns:1fr}
+  .gal{grid-template-columns:1fr}
+}
 </style>
 </head>
 <body>
 
 <aside class="side">
   <div class="logo">
-    <a href="/admin" style="text-decoration:none;display:flex;align-items:center;gap:8px;width:100%;">
+    <a href="/admin" style="text-decoration:none;display:flex;align-items:center;gap:8px;flex:1;">
       <img src="<%= typeof logoUrl !== 'undefined' ? logoUrl : '/img/logo-gsd.png' %>" alt="GSD Logo" style="max-height:36px;max-width:130px;width:auto;object-fit:contain;">
       <span class="prod" style="font-size:10px;letter-spacing:1px;color:var(--green);font-weight:600;white-space:nowrap;">EXPEDIENTES</span>
     </a>
+    <button type="button" class="side-close-btn" onclick="closeMobileSidebar()" aria-label="Cerrar menú">
+      <i data-lucide="x"></i>
+    </button>
   </div>
   <nav>
     <div class="grp">Principal</div>
-    <a data-view="dash" class="<%= (typeof initialView !== 'undefined' ? initialView === 'dash' : (typeof page !== 'undefined' ? page === 'dashboard' : true)) ? 'on' : '' %>" href="/admin"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a>
-    <a data-view="list" class="<%= (typeof initialView !== 'undefined' && initialView === 'list') || (typeof page !== 'undefined' && page === 'expedientes') ? 'on' : '' %>" href="/admin/expedientes"><i data-lucide="folder-open"></i><span>Expedientes</span></a>
-    <a data-view="mytasks" class="<%= (typeof initialView !== 'undefined' && initialView === 'mytasks') || (typeof page !== 'undefined' && page === 'tareas') ? 'on' : '' %>" href="/admin/tareas"><i data-lucide="check-square"></i><span>Mis tareas</span><span class="n" id="nMy">0</span></a>
-    <a data-view="cal" class="<%= (typeof initialView !== 'undefined' && initialView === 'cal') || (typeof page !== 'undefined' && page === 'calendario') ? 'on' : '' %>" href="/admin/calendario"><i data-lucide="calendar"></i><span>Calendario</span></a>
-    <a data-view="clients" class="<%= (typeof initialView !== 'undefined' && initialView === 'clients') || (typeof page !== 'undefined' && (page === 'clientes' || page === 'leads')) ? 'on' : '' %>" href="/admin/clientes"><i data-lucide="users"></i><span>Clientes</span></a>
-    <a data-view="docs" class="<%= (typeof initialView !== 'undefined' && initialView === 'docs') || (typeof page !== 'undefined' && page === 'documentos') ? 'on' : '' %>" href="/admin/documentos"><i data-lucide="file-text"></i><span>Documentos</span></a>
+    <a data-view="dash" class="<%= (typeof initialView !== 'undefined' ? initialView === 'dash' : (typeof page !== 'undefined' ? page === 'dashboard' : true)) ? 'on' : '' %>" href="/admin" onclick="closeMobileSidebar()"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a>
+    <a data-view="list" class="<%= (typeof initialView !== 'undefined' && initialView === 'list') || (typeof page !== 'undefined' && page === 'expedientes') ? 'on' : '' %>" href="/admin/expedientes" onclick="closeMobileSidebar()"><i data-lucide="folder-open"></i><span>Expedientes</span></a>
+    <a data-view="mytasks" class="<%= (typeof initialView !== 'undefined' && initialView === 'mytasks') || (typeof page !== 'undefined' && page === 'tareas') ? 'on' : '' %>" href="/admin/tareas" onclick="closeMobileSidebar()"><i data-lucide="check-square"></i><span>Mis tareas</span><span class="n" id="nMy">0</span></a>
+    <a data-view="cal" class="<%= (typeof initialView !== 'undefined' && initialView === 'cal') || (typeof page !== 'undefined' && page === 'calendario') ? 'on' : '' %>" href="/admin/calendario" onclick="closeMobileSidebar()"><i data-lucide="calendar"></i><span>Calendario</span></a>
+    <a data-view="clients" class="<%= (typeof initialView !== 'undefined' && initialView === 'clients') || (typeof page !== 'undefined' && (page === 'clientes' || page === 'leads')) ? 'on' : '' %>" href="/admin/clientes" onclick="closeMobileSidebar()"><i data-lucide="users"></i><span>Clientes</span></a>
+    <a data-view="docs" class="<%= (typeof initialView !== 'undefined' && initialView === 'docs') || (typeof page !== 'undefined' && page === 'documentos') ? 'on' : '' %>" href="/admin/documentos" onclick="closeMobileSidebar()"><i data-lucide="file-text"></i><span>Documentos</span></a>
     
     <div class="grp">Operaciones</div>
-    <a href="/admin/cotizaciones" class="<%= (typeof page !== 'undefined' && page === 'cotizaciones') ? 'on' : '' %>"><i data-lucide="calculator"></i><span>GSD Quoter</span></a>
-    <a href="/admin/propiedades" class="<%= (typeof page !== 'undefined' && (page === 'propiedades' || page === 'bienes-raices')) ? 'on' : '' %>"><i data-lucide="home"></i><span>Bienes Raíces</span></a>
-    <a href="/admin/blog" class="<%= (typeof page !== 'undefined' && page === 'blog') ? 'on' : '' %>"><i data-lucide="newspaper"></i><span>Blog & SEO</span></a>
+    <a href="/admin/cotizaciones" class="<%= (typeof page !== 'undefined' && page === 'cotizaciones') ? 'on' : '' %>" onclick="closeMobileSidebar()"><i data-lucide="calculator"></i><span>GSD Quoter</span></a>
+    <a href="/admin/propiedades" class="<%= (typeof page !== 'undefined' && (page === 'propiedades' || page === 'bienes-raices')) ? 'on' : '' %>" onclick="closeMobileSidebar()"><i data-lucide="home"></i><span>Bienes Raíces</span></a>
+    <a href="/admin/blog" class="<%= (typeof page !== 'undefined' && page === 'blog') ? 'on' : '' %>" onclick="closeMobileSidebar()"><i data-lucide="newspaper"></i><span>Blog & SEO</span></a>
     
     <div class="grp">Gestión & Sistema</div>
-    <a data-view="tpl" class="<%= (typeof initialView !== 'undefined' && initialView === 'tpl') || (typeof page !== 'undefined' && page === 'plantillas') ? 'on' : '' %>" href="/admin/plantillas"><i data-lucide="layout-template"></i><span>Plantillas de expedientes</span></a>
-    <a href="/admin/ajustes" class="<%= (typeof page !== 'undefined' && (page === 'ajustes' || page === 'branding' || page === 'instagram')) ? 'on' : '' %>"><i data-lucide="settings"></i><span>Ajustes</span></a>
-    <a href="/admin/logout" style="color:var(--red);"><i data-lucide="log-out"></i><span>Cerrar Sesión</span></a>
+    <a data-view="tpl" class="<%= (typeof initialView !== 'undefined' && initialView === 'tpl') || (typeof page !== 'undefined' && page === 'plantillas') ? 'on' : '' %>" href="/admin/plantillas" onclick="closeMobileSidebar()"><i data-lucide="layout-template"></i><span>Plantillas de expedientes</span></a>
+    <a href="/admin/ajustes" class="<%= (typeof page !== 'undefined' && (page === 'ajustes' || page === 'branding' || page === 'instagram')) ? 'on' : '' %>" onclick="closeMobileSidebar()"><i data-lucide="settings"></i><span>Ajustes</span></a>
+    <a href="/admin/logout" style="color:var(--red);" onclick="closeMobileSidebar()"><i data-lucide="log-out"></i><span>Cerrar Sesión</span></a>
   </nav>
   <div class="me"><div class="av">EM</div><div><b>Esteban Mejía</b><span>Abogado / Administrador</span></div></div>
 </aside>
 
+<div class="side-backdrop" id="sideBackdrop" onclick="closeMobileSidebar()"></div>
+
 <header class="hdr">
+  <button type="button" class="btn-sidebar-toggle" id="btnSidebarToggle" onclick="toggleMobileSidebar()" aria-label="Abrir menú">
+    <i data-lucide="menu"></i>
+  </button>
+
   <div class="hdr-search">
-    <input class="search" id="search" placeholder="Buscar expediente, cliente o parcela...">
+    <input class="search" id="search" placeholder="Buscar expediente, cliente...">
   </div>
   <div class="hdr-actions">
     <div class="dropdown-solicitud" style="position:relative;">
       <button class="btn p" id="btnNewSolicitud" onclick="toggleSolicitudDropdown(event)" type="button">
-        <i data-lucide="plus"></i><span>Nueva solicitud</span><i data-lucide="chevron-down" style="width:13px;height:13px;margin-left:2px;opacity:0.8;"></i>
+        <i data-lucide="plus"></i><span class="btn-text-full">Nueva solicitud</span><span class="btn-text-short">Nueva</span><i data-lucide="chevron-down" style="width:13px;height:13px;margin-left:2px;opacity:0.8;"></i>
       </button>
       <div id="dropdownMenuSolicitud" class="menu-solicitud" style="display:none;position:absolute;right:0;top:calc(100% + 6px);background:#ffffff;border:1px solid var(--line);border-radius:8px;box-shadow:0 10px 25px rgba(0,0,0,0.12);min-width:210px;z-index:999;overflow:hidden;padding:6px 0;">
         <a href="/admin/propiedades/nueva" class="solicitud-opt">
@@ -255,21 +344,21 @@ tr.row:hover td{background:var(--bg);cursor:pointer}
     <p class="sub">Aquí tienes el estado actual de tus expedientes.</p>
     <div class="kpis" id="kpis"></div><div class="strip"><b>GSD controla el expediente completo</b><div class="ch"><span>Cliente</span><span>Inmueble</span><span>Documentación</span><span>Técnica</span><span>Jurídica</span><span>Tareas</span><span>Plazos</span><span>Avances</span></div></div>
     <div class="card"><div class="ch"><h2>Requieren atención</h2><span class="link" onclick="go('mytasks')">Ver todas las alertas →</span></div><div class="alerts" id="dashAlerts"></div></div>
-    <div class="card"><div class="ch"><h2>Expedientes recientes</h2><span class="link" onclick="go('list')">Ver todos →</span></div><table><thead><tr><th>Expediente</th><th>Cliente</th><th>Servicio</th><th>Responsable</th><th>Progreso</th><th>Estado</th></tr></thead><tbody id="dashRows"></tbody></table></div>
+    <div class="card"><div class="ch"><h2>Expedientes recientes</h2><span class="link" onclick="go('list')">Ver todos →</span></div><div class="table-responsive"><table><thead><tr><th>Expediente</th><th>Cliente</th><th>Servicio</th><th>Responsable</th><th>Progreso</th><th>Estado</th></tr></thead><tbody id="dashRows"></tbody></table></div></div>
   </section>
 
   <section class="view" id="v-list">
     <div style="display:flex;justify-content:space-between;align-items:center"><div><h1>Expedientes</h1><p class="sub" id="listCount"></p></div><div class="filters" id="listFilters"><button class="on" data-f="all">Todos</button><button data-f="proc">En proceso</button><button data-f="rev">En revisión</button><button data-f="wait">Esperando cliente</button><button data-f="done">Cerrados</button></div></div>
-    <div class="card" style="margin-top:16px"><table><thead><tr><th>Expediente</th><th>Cliente</th><th>Servicio</th><th>Responsable</th><th>Inicio</th><th>Progreso</th><th>Estado</th></tr></thead><tbody id="listRows"></tbody></table></div>
+    <div class="card" style="margin-top:16px"><div class="table-responsive"><table><thead><tr><th>Expediente</th><th>Cliente</th><th>Servicio</th><th>Responsable</th><th>Inicio</th><th>Progreso</th><th>Estado</th></tr></thead><tbody id="listRows"></tbody></table></div></div>
   </section>
 
   <section class="view" id="v-mytasks">
     <h1>Tareas y alertas</h1><p class="sub">Todas las tareas abiertas en todos los expedientes.</p>
-    <div class="card" style="margin-top:16px"><div class="filters" id="mtFilters"><button class="on" data-f="all">Todas</button><button data-f="mine">Mis tareas</button><button data-f="late">Vencidas</button><button data-f="week">Esta semana</button></div><table><thead><tr><th>Tarea</th><th>Expediente</th><th>Etapa</th><th>Responsable</th><th>Fecha límite</th><th>Estado</th></tr></thead><tbody id="mtRows"></tbody></table></div>
+    <div class="card" style="margin-top:16px"><div class="filters" id="mtFilters"><button class="on" data-f="all">Todas</button><button data-f="mine">Mis tareas</button><button data-f="late">Vencidas</button><button data-f="week">Esta semana</button></div><div class="table-responsive"><table><thead><tr><th>Tarea</th><th>Expediente</th><th>Etapa</th><th>Responsable</th><th>Fecha límite</th><th>Estado</th></tr></thead><tbody id="mtRows"></tbody></table></div></div>
   </section>
 
   <section class="view" id="v-cal"><h1>Calendario</h1><p class="sub">Vencimientos de las próximas semanas.</p><div class="card" style="margin-top:16px" id="calBox"></div></section>
-  <section class="view" id="v-clients"><h1>Clientes</h1><p class="sub">Clientes con expedientes en el sistema.</p><div class="card" style="margin-top:16px"><table><thead><tr><th>Cliente</th><th>Cédula / RNC</th><th>Contacto</th><th>Expedientes</th></tr></thead><tbody id="cliRows"></tbody></table></div></section>
+  <section class="view" id="v-clients"><h1>Clientes</h1><p class="sub">Clientes con expedientes en el sistema.</p><div class="card" style="margin-top:16px"><div class="table-responsive"><table><thead><tr><th>Cliente</th><th>Cédula / RNC</th><th>Contacto</th><th>Expedientes</th></tr></thead><tbody id="cliRows"></tbody></table></div></div></section>
   <section class="view" id="v-docs"><h1>Documentos</h1><p class="sub">Documentos pendientes en todos los expedientes.</p><div class="card" style="margin-top:16px" id="docsAll"></div></section>
   <section class="view" id="v-tpl"><h1>Plantillas de expedientes</h1><p class="sub">Cada servicio define sus campos, documentos, etapas y checklist. Lo que se registra aquí se reutiliza en cada expediente nuevo.</p><div class="g3" style="margin-top:16px" id="tplCards"></div></section>
   <section class="view" id="v-soon"><h1>En construcción</h1><p class="sub">Este módulo se implementará en la fase de integración con el CRM.</p></section>
@@ -689,6 +778,19 @@ const initView = '<%= typeof initialView !== "undefined" ? initialView : "dash" 
 go(initView, false);
 renderMy();
 icons();
+
+function toggleMobileSidebar() {
+  const side = document.querySelector('.side');
+  const backdrop = document.getElementById('sideBackdrop');
+  if (side) side.classList.toggle('open');
+  if (backdrop) backdrop.classList.toggle('open');
+}
+function closeMobileSidebar() {
+  const side = document.querySelector('.side');
+  const backdrop = document.getElementById('sideBackdrop');
+  if (side) side.classList.remove('open');
+  if (backdrop) backdrop.classList.remove('open');
+}
 </script>
 </body>
 </html>
