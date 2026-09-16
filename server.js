@@ -863,6 +863,52 @@ app.get('/api/instagram/:project?', async (req, res) => {
   }
 });
 
+// Webhook endpoint para Make.com u otras automatizaciones
+app.post('/api/instagram/webhook', async (req, res) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+
+  try {
+    const { secret, project = 'bienes-raices', posts, instagram_handle, instagram_url } = req.body;
+
+    const expectedSecret = process.env.MAKE_WEBHOOK_SECRET || 'gsd_make_2026';
+    if (secret && secret !== expectedSecret) {
+      return res.status(403).json({ ok: false, error: 'Clave secret de webhook inválida' });
+    }
+
+    if (!Array.isArray(posts) || posts.length === 0) {
+      return res.status(400).json({ ok: false, error: 'Se requiere una lista de publicaciones en el campo "posts"' });
+    }
+
+    await getDb();
+
+    const formatted = posts.slice(0, 12).map((p, idx) => ({
+      id: String(p.id || Date.now() + idx),
+      caption: p.caption || '',
+      media_url: p.media_url || p.imageUrl || '',
+      thumbnail_url: p.thumbnail_url || p.media_url || '',
+      permalink: p.permalink || p.link || 'https://www.instagram.com/',
+      timestamp: p.timestamp || new Date().toISOString()
+    }));
+
+    run(
+      `UPDATE social_feeds SET 
+        posts_json = ?, 
+        instagram_handle = COALESCE(?, instagram_handle),
+        instagram_url = COALESCE(?, instagram_url),
+        updated_at = datetime('now', 'localtime')
+       WHERE project = ?`,
+      [JSON.stringify(formatted), instagram_handle ? instagram_handle.trim() : null, instagram_url ? instagram_url.trim() : null, project]
+    );
+
+    console.log(`[Make Webhook] Sincronizadas ${formatted.length} publicaciones para ${project}`);
+    res.json({ ok: true, count: formatted.length, project });
+  } catch (err) {
+    console.error('Error en webhook de Make:', err);
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
 // Global Error Handler
 app.use((err, req, res, next) => {
   console.error('Unhandled server error:', err);
