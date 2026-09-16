@@ -9,7 +9,11 @@
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.460.0/dist/umd/lucide.min.js"></script>
   <style>
     :root{--navy:#1A3A52;--green:#4A9B6F;--green-l:#E8F4EF;--gray:#6B7280;--line:#E5E7EB;--bg:#F9FAFB;--white:#fff;--red:#C0392B;--red-l:#FBEAEA;--amber:#B7791F;--amber-l:#FDF3E1;--blue:#2B6CB0;--blue-l:#E8F0FA;--ink:#1F2937}
-    *{box-sizing:border-box;margin:0;padding:0}
+    *{box-sizing:border-box;margin:0;padding:0;scrollbar-width:thin;scrollbar-color:#CBD5E1 transparent}
+    ::-webkit-scrollbar{width:6px;height:6px}
+    ::-webkit-scrollbar-track{background:transparent}
+    ::-webkit-scrollbar-thumb{background:#CBD5E1;border-radius:9999px}
+    ::-webkit-scrollbar-thumb:hover{background:#94A3B8}
     body.admin-body{font-family:'Poppins',system-ui,sans-serif!important;font-size:13px!important;color:var(--ink)!important;background:var(--bg)!important;height:100vh!important;display:grid!important;grid-template-columns:250px 1fr!important;grid-template-rows:56px 1fr!important;overflow:hidden!important;margin:0!important;padding:0!important}
     h1,h2,h3,h4,h5,h6{font-family:'Poppins',system-ui,sans-serif!important;color:var(--navy)!important;font-weight:600}
     button{font:inherit;cursor:pointer}

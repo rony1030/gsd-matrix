@@ -219,14 +219,18 @@
           <textarea id="observaciones" rows="3" placeholder="Términos especiales, alcance del servicio, entregables..." oninput="renderPreview()"></textarea>
         </div>
 
-        <div style="display:flex;gap:8px;justify-content:flex-end;">
+        <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;">
           <button type="button" class="btn" onclick="saveQuotationOnly()">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/></svg>
-            Guardar en Historial
+            Guardar
+          </button>
+          <button type="button" class="btn" onclick="openPrintPreview()" title="Ver formato institucional y mandar a imprimir">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+            Vista Impresión
           </button>
           <button type="submit" class="btn p">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-            Generar y Descargar PDF
+            Descargar PDF
           </button>
         </div>
       </form>
@@ -296,9 +300,14 @@
               <strong style="font-size:0.8rem;color:#1A3A52;display:block;"><%= c.cliente_nombre %></strong>
               <small style="font-size:0.7rem;color:#6B7280;"><%= c.referencia %> · <%= c.moneda === 'DOP' ? 'RD$' : 'US$' %><%= Number(c.total||0).toLocaleString() %></small>
             </div>
-            <a href="/admin/cotizaciones/<%= c.id %>/pdf" class="btn sm" style="padding:4px 8px;" title="Descargar PDF">
-              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            </a>
+            <div style="display:flex;gap:4px;">
+              <a href="/admin/cotizaciones/<%= c.id %>/imprimir" target="_blank" class="btn sm" style="padding:4px 8px;" title="Ver / Imprimir en Navegador">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+              </a>
+              <a href="/admin/cotizaciones/<%= c.id %>/pdf" class="btn sm" style="padding:4px 8px;" title="Descargar PDF">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              </a>
+            </div>
           </div>
         <% }) %>
         <% if (!cotizaciones || cotizaciones.length === 0) { %>
@@ -400,6 +409,29 @@ async function saveAndDownloadPDF() {
     a.remove();
   } else {
     alert('Error al generar el documento PDF.');
+  }
+}
+
+async function openPrintPreview() {
+  const payload = getFormData();
+  try {
+    const res = await fetch('/admin/cotizaciones/vista-previa-html', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error('Error al preparar vista previa');
+    const html = await res.text();
+    const w = window.open('', '_blank');
+    if (w) {
+      w.document.open();
+      w.document.write(html);
+      w.document.close();
+    } else {
+      alert('Por favor permite ventanas emergentes (popups) para ver e imprimir la cotización.');
+    }
+  } catch(err) {
+    alert('Error al abrir la vista para impresión: ' + err.message);
   }
 }
 

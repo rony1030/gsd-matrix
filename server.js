@@ -620,7 +620,7 @@ leadsRouter.get('/exportar', async (req, res) => {
 app.use('/admin/leads', leadsRouter);
 
 // ─── COTIZACIONES & GSD QUOTER ────────────────────────
-const { generateQuotationPDF } = require('./services/pdfGenerator');
+const { generateQuotationPDF, generarHTML } = require('./services/pdfGenerator');
 const cotiRouter = express.Router();
 cotiRouter.use(requireAuth);
 
@@ -672,6 +672,17 @@ cotiRouter.post('/generar-pdf', async (req, res) => {
   }
 });
 
+cotiRouter.post('/vista-previa-html', async (req, res) => {
+  try {
+    const html = generarHTML(req.body);
+    const printHtml = html.replace('</body>', '<script>window.addEventListener("load",()=>{setTimeout(()=>window.print(),600);});</script></body>');
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.send(printHtml);
+  } catch (err) {
+    res.status(500).send('Error generando vista previa HTML: ' + err.message);
+  }
+});
+
 cotiRouter.get('/:id/pdf', async (req, res) => {
   await getDb();
   const coti = queryOne('SELECT * FROM cotizaciones WHERE id=? OR referencia=?', [req.params.id, req.params.id]);
@@ -687,6 +698,24 @@ cotiRouter.get('/:id/pdf', async (req, res) => {
     res.send(pdfBuffer);
   } catch (err) {
     res.status(500).send('Error generando PDF: ' + err.message);
+  }
+});
+
+cotiRouter.get('/:id/imprimir', async (req, res) => {
+  await getDb();
+  const coti = queryOne('SELECT * FROM cotizaciones WHERE id=? OR referencia=?', [req.params.id, req.params.id]);
+  if (!coti) return res.status(404).send('Cotización no encontrada');
+  try {
+    coti.items = JSON.parse(coti.items_json || '[]');
+  } catch(e) { coti.items = []; }
+  
+  try {
+    const html = generarHTML(coti);
+    const printHtml = html.replace('</body>', '<script>window.addEventListener("load",()=>{setTimeout(()=>window.print(),600);});</script></body>');
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.send(printHtml);
+  } catch (err) {
+    res.status(500).send('Error generando impresión HTML: ' + err.message);
   }
 });
 
