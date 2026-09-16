@@ -124,7 +124,7 @@
     
     <div class="grp">Operaciones</div>
     <a href="/admin/cotizaciones" class="<%= (typeof page !== 'undefined' && page === 'cotizaciones') ? 'on' : '' %>"><i data-lucide="calculator"></i><span>GSD Quoter</span></a>
-    <a href="/admin/propiedades" class="<%= (typeof page !== 'undefined' && page === 'propiedades') ? 'on' : '' %>"><i data-lucide="home"></i><span>Bienes Raíces</span></a>
+    <a href="/admin/propiedades" class="<%= (typeof page !== 'undefined' && (page === 'propiedades' || page === 'bienes-raices')) ? 'on' : '' %>"><i data-lucide="home"></i><span>Bienes Raíces</span></a>
     <a href="/admin/blog" class="<%= (typeof page !== 'undefined' && page === 'blog') ? 'on' : '' %>"><i data-lucide="newspaper"></i><span>Blog & SEO</span></a>
     
     <div class="grp">Gestión & Sistema</div>

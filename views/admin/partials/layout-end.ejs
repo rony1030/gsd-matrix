@@ -1,12 +1,46 @@
 </main>
 <script>
-  if (window.lucide) {
-    lucide.createIcons();
+  let _lucideRetries = 0;
+  function initLucideIcons() {
+    if (window.lucide && typeof lucide.createIcons === 'function') {
+      lucide.createIcons();
+    } else if (_lucideRetries++ < 15) {
+      setTimeout(initLucideIcons, 150);
+    }
   }
+  initLucideIcons();
+  document.addEventListener('DOMContentLoaded', initLucideIcons);
+  window.addEventListener('load', initLucideIcons);
+
+  // Auto-activación segura del menú lateral según la URL
+  try {
+    const currentPath = window.location.pathname;
+    const sideLinks = document.querySelectorAll('.side nav a');
+    let matched = false;
+    sideLinks.forEach(a => {
+      const href = a.getAttribute('href');
+      if (href && href !== '/admin/logout' && href !== '#') {
+        if (href === currentPath || (href !== '/admin' && currentPath.startsWith(href))) {
+          sideLinks.forEach(l => l.classList.remove('on'));
+          a.classList.add('on');
+          matched = true;
+        }
+      }
+    });
+    if (!matched && (currentPath === '/admin' || currentPath === '/admin/')) {
+      const dash = document.querySelector('.side nav a[href="/admin"]');
+      if (dash) dash.classList.add('on');
+    }
+  } catch(e) {}
+
   function toggleSolicitudDropdown(e) {
     if (e) e.stopPropagation();
     const m = document.getElementById('dropdownMenuSolicitud');
     if (m) m.style.display = m.style.display === 'block' ? 'none' : 'block';
+  }
+  function closeSolicitudDropdown() {
+    const m = document.getElementById('dropdownMenuSolicitud');
+    if (m) m.style.display = 'none';
   }
   document.addEventListener('click', (e) => {
     const m = document.getElementById('dropdownMenuSolicitud');

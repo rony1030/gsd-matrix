@@ -193,21 +193,21 @@ tr.row:hover td{background:var(--bg);cursor:pointer}
   </div>
   <nav>
     <div class="grp">Principal</div>
-    <a data-view="dash" class="on" href="/admin"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a>
-    <a data-view="list" href="/admin/expedientes"><i data-lucide="folder-open"></i><span>Expedientes</span></a>
-    <a data-view="mytasks" href="/admin/tareas"><i data-lucide="check-square"></i><span>Mis tareas</span><span class="n" id="nMy">0</span></a>
-    <a data-view="cal" href="/admin/calendario"><i data-lucide="calendar"></i><span>Calendario</span></a>
-    <a data-view="clients" href="/admin/clientes"><i data-lucide="users"></i><span>Clientes</span></a>
-    <a data-view="docs" href="/admin/documentos"><i data-lucide="file-text"></i><span>Documentos</span></a>
+    <a data-view="dash" class="<%= (typeof initialView !== 'undefined' ? initialView === 'dash' : (typeof page !== 'undefined' ? page === 'dashboard' : true)) ? 'on' : '' %>" href="/admin"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a>
+    <a data-view="list" class="<%= (typeof initialView !== 'undefined' && initialView === 'list') || (typeof page !== 'undefined' && page === 'expedientes') ? 'on' : '' %>" href="/admin/expedientes"><i data-lucide="folder-open"></i><span>Expedientes</span></a>
+    <a data-view="mytasks" class="<%= (typeof initialView !== 'undefined' && initialView === 'mytasks') || (typeof page !== 'undefined' && page === 'tareas') ? 'on' : '' %>" href="/admin/tareas"><i data-lucide="check-square"></i><span>Mis tareas</span><span class="n" id="nMy">0</span></a>
+    <a data-view="cal" class="<%= (typeof initialView !== 'undefined' && initialView === 'cal') || (typeof page !== 'undefined' && page === 'calendario') ? 'on' : '' %>" href="/admin/calendario"><i data-lucide="calendar"></i><span>Calendario</span></a>
+    <a data-view="clients" class="<%= (typeof initialView !== 'undefined' && initialView === 'clients') || (typeof page !== 'undefined' && (page === 'clientes' || page === 'leads')) ? 'on' : '' %>" href="/admin/clientes"><i data-lucide="users"></i><span>Clientes</span></a>
+    <a data-view="docs" class="<%= (typeof initialView !== 'undefined' && initialView === 'docs') || (typeof page !== 'undefined' && page === 'documentos') ? 'on' : '' %>" href="/admin/documentos"><i data-lucide="file-text"></i><span>Documentos</span></a>
     
     <div class="grp">Operaciones</div>
-    <a href="/admin/cotizaciones"><i data-lucide="calculator"></i><span>GSD Quoter</span></a>
-    <a href="/admin/propiedades"><i data-lucide="home"></i><span>Bienes Raíces</span></a>
-    <a href="/admin/blog"><i data-lucide="newspaper"></i><span>Blog & SEO</span></a>
+    <a href="/admin/cotizaciones" class="<%= (typeof page !== 'undefined' && page === 'cotizaciones') ? 'on' : '' %>"><i data-lucide="calculator"></i><span>GSD Quoter</span></a>
+    <a href="/admin/propiedades" class="<%= (typeof page !== 'undefined' && (page === 'propiedades' || page === 'bienes-raices')) ? 'on' : '' %>"><i data-lucide="home"></i><span>Bienes Raíces</span></a>
+    <a href="/admin/blog" class="<%= (typeof page !== 'undefined' && page === 'blog') ? 'on' : '' %>"><i data-lucide="newspaper"></i><span>Blog & SEO</span></a>
     
     <div class="grp">Gestión & Sistema</div>
-    <a data-view="tpl" href="/admin/plantillas"><i data-lucide="layout-template"></i><span>Plantillas de expedientes</span></a>
-    <a href="/admin/ajustes"><i data-lucide="settings"></i><span>Ajustes</span></a>
+    <a data-view="tpl" class="<%= (typeof initialView !== 'undefined' && initialView === 'tpl') || (typeof page !== 'undefined' && page === 'plantillas') ? 'on' : '' %>" href="/admin/plantillas"><i data-lucide="layout-template"></i><span>Plantillas de expedientes</span></a>
+    <a href="/admin/ajustes" class="<%= (typeof page !== 'undefined' && (page === 'ajustes' || page === 'branding' || page === 'instagram')) ? 'on' : '' %>"><i data-lucide="settings"></i><span>Ajustes</span></a>
     <a href="/admin/logout" style="color:var(--red);"><i data-lucide="log-out"></i><span>Cerrar Sesión</span></a>
   </nav>
   <div class="me"><div class="av">EM</div><div><b>Esteban Mejía</b><span>Abogado / Administrador</span></div></div>
@@ -324,7 +324,18 @@ tr.row:hover td{background:var(--bg);cursor:pointer}
 <div class="toast" id="toast"></div>
 <script>
 // ===== DATA: plantillas por servicio =====
-const icons=()=>{try{lucide.createIcons()}catch(e){}};
+let _iconRetries = 0;
+const icons=()=>{
+  try{
+    if (window.lucide && typeof lucide.createIcons === 'function') {
+      lucide.createIcons();
+    } else if (_iconRetries++ < 15) {
+      setTimeout(icons, 150);
+    }
+  }catch(e){}
+};
+document.addEventListener('DOMContentLoaded', icons);
+window.addEventListener('load', icons);
 const TEAM=['Esteban Mejía','Carlos Rodríguez','Ana Martínez','Brenda Laureano','Rafael Peña'];
 const TPL={
  deslinde:{nombre:'Deslinde Catastral',div:'Agrimensura',plazo:120,tec:true,
@@ -350,7 +361,7 @@ const TPL={
   sucesiones:{nombre:'Sucesiones y Determinación Herederos',div:'Legal',plazo:60,tec:false,
    objeto:{causante:'De cujus (Fallecido)',herederos:'Herederos identificados',bienes:'Inmuebles inventariados',radicacion:'Lugar de apertura'},
    docs:[['CLIENTE','Acta de defunción','cliente'],['CLIENTE','Actas de nacimiento de herederos','cliente'],['CLIENTE','Acta de matrimonio del de cujus','cliente'],['CLIENTE','Títulos de propiedad de los bienes','cliente'],['GSD','Instancia de determinación de herederos','gsd'],['PROCESO','Pliego de sucesiones DGII','gsd'],['PROCESO','Resolución judicial o registral','gsd']],
-   fases:[['Recopilación',['Recepción de actas del estado civil','Certificaciones de títulos']],['Impuestos',['Declaración jurada de sucesiones ante DGII','Cálculo de impuestos']],['Partición',['Acuerdo amigable de partición o adjudicación']],['Registro',['Transferencia e inscripción registral']],['Cierre',['Entrega de títulos adjudicados']]]
+   fases:[['Recopilación',['Recepción de actas del estado civil','Certificaciones de títulos']],['Impuestos',['Declaración jurada de sucesiones ante DGII','Cálculo de impuestos']],['Partición',['Acuerdo amigable de partición o adjudicación']],['Registro',['Transferencia e inscripción registral']],['Cierre',['Entrega de títulos adjudicados']]]}
 };
 // Aliases
 TPL['deslinde-catastral'] = TPL.deslinde;
@@ -428,7 +439,9 @@ function go(v, push = true){
   if (!v || !$('v-'+v)) v = 'dash';
   document.querySelectorAll('.view').forEach(x=>x.classList.remove('on'));
   $('v-'+v).classList.add('on');
-  document.querySelectorAll('.side a[data-view]').forEach(a=>a.classList.toggle('on',a.dataset.view===v));
+  document.querySelectorAll('.side a').forEach(a => a.classList.remove('on'));
+  const targetA = document.querySelector(`.side a[data-view="${v}"]`);
+  if (targetA) targetA.classList.add('on');
   $('main').scrollTop=0;
   ({dash:renderDash,list:renderList,mytasks:renderMy,cal:renderCal,clients:renderCli,docs:renderDocsAll,tpl:renderTpl})[v]?.();
   icons();
