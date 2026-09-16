@@ -60,6 +60,32 @@
     if (side) side.classList.remove('open');
     if (backdrop) backdrop.classList.remove('open');
   }
+
+  // Sincronización global del badge de tareas pendientes ("Mis tareas")
+  (function() {
+    function applyTaskBadge(count) {
+      const b = document.getElementById('nMy');
+      if (!b) return;
+      const n = parseInt(count, 10) || 0;
+      b.textContent = n;
+      b.style.display = n > 0 ? 'inline-block' : 'none';
+    }
+
+    try {
+      const cached = localStorage.getItem('gsd_task_badge_count');
+      if (cached !== null) applyTaskBadge(cached);
+    } catch(e) {}
+
+    fetch('/admin/api/task-stats')
+      .then(r => r.json())
+      .then(data => {
+        if (data && typeof data.myTasksUrgent === 'number') {
+          applyTaskBadge(data.myTasksUrgent);
+          try { localStorage.setItem('gsd_task_badge_count', data.myTasksUrgent); } catch(e) {}
+        }
+      })
+      .catch(() => {});
+  })();
 </script>
 </body>
 </html>

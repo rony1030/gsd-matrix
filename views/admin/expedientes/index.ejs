@@ -537,6 +537,7 @@ function go(v, push = true){
   if (targetA) targetA.classList.add('on');
   $('main').scrollTop=0;
   ({dash:renderDash,list:renderList,mytasks:renderMy,cal:renderCal,clients:renderCli,docs:renderDocsAll,tpl:renderTpl})[v]?.();
+  if (typeof updateTaskBadge === 'function') updateTaskBadge();
   icons();
   if (push && URL_MAP[v] && window.location.pathname !== URL_MAP[v]) {
     history.pushState({view: v}, '', URL_MAP[v]);
@@ -570,11 +571,17 @@ function renderList(){const q=$('search').value.toLowerCase();const rows=DB.filt
 $('search').addEventListener('input',()=>{go('list');});
 let mtF='all';$('mtFilters').onclick=ev=>{if(ev.target.dataset.f){mtF=ev.target.dataset.f;[...$('mtFilters').children].forEach(b=>b.classList.toggle('on',b===ev.target));renderMy();}};
 function allTasks(){return DB.flatMap(e=>(e.tasks||[]).map(t=>({...t,e})));}
+function updateTaskBadge(){
+  const myC = allTasks().filter(t=>t.who==='Esteban Mejía'&&t.due&&t.st!=='done'&&t.st!=='na'&&days(t.due)<=3).length;
+  if ($('nMy')) {
+    $('nMy').textContent = myC;
+    $('nMy').style.display = myC > 0 ? 'inline-block' : 'none';
+  }
+  try { localStorage.setItem('gsd_task_badge_count', myC); } catch(e) {}
+}
 function renderMy(){let ts=allTasks().filter(t=>t.st!=='done'&&t.st!=='na');if(mtF==='mine')ts=ts.filter(t=>t.who==='Esteban Mejía');if(mtF==='late')ts=ts.filter(t=>t.due&&days(t.due)<0);if(mtF==='week')ts=ts.filter(t=>t.due&&days(t.due)>=0&&days(t.due)<=7);ts.sort((a,b)=>(a.due||'9')>(b.due||'9')?1:-1);
  $('mtRows').innerHTML=ts.map(t=>`<tr class="row" onclick="openExp('${t.e.id}','tareas')"><td>${t.name}</td><td>${t.e.id}</td><td>${TPL[t.e.svc]?.fases[t.phase]?.[0]||'General'}</td><td>${t.who}</td><td class="${t.due&&days(t.due)<0?'st-block':''}">${fd(t.due)}</td><td class="${ST[t.st][1]}">● ${ST[t.st][0]}</td></tr>`).join('')||'<tr><td colspan="6" class="empty" style="text-align:center;padding:28px;color:var(--gray);">No hay tareas pendientes.</td></tr>';
- const myC = allTasks().filter(t=>t.who==='Esteban Mejía'&&t.due&&t.st!=='done'&&t.st!=='na'&&days(t.due)<=3).length;
- $('nMy').textContent=myC;
- $('nMy').style.display=myC>0?'inline-block':'none';}
+ updateTaskBadge();}
 function renderCal(){const ts=allTasks().filter(t=>t.due&&t.st!=='done'&&t.st!=='na').sort((a,b)=>a.due>b.due?1:-1);const g={};ts.forEach(t=>{(g[t.due]=g[t.due]||[]).push(t);});$('calBox').innerHTML=Object.keys(g).map(d=>`<div style="display:grid;grid-template-columns:110px 1fr;gap:14px;padding:10px 0;border-bottom:1px solid var(--line)"><div><b style="color:${days(d)<0?'var(--red)':'var(--navy)'};font-weight:500">${fd(d)}</b><br><small style="color:var(--gray)">${days(d)<0?'vencido':days(d)===0?'hoy':'en '+days(d)+' días'}</small></div><div>${g[d].map(t=>`<div style="padding:3px 0"><span class="link" onclick="openExp('${t.e.id}','tareas')">${t.name}</span> <small style="color:var(--gray)">· ${t.e.id} · ${t.who}</small></div>`).join('')}</div></div>`).join('')||'<div class="empty" style="text-align:center;padding:28px;color:var(--gray);">Sin vencimientos programados.</div>';}
 function renderCli(){const g={};DB.forEach(e=>{if(e.cliente?.nombre){(g[e.cliente.nombre]=g[e.cliente.nombre]||{c:e.cliente,ex:[]}).ex.push(e.id);}});$('cliRows').innerHTML=Object.values(g).map(x=>`<tr><td><b style="font-weight:500;color:var(--navy)">${x.c.nombre}</b></td><td>${x.c.cedula||'—'}</td><td>${x.c.email||'—'}<br><small style="color:var(--gray)">${x.c.tel||'—'}</small></td><td>${x.ex.map(i=>`<span class="link" onclick="openExp('${i}')">${i}</span>`).join(', ')}</td></tr>`).join('')||'<tr><td colspan="4" class="empty" style="text-align:center;padding:28px;color:var(--gray);">No hay clientes registrados aún.</td></tr>';}
 function renderDocsAll(){const rows=DB.flatMap(e=>(e.docs||[]).filter(d=>d.st!=='ok').map(d=>({...d,e})));$('docsAll').innerHTML=rows.map(d=>`<div class="doc"><div class="ic miss"><i data-lucide="file"></i></div><div><b>${d.name}</b><small>${d.e.id} · ${d.e.cliente?.nombre||'Cliente'} · aporta: ${d.by==='cliente'?'cliente':'GSD'}</small></div><div class="acts"><span class="tag ${d.st==='wait'?'wait':'late'}">${d.st==='wait'?'Solicitado':'Pendiente'}</span><button class="btn sm" onclick="openExp('${d.e.id}','documentos')">Abrir</button></div></div>`).join('')||'<div class="empty" style="text-align:center;padding:28px;color:var(--gray);">No hay documentos pendientes. Todo al día.</div>';}

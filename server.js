@@ -303,6 +303,30 @@ crmSubmodules.forEach(({ path: subPath, view, page }) => {
   });
 });
 
+// API para estadísticas de tareas y sincronización del badge global en el menú lateral
+app.get('/admin/api/task-stats', requireAuth, async (req, res) => {
+  try {
+    await getDb();
+    const rows = queryAll('SELECT tasks_json FROM expedientes') || [];
+    let myUrgent = 0;
+    const now = new Date();
+    rows.forEach(r => {
+      try {
+        const ts = JSON.parse(r.tasks_json || '[]');
+        ts.forEach(t => {
+          if (t.who === 'Esteban Mejía' && t.due && t.st !== 'done' && t.st !== 'na') {
+            const diffDays = Math.ceil((new Date(t.due) - now) / (1000 * 60 * 60 * 24));
+            if (diffDays <= 3) myUrgent++;
+          }
+        });
+      } catch(e) {}
+    });
+    res.json({ ok: true, myTasksUrgent: myUrgent });
+  } catch (err) {
+    res.json({ ok: false, myTasksUrgent: 0 });
+  }
+});
+
 // Rutas administrativas para poblar y limpiar datos de prueba
 app.get('/admin/api/seed-demo', requireAuth, async (req, res) => {
   try {
