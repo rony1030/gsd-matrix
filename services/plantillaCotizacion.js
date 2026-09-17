@@ -60,7 +60,7 @@ function fmtFecha(d) {
 const CSS = `
 @page {
   size: A4 portrait;
-  margin: 0mm !important;
+  margin: 0 !important;
 }
 * {
   box-sizing: border-box;
@@ -82,7 +82,7 @@ html, body {
   max-width: 210mm;
   margin: 0 auto;
   min-height: auto;
-  padding: 0 0 10mm 0;
+  padding: 0 0 6mm 0;
   background: #ffffff;
 }
 
@@ -90,7 +90,7 @@ html, body {
 .head {
   background: ${NAVY};
   color: #ffffff;
-  padding: 10mm 16mm 9mm 16mm;
+  padding: 8mm 16mm 7mm 16mm;
   position: relative;
   overflow: hidden;
   margin: 0 !important;
@@ -101,48 +101,48 @@ html, body {
 .head .doc { text-align: right; }
 .head .doc .lbl { font-size: 6.2pt; letter-spacing: .24em; text-transform: uppercase; color: ${GREEN}; font-weight: 600; }
 .head .doc .num { font-size: 14pt; font-weight: 600; color: #ffffff; margin-top: 1mm; letter-spacing: .02em; }
-.head h1 { font-size: 18.5pt; font-weight: 200; margin: 6.5mm 0 0 0; line-height: 1.15; letter-spacing: -.01em; position: relative; }
+.head h1 { font-size: 18pt; font-weight: 200; margin: 5mm 0 0 0; line-height: 1.15; letter-spacing: -.01em; position: relative; }
 .head h1 b { font-weight: 600; color: #ffffff; }
-.head .sub { font-size: 8.2pt; color: #A9BBD2; margin-top: 2.2mm; position: relative; font-weight: 300; }
+.head .sub { font-size: 8.2pt; color: #A9BBD2; margin-top: 2mm; position: relative; font-weight: 300; }
 
-.body { padding: 5mm 16mm 0 16mm; }
+.body { padding: 4mm 16mm 0 16mm; }
 
 /* ── bloques ── */
-.eyebrow { font-size: 6.4pt; letter-spacing: .22em; text-transform: uppercase; color: ${GREEN}; font-weight: 600; margin: 0 0 1.8mm 0; }
-h2 { font-size: 11.5pt; font-weight: 600; color: ${NAVY}; margin: 0 0 2.2mm 0; }
-p { font-size: 8.6pt; line-height: 1.5; margin: 0 0 2mm 0; }
+.eyebrow { font-size: 6.4pt; letter-spacing: .22em; text-transform: uppercase; color: ${GREEN}; font-weight: 600; margin: 0 0 1.5mm 0; }
+h2 { font-size: 11pt; font-weight: 600; color: ${NAVY}; margin: 0 0 2mm 0; }
+p { font-size: 8.5pt; line-height: 1.45; margin: 0 0 1.8mm 0; }
 b, strong { color: ${NAVY}; font-weight: 600; }
-.rule { width: 14mm; height: 2pt; background: ${GREEN}; margin: 0 0 3mm 0; }
-.sec { margin-bottom: 4.5mm; page-break-inside: avoid; break-inside: avoid; }
+.rule { width: 14mm; height: 2pt; background: ${GREEN}; margin: 0 0 2.5mm 0; }
+.sec { margin-bottom: 3.8mm; page-break-inside: avoid; break-inside: avoid; }
 
 .cols { display: flex; }
 .cols > div { flex: 1; }
 .cols > div + div { margin-left: 8mm; }
 
 .kv { width: 100%; border-collapse: collapse; }
-.kv td { font-size: 8.4pt; padding: 1.5mm 0; border-bottom: .5pt solid ${HAIR}; vertical-align: top; }
+.kv td { font-size: 8.4pt; padding: 1.4mm 0; border-bottom: .5pt solid ${HAIR}; vertical-align: top; }
 .kv td.k { color: ${MUTE}; width: 34%; font-size: 7.2pt; letter-spacing: .06em; text-transform: uppercase; }
 .kv td.v { color: ${INK}; font-weight: 500; }
 .kv tr:last-child td { border-bottom: none; }
 
 table.money { width: 100%; border-collapse: collapse; margin-top: 1mm; page-break-inside: avoid; break-inside: avoid; }
 table.money th { font-size: 6.5pt; letter-spacing: .14em; text-transform: uppercase; color: ${MUTE};
-  font-weight: 600; text-align: left; padding: 0 3mm 1.8mm 0; border-bottom: 1pt solid ${NAVY}; }
+  font-weight: 600; text-align: left; padding: 0 3mm 1.6mm 0; border-bottom: 1pt solid ${NAVY}; }
 table.money th.r, table.money td.r { text-align: right; padding-right: 0; }
-table.money td { font-size: 8.6pt; padding: 2mm 3mm 2mm 0; border-bottom: .5pt solid ${HAIR}; vertical-align: top; color: ${BODY}; }
+table.money td { font-size: 8.5pt; padding: 1.8mm 3mm 1.8mm 0; border-bottom: .5pt solid ${HAIR}; vertical-align: top; color: ${BODY}; }
 table.money td.c { color: ${NAVY}; font-weight: 500; }
-table.money td .sub { display: block; font-size: 7pt; color: ${MUTE}; margin-top: .5mm; line-height: 1.35; }
-table.money tr.tot td { border-bottom: none; border-top: 1pt solid ${NAVY}; padding-top: 2.5mm;
-  font-size: 11pt; font-weight: 600; color: ${NAVY}; }
-table.money tr.sub-t td { font-size: 8.6pt; color: ${INK}; }
+table.money td .sub { display: block; font-size: 7pt; color: ${MUTE}; margin-top: .4mm; line-height: 1.3; }
+table.money tr.tot td { border-bottom: none; border-top: 1pt solid ${NAVY}; padding-top: 2.2mm;
+  font-size: 10.5pt; font-weight: 600; color: ${NAVY}; }
+table.money tr.sub-t td { font-size: 8.5pt; color: ${INK}; }
 table.money tr.desc td { color: ${GREEN}; font-weight: 600; }
 
 ul.tick { list-style: none; margin: 0; padding: 0; }
-ul.tick li { font-size: 8.2pt; line-height: 1.45; color: ${BODY}; padding: 0 0 1.4mm 4mm; position: relative; }
-ul.tick li:before { content: ''; position: absolute; left: 0; top: 1.8mm; width: 1.6mm; height: 1.6mm; background: ${GREEN}; border-radius: .4mm; }
+ul.tick li { font-size: 8.2pt; line-height: 1.4; color: ${BODY}; padding: 0 0 1.2mm 4mm; position: relative; }
+ul.tick li:before { content: ''; position: absolute; left: 0; top: 1.6mm; width: 1.6mm; height: 1.6mm; background: ${GREEN}; border-radius: .4mm; }
 ul.dash { list-style: none; margin: 0; padding: 0; }
-ul.dash li { font-size: 8.2pt; line-height: 1.45; color: ${BODY}; padding: 0 0 1.4mm 4mm; position: relative; }
-ul.dash li:before { content: ''; position: absolute; left: 0; top: 2.4mm; width: 2.2mm; height: .8pt; background: ${FAINT}; }
+ul.dash li { font-size: 8.2pt; line-height: 1.4; color: ${BODY}; padding: 0 0 1.2mm 4mm; position: relative; }
+ul.dash li:before { content: ''; position: absolute; left: 0; top: 2.2mm; width: 2.2mm; height: .8pt; background: ${FAINT}; }
 
 .steps { display: flex; margin-top: 2mm; }
 .step { flex: 1; padding: 0 2.5mm; position: relative; }
@@ -154,31 +154,31 @@ ul.dash li:before { content: ''; position: absolute; left: 0; top: 2.4mm; width:
 .step .h { font-size: 7.6pt; font-weight: 600; color: ${NAVY}; line-height: 1.2; margin-bottom: .8mm; }
 .step .d { font-size: 6.8pt; line-height: 1.35; color: ${MUTE}; }
 
-.note { background: ${PAPER}; border-left: 2pt solid ${FAINT}; padding: 2.5mm 3.5mm; font-size: 7.2pt; line-height: 1.45; color: ${MUTE}; }
+.note { background: ${PAPER}; border-left: 2pt solid ${FAINT}; padding: 2.2mm 3.2mm; font-size: 7.2pt; line-height: 1.4; color: ${MUTE}; }
 .note.g { border-left-color: ${GREEN}; }
 .note b { color: ${BODY}; }
 
-.band { background: ${NAVY}; color: #ffffff; padding: 4.5mm 5.5mm; border-radius: 1.6mm; }
-.band h4 { font-size: 10.5pt; font-weight: 300; color: #ffffff; margin: 0 0 1.8mm 0; }
+.band { background: ${NAVY}; color: #ffffff; padding: 4mm 5mm; border-radius: 1.6mm; }
+.band h4 { font-size: 10pt; font-weight: 300; color: #ffffff; margin: 0 0 1.5mm 0; }
 .band h4 b { font-weight: 600; color: #ffffff; }
-.band p { font-size: 8pt; line-height: 1.5; color: #C3D2E3; margin: 0; }
+.band p { font-size: 7.8pt; line-height: 1.45; color: #C3D2E3; margin: 0; }
 .band b, .band strong { color: #ffffff; }
 .head b, .head strong { color: #ffffff; }
 
 /* ── aceptación ── */
-.accept { border: 1pt solid ${HAIR}; border-radius: 1.6mm; padding: 3.5mm 5mm; margin-top: 2.5mm; page-break-inside: avoid; break-inside: avoid; }
-.accept .t { font-size: 6.2pt; letter-spacing: .22em; text-transform: uppercase; color: ${GREEN}; font-weight: 600; margin-bottom: 1.5mm; }
-.sigs { display: flex; margin-top: 6mm; }
+.accept { border: 1pt solid ${HAIR}; border-radius: 1.6mm; padding: 3mm 4.5mm; margin-top: 2mm; page-break-inside: avoid !important; break-inside: avoid !important; }
+.accept .t { font-size: 6.2pt; letter-spacing: .22em; text-transform: uppercase; color: ${GREEN}; font-weight: 600; margin-bottom: 1.2mm; }
+.sigs { display: flex; margin-top: 5mm; }
 .sig { flex: 1; }
 .sig + .sig { margin-left: 10mm; }
-.sig .line { border-top: .8pt solid ${INK}; padding-top: 1.8mm; }
+.sig .line { border-top: .8pt solid ${INK}; padding-top: 1.6mm; }
 .sig .nm { font-size: 8.2pt; font-weight: 600; color: ${NAVY}; }
-.sig .rl { font-size: 7pt; color: ${MUTE}; margin-top: .4mm; }
+.sig .rl { font-size: 7pt; color: ${MUTE}; margin-top: .3mm; }
 
 /* ── pie ── */
-.foot { margin-top: 5mm; padding: 3mm 16mm 0 16mm; border-top: .5pt solid ${HAIR};
+.foot { margin-top: 4mm; padding: 2.5mm 16mm 0 16mm; border-top: .5pt solid ${HAIR};
   display: flex; justify-content: space-between; align-items: flex-end; page-break-inside: avoid; break-inside: avoid; }
-.foot .l { font-size: 6.5pt; line-height: 1.55; color: ${MUTE}; }
+.foot .l { font-size: 6.5pt; line-height: 1.5; color: ${MUTE}; }
 .foot .l b { color: ${NAVY}; font-weight: 600; display: block; font-size: 7.2pt; letter-spacing: .06em; }
 .foot .r { font-size: 6.2pt; color: ${FAINT}; text-align: right; letter-spacing: .1em; text-transform: uppercase; }
 
@@ -187,22 +187,33 @@ ul.dash li:before { content: ''; position: absolute; left: 0; top: 2.4mm; width:
 @media print {
   @page {
     size: A4 portrait;
-    margin: 0mm !important;
+    margin: 0 !important;
   }
   html, body {
     margin: 0 !important;
     padding: 0 !important;
     width: 210mm !important;
+    background: #ffffff !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
+  .no-print {
+    display: none !important;
+  }
   .sheet {
     margin: 0 !important;
-    padding: 0 !important;
-    width: 100% !important;
+    padding: 0 0 4mm 0 !important;
+    width: 210mm !important;
+    max-width: 210mm !important;
+    box-shadow: none !important;
   }
   .head {
-    margin-top: 0 !important;
+    margin: 0 !important;
+    width: 210mm !important;
+  }
+  .accept {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
   }
 }
 `;

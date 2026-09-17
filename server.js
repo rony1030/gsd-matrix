@@ -699,9 +699,50 @@ cotiRouter.post('/generar-pdf', async (req, res) => {
 cotiRouter.post('/vista-previa-html', async (req, res) => {
   try {
     const html = generarHTML(req.body);
-    const printHtml = html.replace('</body>', '<script>window.addEventListener("load",()=>{setTimeout(()=>window.print(),600);});</script></body>');
+    const clientPayloadJson = JSON.stringify(req.body).replace(/</g, '\\u003c');
+    const toolbar = `
+<div class="no-print" style="position:sticky;top:0;left:0;right:0;z-index:9999;background:#1E3962;color:#ffffff;padding:10px 20px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 10px rgba(0,0,0,0.2);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+  <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+    <span style="font-weight:700;font-size:12.5px;letter-spacing:0.5px;color:#74B241;">GSD QUOTER</span>
+    <span style="color:#ffffff;font-size:12.5px;">Vista Previa de Cotización</span>
+    <span style="color:#A9BBD2;font-size:11.5px;">💡 Para formato perfecto sin márgenes blancos ni cortes, usa <b>Descargar PDF Oficial</b>.</span>
+  </div>
+  <div style="display:flex;gap:10px;align-items:center;">
+    <button onclick="window.print()" style="background:transparent;border:1px solid #74B241;color:#ffffff;padding:6px 13px;border-radius:6px;font-size:12px;cursor:pointer;font-weight:500;">
+      🖨️ Imprimir
+    </button>
+    <button onclick="descargarPDFDirecto()" style="background:#74B241;border:none;color:#ffffff;padding:7px 15px;border-radius:6px;font-size:12px;cursor:pointer;font-weight:600;">
+      📥 Descargar PDF Oficial (A4 Completo)
+    </button>
+  </div>
+</div>
+<script>
+  const _cotiData = ${clientPayloadJson};
+  async function descargarPDFDirecto() {
+    try {
+      const res = await fetch('/admin/cotizaciones/generar-pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(_cotiData)
+      });
+      if (!res.ok) throw new Error('Error generando PDF');
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'Cotizacion_' + (_cotiData.referencia || 'GSD') + '.pdf';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    } catch (e) {
+      alert('Error al descargar PDF: ' + e.message);
+    }
+  }
+</script>
+`;
+    const finalHtml = html.replace('<body>', '<body>' + toolbar);
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    res.send(printHtml);
+    res.send(finalHtml);
   } catch (err) {
     res.status(500).send('Error generando vista previa HTML: ' + err.message);
   }
@@ -735,9 +776,26 @@ cotiRouter.get('/:id/imprimir', async (req, res) => {
   
   try {
     const html = generarHTML(coti);
-    const printHtml = html.replace('</body>', '<script>window.addEventListener("load",()=>{setTimeout(()=>window.print(),600);});</script></body>');
+    const toolbar = `
+<div class="no-print" style="position:sticky;top:0;left:0;right:0;z-index:9999;background:#1E3962;color:#ffffff;padding:10px 20px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 10px rgba(0,0,0,0.2);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+  <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+    <span style="font-weight:700;font-size:12.5px;letter-spacing:0.5px;color:#74B241;">GSD QUOTER</span>
+    <span style="color:#ffffff;font-size:12.5px;">Cotización ${coti.referencia}</span>
+    <span style="color:#A9BBD2;font-size:11.5px;">💡 Descarga el PDF oficial directo sin márgenes de navegador ni saltos de página.</span>
+  </div>
+  <div style="display:flex;gap:10px;align-items:center;">
+    <button onclick="window.print()" style="background:transparent;border:1px solid #74B241;color:#ffffff;padding:6px 13px;border-radius:6px;font-size:12px;cursor:pointer;font-weight:500;">
+      🖨️ Imprimir
+    </button>
+    <a href="/admin/cotizaciones/${coti.id}/pdf" style="background:#74B241;text-decoration:none;color:#ffffff;padding:7px 15px;border-radius:6px;font-size:12px;cursor:pointer;font-weight:600;display:inline-block;">
+      📥 Descargar PDF Oficial (A4 Completo)
+    </a>
+  </div>
+</div>
+`;
+    const finalHtml = html.replace('<body>', '<body>' + toolbar);
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    res.send(printHtml);
+    res.send(finalHtml);
   } catch (err) {
     res.status(500).send('Error generando impresión HTML: ' + err.message);
   }
