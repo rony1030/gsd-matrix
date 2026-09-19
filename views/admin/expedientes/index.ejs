@@ -177,7 +177,37 @@ tr.row:hover td{background:var(--bg);cursor:pointer}
 @keyframes sk{from{background-position:200% 0}to{background-position:-200% 0}}
 .cv{border:1px solid var(--line);border-radius:12px;overflow:hidden}
 .cv .top{background:var(--navy);color:#fff;padding:18px 22px;display:flex;justify-content:space-between;align-items:center}
-.cv .top small{color:#CFE3D8;display:block;font-size:11px;letter-spacing:1px}
+/* ===== CALENDAR WIDGET & GRID STYLES ===== */
+.cal-container{display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start}
+@media(max-width:1100px){.cal-container{grid-template-columns:1fr}}
+.cal-card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:20px;box-shadow:0 1px 3px rgba(26,58,82,.04)}
+.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.cal-header h2{font-size:17px;color:var(--navy);font-weight:600;display:flex;align-items:center;gap:8px}
+.cal-nav{display:flex;align-items:center;gap:6px}
+.cal-nav-btn{background:#fff;border:1px solid var(--line);width:32px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--navy);cursor:pointer;transition:all .15s}
+.cal-nav-btn:hover{background:var(--bg);border-color:var(--gray)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal-day-head{text-align:center;font-size:11px;font-weight:600;color:var(--gray);text-transform:uppercase;padding:8px 0;letter-spacing:0.5px}
+.cal-cell{min-height:76px;border:1px solid var(--line);border-radius:8px;padding:6px;background:#fff;position:relative;display:flex;flex-direction:column;transition:all .15s}
+.cal-cell.other-month{background:#FBFBFC;opacity:0.45}
+.cal-cell.today{border-color:var(--green);background:var(--green-l)}
+.cal-cell.today .cal-num{color:#2F6B4A;font-weight:700}
+.cal-cell:hover:not(.other-month){border-color:var(--navy);box-shadow:0 2px 6px rgba(26,58,82,.08)}
+.cal-num{font-size:12px;font-weight:600;color:var(--ink);margin-bottom:4px}
+.cal-events{display:flex;flex-direction:column;gap:3px;flex:1;overflow:hidden}
+.cal-pill{font-size:10.5px;padding:2px 5px;border-radius:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500;cursor:pointer;line-height:1.2;transition:transform .1s}
+.cal-pill:hover{transform:scale(1.02)}
+.cal-pill.late{background:var(--red-l);color:var(--red);border-left:2px solid var(--red)}
+.cal-pill.today{background:var(--green-l);color:#2F6B4A;border-left:2px solid var(--green)}
+.cal-pill.soon{background:var(--blue-l);color:var(--blue);border-left:2px solid var(--blue)}
+.cal-pill.normal{background:#EEF2F5;color:var(--navy);border-left:2px solid var(--navy)}
+
+.cal-side-list{display:flex;flex-direction:column;gap:14px}
+.cal-agenda-item{display:flex;gap:12px;padding:10px;border:1px solid var(--line);border-radius:8px;background:#fff;transition:border-color .15s}
+.cal-agenda-item:hover{border-color:var(--navy)}
+.cal-agenda-date{min-width:54px;text-align:center;background:var(--bg);border-radius:6px;padding:6px 4px;border:1px solid var(--line);flex-shrink:0}
+.cal-agenda-date b{display:block;font-size:16px;color:var(--navy);line-height:1}
+.cal-agenda-date small{font-size:10px;color:var(--gray);text-transform:uppercase;font-weight:600}
 .cv .body{padding:18px 22px}
 .cv .step{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--line)}
 .cv .step .n{width:22px;height:22px;border-radius:50%;background:var(--green-l);color:#2F6B4A;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0}
@@ -359,7 +389,15 @@ tr.row:hover td{background:var(--bg);cursor:pointer}
     <div class="card" style="margin-top:16px"><div class="filters" id="mtFilters"><button class="on" data-f="all">Todas</button><button data-f="mine">Mis tareas</button><button data-f="late">Vencidas</button><button data-f="week">Esta semana</button></div><div class="table-responsive"><table><thead><tr><th>Tarea</th><th>Expediente</th><th>Etapa</th><th>Responsable</th><th>Fecha límite</th><th>Estado</th></tr></thead><tbody id="mtRows"></tbody></table></div></div>
   </section>
 
-  <section class="view" id="v-cal"><h1>Calendario</h1><p class="sub">Vencimientos de las próximas semanas.</p><div class="card" style="margin-top:16px" id="calBox"></div></section>
+  <section class="view" id="v-cal">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div>
+        <h1>Calendario de Plazos & Vencimientos</h1>
+        <p class="sub">Control de audiencias, trámites en Mensuras/Registro y compromisos con clientes.</p>
+      </div>
+    </div>
+    <div id="calBox"></div>
+  </section>
   <section class="view" id="v-clients"><h1>Clientes</h1><p class="sub">Clientes con expedientes en el sistema.</p><div class="card" style="margin-top:16px"><div class="table-responsive"><table><thead><tr><th>Cliente</th><th>Cédula / RNC</th><th>Contacto</th><th>Expedientes</th></tr></thead><tbody id="cliRows"></tbody></table></div></div></section>
   <section class="view" id="v-docs"><h1>Documentos</h1><p class="sub">Documentos pendientes en todos los expedientes.</p><div class="card" style="margin-top:16px" id="docsAll"></div></section>
   <section class="view" id="v-tpl"><h1>Plantillas de expedientes</h1><p class="sub">Cada servicio define sus campos, documentos, etapas y checklist. Lo que se registra aquí se reutiliza en cada expediente nuevo.</p><div class="g3" style="margin-top:16px" id="tplCards"></div></section>
@@ -613,7 +651,166 @@ function updateTaskBadge(){
 function renderMy(){let ts=allTasks().filter(t=>t.st!=='done'&&t.st!=='na');if(mtF==='mine')ts=ts.filter(t=>t.who==='Esteban Mejía');if(mtF==='late')ts=ts.filter(t=>t.due&&days(t.due)<0);if(mtF==='week')ts=ts.filter(t=>t.due&&days(t.due)>=0&&days(t.due)<=7);ts.sort((a,b)=>(a.due||'9')>(b.due||'9')?1:-1);
  $('mtRows').innerHTML=ts.map(t=>`<tr class="row" onclick="openExp('${t.e.id}','tareas')"><td>${t.name}</td><td>${t.e.id}</td><td>${TPL[t.e.svc]?.fases[t.phase]?.[0]||'General'}</td><td>${t.who}</td><td class="${t.due&&days(t.due)<0?'st-block':''}">${fd(t.due)}</td><td class="${ST[t.st][1]}">● ${ST[t.st][0]}</td></tr>`).join('')||'<tr><td colspan="6" class="empty" style="text-align:center;padding:28px;color:var(--gray);">No hay tareas pendientes.</td></tr>';
  updateTaskBadge();}
-function renderCal(){const ts=allTasks().filter(t=>t.due&&t.st!=='done'&&t.st!=='na').sort((a,b)=>a.due>b.due?1:-1);const g={};ts.forEach(t=>{(g[t.due]=g[t.due]||[]).push(t);});$('calBox').innerHTML=Object.keys(g).map(d=>`<div style="display:grid;grid-template-columns:110px 1fr;gap:14px;padding:10px 0;border-bottom:1px solid var(--line)"><div><b style="color:${days(d)<0?'var(--red)':'var(--navy)'};font-weight:500">${fd(d)}</b><br><small style="color:var(--gray)">${days(d)<0?'vencido':days(d)===0?'hoy':'en '+days(d)+' días'}</small></div><div>${g[d].map(t=>`<div style="padding:3px 0"><span class="link" onclick="openExp('${t.e.id}','tareas')">${t.name}</span> <small style="color:var(--gray)">· ${t.e.id} · ${t.who}</small></div>`).join('')}</div></div>`).join('')||'<div class="empty" style="text-align:center;padding:28px;color:var(--gray);">Sin vencimientos programados.</div>';}
+let calDate = new Date();
+
+function changeCalMonth(delta) {
+  calDate.setMonth(calDate.getMonth() + delta);
+  renderCal();
+}
+
+function setCalToday() {
+  calDate = new Date();
+  renderCal();
+}
+
+const MONTH_NAMES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+const DAY_HEADERS = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+
+function renderCal() {
+  const year = calDate.getFullYear();
+  const month = calDate.getMonth();
+  
+  // All active tasks with due dates
+  const allT = allTasks().filter(t => t.due && t.st !== 'done' && t.st !== 'na');
+  const tasksSorted = [...allT].sort((a, b) => a.due > b.due ? 1 : -1);
+  
+  // Group tasks by date YYYY-MM-DD
+  const tasksByDate = {};
+  allT.forEach(t => {
+    (tasksByDate[t.due] = tasksByDate[t.due] || []).push(t);
+  });
+
+  // Month calculations (Monday = 0, Sunday = 6)
+  const firstDay = new Date(year, month, 1).getDay();
+  const offset = (firstDay + 6) % 7;
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const daysInPrevMonth = new Date(year, month, 0).getDate();
+  const totalCells = Math.ceil((offset + daysInMonth) / 7) * 7;
+
+  // Month tasks count
+  const monthPrefix = `${year}-${String(month + 1).padStart(2, '0')}`;
+  const monthTasksCount = allT.filter(t => t.due.startsWith(monthPrefix)).length;
+
+  let gridHTML = '';
+  // Day headers
+  gridHTML += DAY_HEADERS.map(d => `<div class="cal-day-head">${d}</div>`).join('');
+
+  // Calendar cells
+  for (let i = 0; i < totalCells; i++) {
+    if (i < offset) {
+      // Prev month trailing
+      const dNum = daysInPrevMonth - offset + i + 1;
+      gridHTML += `<div class="cal-cell other-month"><div class="cal-num">${dNum}</div></div>`;
+    } else if (i < offset + daysInMonth) {
+      // Current month day
+      const dNum = i - offset + 1;
+      const dStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(dNum).padStart(2, '0')}`;
+      const isToday = (dStr === TODAY);
+      const dayTasks = tasksByDate[dStr] || [];
+
+      gridHTML += `
+        <div class="cal-cell ${isToday ? 'today' : ''}">
+          <div class="cal-num">${dNum}</div>
+          <div class="cal-events">
+            ${dayTasks.map(t => {
+              const diff = days(t.due);
+              let pillCls = 'normal';
+              if (diff < 0) pillCls = 'late';
+              else if (diff === 0) pillCls = 'today';
+              else if (diff <= 3) pillCls = 'soon';
+              const divName = (TPL[t.e.svc] || TPL.deslinde).div || 'Legal';
+              return `
+                <div class="cal-pill ${pillCls}" onclick="openExp('${t.e.id}','tareas')" title="${t.name} (${t.e.id} - ${t.e.cliente?.nombre || 'Cliente'}) · Resp: ${t.who}">
+                  ● ${t.name}
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      `;
+    } else {
+      // Next month leading
+      const dNum = i - (offset + daysInMonth) + 1;
+      gridHTML += `<div class="cal-cell other-month"><div class="cal-num">${dNum}</div></div>`;
+    }
+  }
+
+  // Right side agenda
+  const agendaHTML = tasksSorted.length ? tasksSorted.slice(0, 10).map(t => {
+    const diff = days(t.due);
+    const [y, m, d] = t.due.split('-');
+    const mShort = M[parseInt(m) - 1]?.toUpperCase() || 'MES';
+    const isLate = diff < 0;
+    const isToday = diff === 0;
+    const divName = (TPL[t.e.svc] || TPL.deslinde).div || 'Legal';
+
+    return `
+      <div class="cal-agenda-item" onclick="openExp('${t.e.id}','tareas')" style="cursor:pointer">
+        <div class="cal-agenda-date" style="border-color:${isLate ? 'var(--red)' : isToday ? 'var(--green)' : 'var(--line)'};background:${isLate ? 'var(--red-l)' : isToday ? 'var(--green-l)' : 'var(--bg)'}">
+          <b style="color:${isLate ? 'var(--red)' : isToday ? '#2F6B4A' : 'var(--navy)'}">${parseInt(d)}</b>
+          <small style="color:${isLate ? 'var(--red)' : isToday ? '#2F6B4A' : 'var(--gray)'}">${mShort}</small>
+        </div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
+            <span style="font-size:10px;padding:1px 6px;border-radius:6px;font-weight:600;background:${DIV_BG[divName] || '#eee'};color:${DIV_COLOR[divName] || '#666'}">${divName}</span>
+            <span style="font-size:11px;color:var(--gray)">${t.e.id}</span>
+          </div>
+          <b style="font-size:12.5px;color:var(--navy);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${t.name}">${t.name}</b>
+          <div style="font-size:11px;color:var(--gray);margin-top:2px;display:flex;justify-content:space-between">
+            <span>${t.e.cliente?.nombre || 'Cliente'}</span>
+            <span style="font-weight:500;color:${isLate ? 'var(--red)' : isToday ? 'var(--green)' : 'var(--gray)'}">
+              ${isLate ? `Vencida (${-diff}d)` : isToday ? 'Vence hoy' : `En ${diff}d`}
+            </span>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('') : '<div class="empty" style="text-align:center;padding:24px;color:var(--gray)">Sin vencimientos programados. Todo al día.</div>';
+
+  $('calBox').innerHTML = `
+    <div class="cal-container">
+      <!-- CALENDARIO MENSUAL -->
+      <div class="cal-card">
+        <div class="cal-header">
+          <h2>
+            <i data-lucide="calendar" style="color:var(--green)"></i>
+            <span>${MONTH_NAMES[month]} ${year}</span>
+            ${monthTasksCount > 0 ? `<span class="tag proc" style="font-size:11px">${monthTasksCount} compromiso${monthTasksCount !== 1 ? 's' : ''}</span>` : ''}
+          </h2>
+          <div class="cal-nav">
+            <button class="btn sm" onclick="setCalToday()" style="font-weight:600;height:32px;padding:0 10px">Hoy</button>
+            <button class="cal-nav-btn" onclick="changeCalMonth(-1)" title="Mes anterior"><i data-lucide="chevron-left"></i></button>
+            <button class="cal-nav-btn" onclick="changeCalMonth(1)" title="Mes siguiente"><i data-lucide="chevron-right"></i></button>
+          </div>
+        </div>
+        <div class="cal-grid">
+          ${gridHTML}
+        </div>
+        <div style="display:flex;gap:14px;margin-top:14px;padding-top:12px;border-top:1px solid var(--line);font-size:11px;color:var(--gray);flex-wrap:wrap">
+          <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:2px;background:var(--red)"></span> Vencido</span>
+          <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:2px;background:var(--green)"></span> Vence hoy</span>
+          <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:2px;background:var(--blue)"></span> Próximo (≤3 días)</span>
+          <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:2px;background:var(--navy)"></span> Programado</span>
+        </div>
+      </div>
+
+      <!-- AGENDA DE PRÓXIMOS VENCIMIENTOS -->
+      <div class="cal-card">
+        <div class="cal-header">
+          <h2 style="font-size:15px">
+            <i data-lucide="clock" style="color:var(--navy)"></i>
+            <span>Próximos Vencimientos</span>
+          </h2>
+          <span class="tag ${allT.some(t => days(t.due) < 0) ? 'late' : 'proc'}">${allT.length} pendientes</span>
+        </div>
+        <div class="cal-side-list">
+          ${agendaHTML}
+        </div>
+      </div>
+    </div>
+  `;
+  icons();
+}
 function renderCli(){const g={};DB.forEach(e=>{if(e.cliente?.nombre){(g[e.cliente.nombre]=g[e.cliente.nombre]||{c:e.cliente,ex:[]}).ex.push(e.id);}});$('cliRows').innerHTML=Object.values(g).map(x=>`<tr><td><b style="font-weight:500;color:var(--navy)">${x.c.nombre}</b></td><td>${x.c.cedula||'—'}</td><td>${x.c.email||'—'}<br><small style="color:var(--gray)">${x.c.tel||'—'}</small></td><td>${x.ex.map(i=>`<span class="link" onclick="openExp('${i}')">${i}</span>`).join(', ')}</td></tr>`).join('')||'<tr><td colspan="4" class="empty" style="text-align:center;padding:28px;color:var(--gray);">No hay clientes registrados aún.</td></tr>';}
 function renderDocsAll(){const rows=DB.flatMap(e=>(e.docs||[]).filter(d=>d.st!=='ok').map(d=>({...d,e})));$('docsAll').innerHTML=rows.map(d=>`<div class="doc"><div class="ic miss"><i data-lucide="file"></i></div><div><b>${d.name}</b><small>${d.e.id} · ${d.e.cliente?.nombre||'Cliente'} · aporta: ${d.by==='cliente'?'cliente':'GSD'}</small></div><div class="acts"><span class="tag ${d.st==='wait'?'wait':'late'}">${d.st==='wait'?'Solicitado':'Pendiente'}</span><button class="btn sm" onclick="openExp('${d.e.id}','documentos')">Abrir</button></div></div>`).join('')||'<div class="empty" style="text-align:center;padding:28px;color:var(--gray);">No hay documentos pendientes. Todo al día.</div>';}
 function renderTpl(){$('tplCards').innerHTML=Object.entries(TPL).map(([k,t])=>`<div class="card"><h2>${t.nombre}</h2><p class="sub">${t.div} · plazo estimado ${t.plazo} días</p><div class="kv" style="margin-top:12px;grid-template-columns:110px 1fr"><span class="k">Campos</span><span class="v">${Object.keys(t.objeto).length} del objeto</span><span class="k">Documentos</span><span class="v">${t.docs.length}</span><span class="k">Etapas</span><span class="v">${t.fases.length}</span><span class="k">Tareas</span><span class="v">${t.fases.reduce((a,f)=>a+f[1].length,0)}</span></div><div style="margin-top:12px;font-size:11.5px;color:var(--gray)">${t.fases.map(f=>f[0]).join(' → ')}</div></div>`).join('');}
