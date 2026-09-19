@@ -166,7 +166,281 @@ tr.row:hover td{background:var(--bg);cursor:pointer}
 .radio label.on{border-color:var(--green);background:var(--green-l)}
 .quote-src{background:var(--bg);border-radius:8px;padding:12px 14px;margin:10px 0}
 .hidden{display:none!important}
-@media print{body{display:block}.side,.hdr,.main,.toast{display:none!important}.modal{position:static;background:none;display:block}.modal .box{width:auto;max-height:none;box-shadow:none}.mf,.modal .box h2{display:none}}
+
+/* ===== PLANTILLAS & PDF PREVIEW STYLES ===== */
+.tpl-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-radius: 12px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  padding: 18px 20px;
+  box-shadow: 0 1px 3px rgba(26,58,82,0.04);
+  transition: all 0.2s ease;
+  position: relative;
+}
+.tpl-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 6px 16px -2px rgba(26,58,82,0.08);
+  transform: translateY(-2px);
+}
+.tpl-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+  gap: 8px;
+}
+.tpl-card-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--navy);
+  margin: 0 0 6px 0;
+  line-height: 1.3;
+}
+.tpl-desc-preview {
+  font-size: 11.5px;
+  color: #475569;
+  line-height: 1.5;
+  margin-bottom: 12px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.tpl-chip-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  background: #f8fafc;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  margin-bottom: 12px;
+  text-align: center;
+}
+.tpl-chip-item small {
+  display: block;
+  font-size: 9.5px;
+  color: var(--gray);
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.tpl-chip-item b {
+  font-size: 12px;
+  color: var(--navy);
+}
+.tpl-flow-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+  font-size: 11px;
+  color: #64748b;
+  margin-bottom: 16px;
+  padding-top: 4px;
+}
+.tpl-flow-pill {
+  background: #f1f5f9;
+  color: #334155;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 10.5px;
+  font-weight: 500;
+}
+.tpl-card-actions {
+  display: flex;
+  gap: 6px;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 12px;
+  margin-top: auto;
+}
+
+/* Modal PDF Preview & Paper */
+.tpl-pdf-paper {
+  background: #ffffff;
+  color: #1e293b;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  padding: 32px 36px;
+  border-radius: 8px;
+  line-height: 1.55;
+  font-size: 12.5px;
+}
+.tpl-pdf-paper * {
+  box-sizing: border-box;
+}
+.tpl-pdf-hdr {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid var(--navy);
+  padding-bottom: 16px;
+  margin-bottom: 20px;
+}
+.tpl-pdf-hdr-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.tpl-pdf-hdr-logo {
+  max-height: 48px;
+  max-width: 140px;
+  object-fit: contain;
+}
+.tpl-pdf-hdr-company b {
+  display: block;
+  font-size: 13.5px;
+  color: var(--navy);
+}
+.tpl-pdf-hdr-company span {
+  font-size: 10px;
+  color: var(--gray);
+  line-height: 1.3;
+  display: block;
+}
+.tpl-pdf-badge {
+  background: var(--navy);
+  color: #ffffff;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  padding: 4px 10px;
+  border-radius: 4px;
+}
+.tpl-pdf-sec-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--navy);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 18px 0 8px 0;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 4px;
+}
+.tpl-pdf-deliverables {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 8px 0 14px 0;
+}
+.tpl-pdf-deliv-item {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #1e293b;
+}
+.tpl-pdf-roadmap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 10px 0 14px 0;
+}
+.tpl-pdf-road-step {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  background: #fdfdfd;
+  border: 1px solid #f1f5f9;
+  border-left: 3px solid var(--green);
+  border-radius: 4px;
+  padding: 8px 12px;
+}
+.tpl-pdf-road-num {
+  font-weight: 800;
+  font-size: 11px;
+  color: var(--green);
+  min-width: 18px;
+}
+.tpl-pdf-docs-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin: 10px 0 16px 0;
+}
+.tpl-pdf-doc-col {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 10px 12px;
+}
+.tpl-pdf-doc-col h4 {
+  margin: 0 0 6px 0;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--navy);
+  text-transform: uppercase;
+}
+.tpl-pdf-doc-list {
+  margin: 0;
+  padding-left: 16px;
+  font-size: 11px;
+  color: #334155;
+  line-height: 1.5;
+}
+.tpl-pdf-fee-box {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 14px 0;
+}
+.tpl-pdf-signatures {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  margin-top: 28px;
+  padding-top: 14px;
+}
+.tpl-pdf-sig-box {
+  text-align: center;
+  border-top: 1px solid #94a3b8;
+  padding-top: 6px;
+  font-size: 11px;
+  color: #475569;
+}
+
+/* Print Overrides */
+@media print {
+  body { display: block !important; background: #ffffff !important; color: #000 !important; }
+  .side, .hdr, .main, .toast, .modal:not(#mTplPdf):not(#mUpd):not(#mRecibo) { display: none !important; }
+  #mTplPdf, #mUpd, #mRecibo {
+    position: static !important;
+    background: none !important;
+    display: block !important;
+    padding: 0 !important;
+  }
+  #mTplPdf .box, #mUpd .box, #mRecibo .box {
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: none !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+  }
+  #mTplPdf .mf, #mTplPdf .modal-header-actions, #mUpd .mf, #mRecibo .mf {
+    display: none !important;
+  }
+  .tpl-pdf-paper {
+    padding: 0 !important;
+    font-size: 11pt !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
 
 .bar i{transition:width .5s ease}
 .btn,.svc,.tabs button,.tl .c,.alert{transition:background .15s,border-color .15s,color .15s,box-shadow .15s}
@@ -442,7 +716,36 @@ tr.row:hover td{background:var(--bg);cursor:pointer}
   </section>
   <section class="view" id="v-clients"><h1>Clientes</h1><p class="sub">Clientes con expedientes en el sistema.</p><div class="card" style="margin-top:16px"><div class="table-responsive"><table><thead><tr><th>Cliente</th><th>Cédula / RNC</th><th>Contacto</th><th>Expedientes</th></tr></thead><tbody id="cliRows"></tbody></table></div></div></section>
   <section class="view" id="v-docs"><h1>Documentos</h1><p class="sub">Documentos pendientes en todos los expedientes.</p><div class="card" style="margin-top:16px" id="docsAll"></div></section>
-  <section class="view" id="v-tpl"><h1>Plantillas de expedientes</h1><p class="sub">Cada servicio define sus campos, documentos, etapas y checklist. Lo que se registra aquí se reutiliza en cada expediente nuevo.</p><div class="g3" style="margin-top:16px" id="tplCards"></div></section>
+  <section class="view" id="v-tpl">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:14px;">
+      <div>
+        <h1 style="margin:0;font-size:1.45rem;font-weight:700;color:var(--navy);">Plantillas de Expedientes & Servicios</h1>
+        <p class="sub" style="margin:4px 0 0;font-size:0.86rem;color:var(--gray);">
+          Personaliza los requerimientos, etapas, checklist y genera la Ficha Técnica / Propuesta PDF oficial para el cliente.
+        </p>
+      </div>
+      <button class="btn p" onclick="openTplEditModal(null)">
+        <i data-lucide="plus"></i>
+        <span>Nueva Plantilla</span>
+      </button>
+    </div>
+
+    <!-- Filters & Search -->
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
+      <div class="filters" id="tplDivFilters" style="margin:0;">
+        <button class="on" data-div="all">Todos</button>
+        <button data-div="Agrimensura">Agrimensura</button>
+        <button data-div="Legal">Legal</button>
+        <button data-div="Inmobiliario">Inmobiliario</button>
+      </div>
+      <div style="width:240px;position:relative;">
+        <input type="text" id="tplSearchInput" placeholder="Buscar plantilla o servicio..." oninput="renderTpl()" style="padding:7px 10px 7px 32px;font-size:12px;height:32px;width:100%;border-radius:6px;border:1px solid var(--line);box-sizing:border-box;">
+        <i data-lucide="search" style="width:14px;height:14px;position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--gray);"></i>
+      </div>
+    </div>
+
+    <div class="g3" style="margin-top:14px" id="tplCards"></div>
+  </section>
   <section class="view" id="v-soon"><h1>En construcción</h1><p class="sub">Este módulo se implementará en la fase de integración con el CRM.</p></section>
 
   <section class="view" id="v-exp"></section>
@@ -521,6 +824,157 @@ tr.row:hover td{background:var(--bg);cursor:pointer}
   <div class="mf"><button class="btn" onclick="closeM('mDocNew')">Cancelar</button><button class="btn p" onclick="saveNewDocModal()">Adjuntar documento</button></div>
 </div></div>
 
+<!-- MODAL: EDITOR DE PLANTILLA -->
+<div class="modal" id="mTplEdit">
+  <div class="box" style="width:780px;max-width:95vw;padding:24px 28px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;border-bottom:1px solid var(--line);padding-bottom:12px;">
+      <div>
+        <h2 id="mTplEditTitle" style="margin:0;font-size:1.15rem;color:var(--navy);font-weight:700;">Editar Plantilla de Servicio</h2>
+        <span style="font-size:11.5px;color:var(--gray);">Configura la información comercial, flujo técnico y requisitos que verá el cliente.</span>
+      </div>
+      <button type="button" class="btn sm ghost" onclick="closeM('mTplEdit')" style="padding:4px 8px;"><i data-lucide="x"></i></button>
+    </div>
+
+    <input type="hidden" id="editTplKey">
+
+    <!-- Tab navigation inside editor -->
+    <div class="filters" id="tplEditorTabs" style="margin-bottom:16px;">
+      <button type="button" class="on" onclick="switchTplEditTab('general')">1. General & Tarifas</button>
+      <button type="button" onclick="switchTplEditTab('vision')">2. Visión Cliente & Entregables</button>
+      <button type="button" onclick="switchTplEditTab('etapas')">3. Etapas & Tareas</button>
+      <button type="button" onclick="switchTplEditTab('docs')">4. Checklist Documental</button>
+    </div>
+
+    <!-- Tab 1: General & Tarifas -->
+    <div id="tplTabGeneral" class="tpl-editor-tab-pane">
+      <div class="g2">
+        <div class="f">
+          <label>Nombre oficial del servicio *</label>
+          <input id="editTplNombre" placeholder="Ej. Deslinde Catastral">
+        </div>
+        <div class="f">
+          <label>División operativa *</label>
+          <select id="editTplDiv">
+            <option value="Agrimensura">Agrimensura (Topografía & Catastro)</option>
+            <option value="Legal">Legal (Notaría & Litigios)</option>
+            <option value="Inmobiliario">Inmobiliario (Bienes Raíces & Títulos)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="g3">
+        <div class="f">
+          <label>Plazo estimado (días hábiles) *</label>
+          <input type="number" id="editTplPlazo" placeholder="120">
+        </div>
+        <div class="f">
+          <label>Honorario base sugerido *</label>
+          <input type="number" id="editTplHonorario" placeholder="1800">
+        </div>
+        <div class="f">
+          <label>Moneda *</label>
+          <select id="editTplMoneda">
+            <option value="USD">USD (Dólares)</option>
+            <option value="DOP">DOP (Pesos Dominicanos)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="f" style="margin-top:4px;">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;color:var(--navy);font-weight:600;">
+          <input type="checkbox" id="editTplTec" style="width:auto;accent-color:var(--green);">
+          <span>¿Requiere peritaje de campo / agrimensura georreferenciada (GNSS RTK)?</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Tab 2: Visión Cliente & Entregables -->
+    <div id="tplTabVision" class="tpl-editor-tab-pane hidden">
+      <div class="f">
+        <label>Descripción técnica & visión para el cliente (aparece en la Ficha PDF) *</label>
+        <textarea id="editTplDesc" style="min-height:90px;" placeholder="Explica de forma clara y profesional el alcance, la necesidad legal y la garantía patrimonial que obtiene el cliente..."></textarea>
+      </div>
+
+      <div class="f">
+        <label style="display:flex;justify-content:space-between;align-items:center;">
+          <span>Entregables tangibles garantizados al cliente</span>
+          <button type="button" class="btn sm" onclick="addEditTplDeliverable()" style="padding:2px 8px;font-size:11px;"><i data-lucide="plus"></i>Agregar entregable</button>
+        </label>
+        <div id="editTplDeliverablesList" style="display:flex;flex-direction:column;gap:6px;margin-top:6px;"></div>
+      </div>
+
+      <div class="f" style="margin-top:12px;">
+        <label>Esquema de pagos sugerido & condiciones</label>
+        <textarea id="editTplCondiciones" style="min-height:60px;" placeholder="Ej. 50% de anticipo al inicio, 30% a la aprobación en Mensuras, 20% contra entrega de Título definitivo."></textarea>
+      </div>
+    </div>
+
+    <!-- Tab 3: Etapas & Tareas -->
+    <div id="tplTabEtapas" class="tpl-editor-tab-pane hidden">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <span style="font-size:12px;color:var(--gray);">Define el flujo paso a paso y las tareas asignadas a cada etapa.</span>
+        <button type="button" class="btn sm" onclick="addEditTplPhase()" style="padding:4px 10px;font-size:11.5px;"><i data-lucide="plus"></i>Agregar Etapa</button>
+      </div>
+      <div id="editTplPhasesList" style="display:flex;flex-direction:column;gap:12px;max-height:360px;overflow-y:auto;padding-right:4px;"></div>
+    </div>
+
+    <!-- Tab 4: Checklist Documental -->
+    <div id="tplTabDocs" class="tpl-editor-tab-pane hidden">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <span style="font-size:12px;color:var(--gray);">Documentos requeridos al cliente y generados por GSD.</span>
+        <button type="button" class="btn sm" onclick="addEditTplDoc()" style="padding:4px 10px;font-size:11.5px;"><i data-lucide="plus"></i>Agregar Documento</button>
+      </div>
+      <div class="table-responsive" style="max-height:340px;overflow-y:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:130px;">Categoría</th>
+              <th>Nombre del Documento</th>
+              <th style="width:120px;">Aporta</th>
+              <th style="width:50px;text-align:center;">Acción</th>
+            </tr>
+          </thead>
+          <tbody id="editTplDocsTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="mf" style="margin-top:20px;border-top:1px solid var(--line);padding-top:14px;justify-content:space-between;">
+      <div>
+        <button type="button" class="btn sm" id="btnRestoreTpl" onclick="restoreTplDefault()" style="color:var(--gray);">Restablecer predeterminado</button>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button type="button" class="btn" onclick="closeM('mTplEdit')">Cancelar</button>
+        <button type="button" class="btn" onclick="previewTplPdfFromEditor()"><i data-lucide="eye"></i>Vista Previa PDF</button>
+        <button type="button" class="btn p" onclick="saveTplModal()"><i data-lucide="check"></i>Guardar Plantilla</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: VISTA PREVIA PDF OFICIAL / FICHA TÉCNICA -->
+<div class="modal" id="mTplPdf">
+  <div class="box" style="width:840px;max-width:96vw;max-height:92vh;padding:0;overflow:hidden;display:flex;flex-direction:column;">
+    <div class="modal-header-actions" style="background:#f8fafc;border-bottom:1px solid var(--line);padding:12px 18px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <i data-lucide="file-text" style="color:var(--navy);width:18px;height:18px;"></i>
+        <b style="font-size:13px;color:var(--navy);">Vista Previa PDF / Ficha Técnica del Servicio</b>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <button type="button" class="btn sm p" onclick="printTplPdf()"><i data-lucide="printer"></i>Imprimir / Guardar PDF</button>
+        <button type="button" class="btn sm" id="btnEditFromPdfModal" onclick="editCurTplFromPdf()"><i data-lucide="edit-3"></i>Editar</button>
+        <button type="button" class="btn sm ghost" onclick="closeM('mTplPdf')" style="padding:4px 8px;"><i data-lucide="x"></i></button>
+      </div>
+    </div>
+
+    <div style="flex:1;overflow-y:auto;padding:20px;background:#e2e8f0;display:flex;justify-content:center;">
+      <div class="tpl-pdf-paper" id="tplPdfPaper" style="width:100%;max-width:760px;box-shadow:0 4px 20px rgba(0,0,0,0.08);">
+        <!-- Generado dinámicamente -->
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 <script>
 // ===== DATA: plantillas por servicio =====
@@ -537,32 +991,224 @@ const icons=()=>{
 document.addEventListener('DOMContentLoaded', icons);
 window.addEventListener('load', icons);
 const TEAM=['Esteban Mejía','Carlos Rodríguez','Ana Martínez','Brenda Laureano','Rafael Peña'];
-const TPL={
- deslinde:{nombre:'Deslinde Catastral',div:'Agrimensura',plazo:120,tec:true,
-  objeto:{provincia:'Provincia',municipio:'Municipio',dm:'Distrito Municipal',sector:'Sector',parcela:'Parcela',dc:'Distrito Catastral',areaReg:'Área registral',areaLev:'Área levantada',matricula:'Matrícula',titulo:'Certificado de título',propietario:'Propietario registral'},
-  docs:[['CLIENTE','Cédula o pasaporte','cliente'],['CLIENTE','Autorización / poder','cliente'],['CLIENTE','Acta de matrimonio (si aplica)','cliente'],['INMUEBLE','Certificado de título o constancia','cliente'],['INMUEBLE','Plano anterior','cliente'],['INMUEBLE','Certificación de estado jurídico','gsd'],['TÉCNICO','Levantamiento GNSS','gsd'],['TÉCNICO','Fotografías de campo','gsd'],['TÉCNICO','Plano definitivo','gsd'],['TÉCNICO','Memoria descriptiva','gsd'],['PROCESO','Solicitud a Mensuras','gsd'],['PROCESO','Notificaciones a colindantes','gsd'],['PROCESO','Resolución Tribunal de Tierras','gsd'],['PROCESO','Certificado de título definitivo','gsd']],
-  fases:[['Diagnóstico',['Recibir documentación del cliente','Revisar título','Consultar Registro de Títulos','Verificar antecedentes','Analizar colindantes','Dictamen de viabilidad']],['Documentación',['Certificación de estado jurídico','Autorización firmada','Constancia de IPI','Solicitud a Mensuras']],['Campo',['Coordinar visita','Levantamiento GNSS','Monumentación','Fotografías','Validación de campo']],['Procesamiento',['Procesamiento GNSS','Cálculos','Plano','Informe técnico','Memoria descriptiva']],['Mensura',['Depósito en Mensuras','Aprobación técnica']],['Aprobación',['Notificación a colindantes']],['Registro',['Tribunal de Tierras y emisión del título']],['Cierre',['Entrega al cliente']]]},
- transferencia:{nombre:'Transferencia de Inmuebles',div:'Inmobiliario',plazo:30,tec:false,
-  objeto:{provincia:'Provincia',municipio:'Municipio',sector:'Sector',matricula:'Matrícula',titulo:'Certificado de título',dc:'Designación catastral',areaReg:'Área',vendedor:'Vendedor',comprador:'Comprador',precio:'Precio de venta'},
-  docs:[['CLIENTE','Cédula comprador','cliente'],['CLIENTE','Cédula vendedor','cliente'],['CLIENTE','Acta de matrimonio vendedor','cliente'],['INMUEBLE','Certificado de título original','cliente'],['INMUEBLE','Certificación de estado jurídico','gsd'],['INMUEBLE','Constancia IPI','gsd'],['PROCESO','Contrato de compraventa notarizado','cliente'],['PROCESO','Recibo impuesto 3% DGII','gsd'],['PROCESO','Recibo depósito Registro','gsd'],['PROCESO','Nuevo certificado de título','gsd']],
-  fases:[['Diagnóstico',['Recibir documentación','Revisar título y cargas','Verificar partes']],['Certificaciones',['Estado jurídico','Constancia IPI','Legalización de firmas']],['Impuestos',['Liquidación DGII','Pago del 3%']],['Registro',['Depósito en Registro de Títulos','Seguimiento','Emisión del nuevo título']],['Cierre',['Entrega al cliente','Cierre del expediente']]]},
-  iguala:{nombre:'Iguala Legal',div:'Legal',plazo:180,tec:false,
-   objeto:{empresa:'Empresa / cliente',rnc:'RNC',nivel:'Nivel de iguala',sede:'Sede',contacto:'Contacto principal',vigencia:'Vigencia del contrato'},
-   docs:[['CLIENTE','Registro mercantil','cliente'],['CLIENTE','Estatutos sociales','cliente'],['CLIENTE','Cédula del representante','cliente'],['PROCESO','Contrato de iguala firmado','gsd'],['PROCESO','Informe mensual','gsd']],
-   fases:[['Diagnóstico',['Reunión inicial','Relevar asuntos abiertos','Definir nivel de iguala']],['Contrato',['Redacción del contrato','Firma','Primer pago']],['Servicio',['Informe mensual 1','Informe mensual 2','Informe mensual 3']],['Renovación',['Evaluación','Renovación o cierre']]]},
-  condominio:{nombre:'Constitución de Condominio',div:'Inmobiliario',plazo:90,tec:true,
-   objeto:{proyecto:'Nombre del proyecto',unidades:'Cantidad de unidades',sector:'Ubicación',parcela:'Parcela matriz',matricula:'Matrícula',areaTotal:'Área total'},
-   docs:[['CLIENTE','Certificado de título','cliente'],['CLIENTE','Planos arquitectónicos','cliente'],['CLIENTE','Licencia de construcción','cliente'],['GSD','Reglamento de régimen','gsd'],['GSD','Planos de división particular','gsd'],['PROCESO','Aprobación Mensuras Catastrales','gsd'],['PROCESO','Certificados de títulos individuales','gsd']],
-   fases:[['Diagnóstico',['Revisión de planos y título matriz','Estructura de unidades']],['Técnica',['Elaboración de planos de condominio','Memoria técnica']],['Reglamento',['Redacción del reglamento de copropiedad','Revisión legal']],['Registro',['Depósito en Mensuras y Registro de Títulos','Emisión de títulos']],['Cierre',['Entrega de carpetas de títulos a propietarios']]]},
-  subdivision:{nombre:'Subdivisión y Refundición',div:'Agrimensura',plazo:90,tec:true,
-   objeto:{parcela:'Parcela origen',provincia:'Provincia',sector:'Sector',solesResultantes:'Porciones resultantes',areaReg:'Área total'},
-   docs:[['CLIENTE','Certificado de título original','cliente'],['CLIENTE','Cédula propietario','cliente'],['TÉCNICO','Levantamiento GNSS parcelario','gsd'],['TÉCNICO','Planos de subdivisión propuestos','gsd'],['PROCESO','Aprobación Dirección Regional Mensuras','gsd']],
-   fases:[['Diagnóstico',['Revisión registral','Análisis de colindancias']],['Campo',['Levantamiento de linderos','Monumentación de vértices']],['Gabinete',['Planos individuales','Memoria técnica descriptiva']],['Aprobación',['Revisión y aprobación catastral']],['Cierre',['Entrega de nuevas constancias y planos']]]},
-  sucesiones:{nombre:'Sucesiones y Determinación Herederos',div:'Legal',plazo:60,tec:false,
-   objeto:{causante:'De cujus (Fallecido)',herederos:'Herederos identificados',bienes:'Inmuebles inventariados',radicacion:'Lugar de apertura'},
-   docs:[['CLIENTE','Acta de defunción','cliente'],['CLIENTE','Actas de nacimiento de herederos','cliente'],['CLIENTE','Acta de matrimonio del de cujus','cliente'],['CLIENTE','Títulos de propiedad de los bienes','cliente'],['GSD','Instancia de determinación de herederos','gsd'],['PROCESO','Pliego de sucesiones DGII','gsd'],['PROCESO','Resolución judicial o registral','gsd']],
-   fases:[['Recopilación',['Recepción de actas del estado civil','Certificaciones de títulos']],['Impuestos',['Declaración jurada de sucesiones ante DGII','Cálculo de impuestos']],['Partición',['Acuerdo amigable de partición o adjudicación']],['Registro',['Transferencia e inscripción registral']],['Cierre',['Entrega de títulos adjudicados']]]}
+
+const DEFAULT_TPL = {
+  deslinde: {
+    nombre: 'Deslinde Catastral',
+    div: 'Agrimensura',
+    plazo: 120,
+    honorario: 1800,
+    moneda: 'USD',
+    tec: true,
+    descripcion: 'Procedimiento técnico y jurídico contradictorio o amigable mediante el cual se individualiza, mide y delimita con precisión georreferenciada una porción de terreno amparada en una Constancia Anotada, cancelando la misma y emitiendo el correspondiente Certificado de Título definitivo por el Registro de Títulos competente.',
+    entregables: [
+      'Certificado de Título Definitivo Registrado',
+      'Plano Catastral Aprobado por Mensuras',
+      'Informe Técnico de Levantamiento GNSS RTK',
+      'Resolución de Aprobación de Tribunal de Tierras'
+    ],
+    condiciones: '50% de anticipo al inicio de trabajos de campo, 30% al ingresar expediente a Mensuras Catastrales, 20% contra entrega de Título definitivo.',
+    objeto: { provincia: 'Provincia', municipio: 'Municipio', dm: 'Distrito Municipal', sector: 'Sector', parcela: 'Parcela', dc: 'Distrito Catastral', areaReg: 'Área registral', areaLev: 'Área levantada', matricula: 'Matrícula', titulo: 'Certificado de título', propietario: 'Propietario registral' },
+    docs: [
+      ['CLIENTE', 'Cédula o pasaporte', 'cliente'],
+      ['CLIENTE', 'Autorización / poder legal', 'cliente'],
+      ['CLIENTE', 'Acta de matrimonio (si aplica)', 'cliente'],
+      ['INMUEBLE', 'Certificado de título o constancia anotada original', 'cliente'],
+      ['INMUEBLE', 'Plano o antecedente catastral', 'cliente'],
+      ['INMUEBLE', 'Certificación de estado jurídico vigente', 'gsd'],
+      ['TÉCNICO', 'Levantamiento GNSS RTK y monumentación', 'gsd'],
+      ['TÉCNICO', 'Fotografías georreferenciadas de campo', 'gsd'],
+      ['TÉCNICO', 'Plano definitivo de deslinde', 'gsd'],
+      ['TÉCNICO', 'Memoria descriptiva y cálculos de coordenadas', 'gsd'],
+      ['PROCESO', 'Solicitud formal a Dirección de Mensuras', 'gsd'],
+      ['PROCESO', 'Actas de notificación a colindantes', 'gsd'],
+      ['PROCESO', 'Resolución aprobatoria Tribunal de Tierras', 'gsd'],
+      ['PROCESO', 'Certificado de Título Definitivo emitido', 'gsd']
+    ],
+    fases: [
+      ['Diagnóstico', ['Recepción y depuración de documentación', 'Revisión registral del título', 'Consultar antecedentes en Registro de Títulos', 'Análisis preliminar de colindancias', 'Dictamen técnico-legal de viabilidad']],
+      ['Documentación', ['Emisión de Certificación de Estado Jurídico', 'Firma de autorización / poder de representación', 'Solicitud de constancia de IPI ante DGII', 'Instancia de solicitud de autorización a Mensuras']],
+      ['Campo GNSS', ['Planificación y coordinación de visita', 'Levantamiento topográfico GNSS RTK georreferenciado', 'Monumentación física de linderos e hitos', 'Registro fotográfico y actas de campo', 'Validación de linderos con colindantes']],
+      ['Procesamiento', ['Post-procesamiento de datos GNSS', 'Cálculo de poligonales y áreas definitivas', 'Dibujo del plano general e individual', 'Redacción de memoria técnica descriptiva']],
+      ['Mensura Catastral', ['Depósito de expediente en Dirección Regional de Mensuras', 'Seguimiento técnico a observaciones', 'Aprobación técnica de los trabajos de mensura']],
+      ['Aprobación & Notificaciones', ['Notificación formal a colindantes e interesados', 'Publicaciones de ley y plazos de oposición']],
+      ['Tribunal & Registro', ['Trámite ante Tribunal de Tierras de Jurisdicción Original', 'Emisión de sentencia / resolución de adjudicación', 'Remisión al Registro de Títulos para expedición']],
+      ['Cierre & Entrega', ['Retiro de Certificado de Título original cancelando constancia', 'Entrega formal de carpeta técnica y legal al cliente', 'Cierre administrativo del expediente']]
+    ]
+  },
+  transferencia: {
+    nombre: 'Transferencia de Inmuebles',
+    div: 'Inmobiliario',
+    plazo: 30,
+    honorario: 850,
+    moneda: 'USD',
+    tec: false,
+    descripcion: 'Gestión integral de debida diligencia legal, liquidación y pago del impuesto de transferencia inmobiliaria (3% DGII) y depósito registral para la transmisión legal de la propiedad y emisión del nuevo Certificado de Título a nombre del comprador.',
+    entregables: [
+      'Nuevo Certificado de Título a nombre del comprador',
+      'Recibo oficial de pago de impuesto DGII 3%',
+      'Certificación de Estado Jurídico de Cierre',
+      'Contrato de Venta definitivo registrado y sellado'
+    ],
+    condiciones: '50% al depósito de la documentación y liquidación fiscal, 50% al entregar el Título a nombre del adquiriente.',
+    objeto: { provincia: 'Provincia', municipio: 'Municipio', sector: 'Sector', matricula: 'Matrícula', titulo: 'Certificado de título', dc: 'Designación catastral', areaReg: 'Área', vendedor: 'Vendedor', comprador: 'Comprador', precio: 'Precio de venta' },
+    docs: [
+      ['CLIENTE', 'Cédula / Pasaporte del comprador', 'cliente'],
+      ['CLIENTE', 'Cédula / Pasaporte del vendedor', 'cliente'],
+      ['CLIENTE', 'Acta de matrimonio del vendedor', 'cliente'],
+      ['INMUEBLE', 'Certificado de título original', 'cliente'],
+      ['INMUEBLE', 'Certificación de estado jurídico vigente', 'gsd'],
+      ['INMUEBLE', 'Constancia de IPI al día emitida por DGII', 'gsd'],
+      ['PROCESO', 'Contrato de compraventa legalizado y notarizado', 'cliente'],
+      ['PROCESO', 'Liquidación y recibo de pago 3% DGII', 'gsd'],
+      ['PROCESO', 'Comprobante de depósito en Registro de Títulos', 'gsd'],
+      ['PROCESO', 'Nuevo Certificado de Título emitido', 'gsd']
+    ],
+    fases: [
+      ['Diagnóstico & Due Diligence', ['Recepción y depuración de documentos', 'Revisión exhaustiva de cargas y gravámenes', 'Verificación de estado civil y capacidad de las partes']],
+      ['Certificaciones & Notaría', ['Emisión de certificación jurídica en Registro', 'Obtención de constancia de IPI en DGII', 'Redacción final y legalización notarial del contrato']],
+      ['Impuestos DGII', ['Presentación de expediente ante DGII', 'Determinación y liquidación del impuesto del 3%', 'Pago y obtención de descargo fiscal']],
+      ['Registro de Títulos', ['Depósito formal en el Registro de Títulos', 'Monitoreo de estado de calificación registral', 'Expedición del nuevo Certificado de Título']],
+      ['Cierre & Entrega', ['Revisión física del nuevo título de propiedad', 'Entrega formal al comprador con comprobantes', 'Cierre del expediente']]
+    ]
+  },
+  iguala: {
+    nombre: 'Iguala Legal Corporativa',
+    div: 'Legal',
+    plazo: 180,
+    honorario: 1200,
+    moneda: 'USD',
+    tec: false,
+    descripcion: 'Servicio continuo de asesoría jurídica preventiva, redacción y revisión contractual, cumplimiento corporativo y representación institucional para empresas e inversionistas en la República Dominicana.',
+    entregables: [
+      'Dictámenes jurídicos y consultas mensuales',
+      'Contratos comerciales e inmobiliarios blindados',
+      'Asistencia y redacción de Asambleas Corporativas',
+      'Gestión continua de relaciones laborales y cobros'
+    ],
+    condiciones: 'Facturación recurrente mensual por adelantado durante el período contratado.',
+    objeto: { empresa: 'Empresa / Razón Social', rnc: 'RNC Fiscal', nivel: 'Nivel de iguala contratado', sede: 'Oficina principal / Sede', contacto: 'Contacto ejecutivo', vigencia: 'Vigencia del contrato' },
+    docs: [
+      ['CLIENTE', 'Registro Mercantil vigente', 'cliente'],
+      ['CLIENTE', 'Estatutos sociales actualizados', 'cliente'],
+      ['CLIENTE', 'Cédula / Documento del representante legal', 'cliente'],
+      ['PROCESO', 'Contrato de iguala legal firmado', 'gsd'],
+      ['PROCESO', 'Informes mensuales de gestión jurídica', 'gsd']
+    ],
+    fases: [
+      ['Diagnóstico Inicial', ['Reunión directiva con el cliente', 'Levantamiento de contingencias y contratos vigentes', 'Definición del alcance y canales prioritarios']],
+      ['Formalización', ['Redacción y firma del contrato de iguala', 'Asignación del abogado líder y protocolo de consultas', 'Emisión de primer comprobante']],
+      ['Ejecución & Asistencia', ['Atención a consultas legales operativas', 'Redacción y revisión de contratos y acuerdos', 'Emisión de dictámenes y actas corporativas', 'Informes periódicos de gestión']],
+      ['Evaluación & Renovación', ['Revisión de resultados y volumen atendido', 'Ajuste de términos y formalización de renovación']]
+    ]
+  },
+  condominio: {
+    nombre: 'Constitución de Condominio',
+    div: 'Inmobiliario',
+    plazo: 90,
+    honorario: 2500,
+    moneda: 'USD',
+    tec: true,
+    descripcion: 'Régimen legal y técnico para la división horizontal o vertical de edificaciones y complejos residenciales/comerciales, redactando el reglamento de copropiedad y emitiendo títulos de propiedad individual por cada unidad y parqueo.',
+    entregables: [
+      'Certificados de Títulos Individuales por Unidad',
+      'Planos de División Particular Aprobados por Mensuras',
+      'Reglamento de Régimen de Condominio Registrado',
+      'Matriz de Distribución de Cuotas y Áreas Comunes'
+    ],
+    condiciones: '40% al iniciar redacción y planos, 30% a la aprobación en Mensuras, 30% a la entrega de la totalidad de títulos.',
+    objeto: { proyecto: 'Nombre del proyecto', unidades: 'Cantidad total de unidades', sector: 'Ubicación / Sector', parcela: 'Parcela matriz', matricula: 'Matrícula matriz', areaTotal: 'Área total de terreno y construcción' },
+    docs: [
+      ['CLIENTE', 'Certificado de Título matriz original', 'cliente'],
+      ['CLIENTE', 'Planos arquitectónicos aprobados por MOPC/Ayuntamiento', 'cliente'],
+      ['CLIENTE', 'Licencia de construcción municipal', 'cliente'],
+      ['GSD', 'Reglamento de régimen de condominio redactado', 'gsd'],
+      ['GSD', 'Planos de división particular y áreas comunes', 'gsd'],
+      ['PROCESO', 'Aprobación Dirección Regional Mensuras Catastrales', 'gsd'],
+      ['PROCESO', 'Certificados de Títulos individuales emitidos', 'gsd']
+    ],
+    fases: [
+      ['Diagnóstico & Arquitectura', ['Revisión de planos aprobados y título matriz', 'Estructuración de unidades funcionales y parqueos', 'Definición de porcentajes de copropiedad']],
+      ['División Técnica & Mensuras', ['Elaboración de planos de división particular', 'Memoria técnica descriptiva de cada unidad', 'Depósito y aprobación ante Mensuras Catastrales']],
+      ['Reglamento & Notaría', ['Redacción del reglamento de copropiedad y administración', 'Protocolización notarial del régimen', 'Inscripción en Registro de Títulos']],
+      ['Emisión Registral', ['Seguimiento al proceso de individualización', 'Expedición de certificados de títulos para cada unidad']],
+      ['Cierre & Entrega', ['Organización de carpetas por propietario', 'Entrega formal al desarrollador / promotor', 'Cierre del expediente']]
+    ]
+  },
+  subdivision: {
+    nombre: 'Subdivisión y Refundición',
+    div: 'Agrimensura',
+    plazo: 90,
+    honorario: 1600,
+    moneda: 'USD',
+    tec: true,
+    descripcion: 'División de un inmueble registrado en dos o más porciones independientes, o la unión de dos o más parcelas colindantes en una sola masa catastral con nuevas matrículas.',
+    entregables: [
+      'Nuevos Certificados de Títulos Resultantes',
+      'Planos Parcelarios Aprobados por Mensuras',
+      'Memoria Técnica Descriptiva de Vértices y Linderos',
+      'Acta de Hitos y Conformidad de Linderos'
+    ],
+    condiciones: '50% a la firma del contrato y medición de campo, 30% al ingresar a Mensuras, 20% a la emisión de nuevos títulos.',
+    objeto: { parcela: 'Parcela origen', provincia: 'Provincia', sector: 'Sector', solesResultantes: 'Porciones resultantes', areaReg: 'Área total' },
+    docs: [
+      ['CLIENTE', 'Certificado de título original', 'cliente'],
+      ['CLIENTE', 'Cédula / RNC del propietario', 'cliente'],
+      ['TÉCNICO', 'Levantamiento GNSS parcelario georreferenciado', 'gsd'],
+      ['TÉCNICO', 'Planos de subdivisión propuestos', 'gsd'],
+      ['PROCESO', 'Aprobación Dirección Regional Mensuras', 'gsd']
+    ],
+    fases: [
+      ['Diagnóstico & Título', ['Revisión registral del inmueble origen', 'Análisis de colindancias y antecedentes catastrales']],
+      ['Campo & Monumentación', ['Levantamiento perimétrico con tecnología GNSS RTK', 'Replanteo y colocación de mojones/hitos en nuevos límites', 'Acta de campo con colindantes']],
+      ['Gabinete & Planos', ['Procesamiento de datos y cálculo de áreas resultantes', 'Elaboración de planos individuales y generales', 'Redacción de memoria descriptiva']],
+      ['Aprobación Catastral', ['Depósito en la Dirección Regional de Mensuras', 'Aprobación técnica de la subdivisión/refundición']],
+      ['Registro & Títulos', ['Trámite registral para cancelación del título anterior', 'Emisión de nuevos títulos independientes', 'Entrega final al cliente']]
+    ]
+  },
+  sucesiones: {
+    nombre: 'Sucesiones y Determinación de Herederos',
+    div: 'Legal',
+    plazo: 60,
+    honorario: 1500,
+    moneda: 'USD',
+    tec: false,
+    descripcion: 'Proceso jurídico para la declaración de herederos legítimos del causante, liquidación de impuestos sucesorales ante DGII y adjudicación formal de los bienes inmuebles a favor de los sucesores.',
+    entregables: [
+      'Títulos de Propiedad a nombre de los Herederos',
+      'Resolución de Determinación de Herederos Registrada',
+      'Certificación de Descargo Fiscal Sucesoral DGII',
+      'Acuerdo de Partición o Adjudicación Notarizado'
+    ],
+    condiciones: '50% al inicio y presentación ante DGII, 50% al registrar los títulos adjudicados.',
+    objeto: { causante: 'De cujus (Fallecido)', herederos: 'Herederos identificados', bienes: 'Inmuebles inventariados', radicacion: 'Lugar de apertura' },
+    docs: [
+      ['CLIENTE', 'Acta de defunción del causante', 'cliente'],
+      ['CLIENTE', 'Actas de nacimiento de todos los herederos', 'cliente'],
+      ['CLIENTE', 'Acta de matrimonio del de cujus (si aplica)', 'cliente'],
+      ['CLIENTE', 'Títulos de propiedad de los bienes inmuebles', 'cliente'],
+      ['GSD', 'Instancia de determinación de herederos redactada', 'gsd'],
+      ['PROCESO', 'Pliego de sucesiones y recibo de descargo DGII', 'gsd'],
+      ['PROCESO', 'Resolución judicial o registral de adjudicación', 'gsd']
+    ],
+    fases: [
+      ['Recopilación & Genealogía', ['Recepción y depuración de actas del estado civil', 'Verificación de títulos de propiedad del causante', 'Determinación de la línea sucesoral y porciones']],
+      ['Impuestos DGII', ['Elaboración de la declaración jurada de sucesiones', 'Presentación y liquidación ante la DGII', 'Obtención de la certificación de pago/exención']],
+      ['Partición & Notaría', ['Redacción del acto de notoriedad y acuerdo amigable de partición', 'Legalización de firmas ante Notario Público']],
+      ['Registro de Títulos', ['Depósito del expediente en el Registro de Títulos', 'Inscripción de la transferencia por causa de muerte', 'Emisión de los nuevos títulos a nombre de los herederos']],
+      ['Cierre & Entrega', ['Revisión y entrega de títulos a los herederos', 'Cierre del expediente']]
+    ]
+  }
 };
+
+const TPL_STORAGE_KEY = 'gsd_custom_tpls_v1';
+let customTpls = {};
+try {
+  customTpls = JSON.parse(localStorage.getItem(TPL_STORAGE_KEY) || '{}');
+} catch(e) {}
+
+const TPL = Object.assign({}, DEFAULT_TPL, customTpls);
+
 // Aliases
 TPL['deslinde-catastral'] = TPL.deslinde;
 TPL['transferencia-confotur'] = TPL.transferencia;
@@ -855,7 +1501,593 @@ function renderCal() {
 }
 function renderCli(){const g={};DB.forEach(e=>{if(e.cliente?.nombre){(g[e.cliente.nombre]=g[e.cliente.nombre]||{c:e.cliente,ex:[]}).ex.push(e.id);}});$('cliRows').innerHTML=Object.values(g).map(x=>`<tr><td><b style="font-weight:500;color:var(--navy)">${x.c.nombre}</b></td><td>${x.c.cedula||'—'}</td><td>${x.c.email||'—'}<br><small style="color:var(--gray)">${x.c.tel||'—'}</small></td><td>${x.ex.map(i=>`<span class="link" onclick="openExp('${i}')">${i}</span>`).join(', ')}</td></tr>`).join('')||'<tr><td colspan="4" class="empty" style="text-align:center;padding:28px;color:var(--gray);">No hay clientes registrados aún.</td></tr>';}
 function renderDocsAll(){const rows=DB.flatMap(e=>(e.docs||[]).filter(d=>d.st!=='ok').map(d=>({...d,e})));$('docsAll').innerHTML=rows.map(d=>`<div class="doc"><div class="ic miss"><i data-lucide="file"></i></div><div><b>${d.name}</b><small>${d.e.id} · ${d.e.cliente?.nombre||'Cliente'} · aporta: ${d.by==='cliente'?'cliente':'GSD'}</small></div><div class="acts"><span class="tag ${d.st==='wait'?'wait':'late'}">${d.st==='wait'?'Solicitado':'Pendiente'}</span><button class="btn sm" onclick="openExp('${d.e.id}','documentos')">Abrir</button></div></div>`).join('')||'<div class="empty" style="text-align:center;padding:28px;color:var(--gray);">No hay documentos pendientes. Todo al día.</div>';}
-function renderTpl(){$('tplCards').innerHTML=Object.entries(TPL).map(([k,t])=>`<div class="card"><h2>${t.nombre}</h2><p class="sub">${t.div} · plazo estimado ${t.plazo} días</p><div class="kv" style="margin-top:12px;grid-template-columns:110px 1fr"><span class="k">Campos</span><span class="v">${Object.keys(t.objeto).length} del objeto</span><span class="k">Documentos</span><span class="v">${t.docs.length}</span><span class="k">Etapas</span><span class="v">${t.fases.length}</span><span class="k">Tareas</span><span class="v">${t.fases.reduce((a,f)=>a+f[1].length,0)}</span></div><div style="margin-top:12px;font-size:11.5px;color:var(--gray)">${t.fases.map(f=>f[0]).join(' → ')}</div></div>`).join('');}
+let tplDivF = 'all';
+let _editTplData = null;
+let _curTplKey = 'deslinde';
+
+document.addEventListener('DOMContentLoaded', () => {
+  const filterWrap = $('tplDivFilters');
+  if (filterWrap) {
+    filterWrap.onclick = (ev) => {
+      if (ev.target && ev.target.dataset && ev.target.dataset.div) {
+        tplDivF = ev.target.dataset.div;
+        [...filterWrap.children].forEach(b => b.classList.toggle('on', b === ev.target));
+        renderTpl();
+      }
+    };
+  }
+});
+
+function getTplList() {
+  const uniqueKeys = Object.keys(TPL).filter(k => !k.includes('-'));
+  return uniqueKeys.map(k => ({ key: k, ...TPL[k] }));
+}
+
+function renderTpl() {
+  const list = getTplList();
+  const searchQ = ($('tplSearchInput')?.value || '').toLowerCase().trim();
+  
+  const filtered = list.filter(t => {
+    const matchDiv = (tplDivF === 'all' || t.div === tplDivF);
+    const matchQ = !searchQ || 
+      (t.nombre || '').toLowerCase().includes(searchQ) ||
+      (t.div || '').toLowerCase().includes(searchQ) ||
+      (t.descripcion || '').toLowerCase().includes(searchQ);
+    return matchDiv && matchQ;
+  });
+
+  const cardsContainer = $('tplCards');
+  if (!cardsContainer) return;
+
+  if (!filtered.length) {
+    cardsContainer.innerHTML = `
+      <div style="grid-column:1/-1;text-align:center;padding:3rem 1.5rem;background:#ffffff;border-radius:12px;border:1px dashed var(--line);color:var(--gray);">
+        <i data-lucide="layout-template" style="width:36px;height:36px;margin:0 auto 8px;display:block;opacity:0.4;"></i>
+        <b style="font-size:14px;color:var(--navy);display:block;">No se encontraron plantillas de servicio</b>
+        <span style="font-size:12px;">Intenta ajustar los filtros de búsqueda o haz clic en "+ Nueva Plantilla".</span>
+      </div>
+    `;
+    icons();
+    return;
+  }
+
+  cardsContainer.innerHTML = filtered.map(t => {
+    const k = t.key;
+    const divColor = DIV_COLOR[t.div] || 'var(--navy)';
+    const divBg = DIV_BG[t.div] || '#EEF2F5';
+    const fieldCount = Object.keys(t.objeto || {}).length;
+    const docCount = (t.docs || []).length;
+    const phaseCount = (t.fases || []).length;
+    const taskCount = (t.fases || []).reduce((acc, f) => acc + (f[1] ? f[1].length : 0), 0);
+    const feeFormatted = t.honorario ? `${t.moneda === 'DOP' ? 'RD$' : 'US$'}${Number(t.honorario).toLocaleString()}` : 'Tarifa personalizada';
+    const desc = t.descripcion || 'Servicio profesional integral respaldado por la división técnica y legal de GSD.';
+
+    return `
+      <div class="tpl-card" style="border-top:3.5px solid ${divColor};">
+        <div>
+          <div class="tpl-card-header">
+            <span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;text-transform:uppercase;background:${divBg};color:${divColor};">
+              ${t.div}
+            </span>
+            <div style="display:flex;gap:4px;align-items:center;">
+              <span class="tag proc" style="font-size:10.5px;padding:2px 6px;">⏱ ${t.plazo || 30} días</span>
+              <span class="tag done" style="font-size:10.5px;padding:2px 6px;">💵 ${feeFormatted}</span>
+            </div>
+          </div>
+
+          <h3 class="tpl-card-title">${t.nombre}</h3>
+          <p class="tpl-desc-preview">${desc}</p>
+
+          <div class="tpl-chip-row">
+            <div class="tpl-chip-item">
+              <small>Campos</small>
+              <b>${fieldCount}</b>
+            </div>
+            <div class="tpl-chip-item">
+              <small>Documentos</small>
+              <b>${docCount}</b>
+            </div>
+            <div class="tpl-chip-item">
+              <small>Etapas</small>
+              <b>${phaseCount}</b>
+            </div>
+            <div class="tpl-chip-item">
+              <small>Tareas</small>
+              <b>${taskCount}</b>
+            </div>
+          </div>
+
+          <div class="tpl-flow-pills">
+            <span style="font-size:10.5px;font-weight:700;color:var(--navy);margin-right:2px;">Flujo:</span>
+            ${(t.fases || []).map((f, i) => `
+              <span class="tpl-flow-pill">${i+1}. ${f[0]}</span>
+              ${i < (t.fases.length - 1) ? '<span style="color:#cbd5e1;font-size:10px;">→</span>' : ''}
+            `).join('')}
+          </div>
+        </div>
+
+        <div class="tpl-card-actions">
+          <button type="button" class="btn sm" onclick="openTplPdfModal('${k}')" style="flex:1;font-size:11.5px;padding:6px 8px;" title="Ver propuesta PDF para cliente">
+            <i data-lucide="file-text" style="width:13px;height:13px;"></i>
+            <span>Ficha PDF</span>
+          </button>
+          <button type="button" class="btn sm" onclick="openTplEditModal('${k}')" style="font-size:11.5px;padding:6px 10px;" title="Editar requerimientos y etapas">
+            <i data-lucide="edit-3" style="width:13px;height:13px;"></i>
+            <span>Editar</span>
+          </button>
+          <button type="button" class="btn sm p" onclick="newExpFromTpl('${k}')" style="font-size:11.5px;padding:6px 10px;" title="Iniciar nuevo expediente con esta plantilla">
+            <i data-lucide="folder-plus" style="width:13px;height:13px;"></i>
+            <span>Usar</span>
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  icons();
+}
+
+/* ===== MODAL EDITOR DE PLANTILLAS ===== */
+function switchTplEditTab(tabName) {
+  const tabs = ['general', 'vision', 'etapas', 'docs'];
+  const buttons = document.querySelectorAll('#tplEditorTabs button');
+  
+  tabs.forEach((t, i) => {
+    const pane = document.getElementById(`tplTab${t.charAt(0).toUpperCase() + t.slice(1)}`);
+    if (pane) {
+      if (t === tabName) {
+        pane.classList.remove('hidden');
+        if (buttons[i]) buttons[i].classList.add('on');
+      } else {
+        pane.classList.add('hidden');
+        if (buttons[i]) buttons[i].classList.remove('on');
+      }
+    }
+  });
+  icons();
+}
+
+function openTplEditModal(key) {
+  _curTplKey = key || '';
+  const isNew = !key || !TPL[key];
+  
+  $('mTplEditTitle').innerText = isNew ? 'Crear Nueva Plantilla de Servicio' : `Editar Plantilla: ${TPL[key].nombre}`;
+  $('btnRestoreTpl').style.display = isNew ? 'none' : 'inline-block';
+  $('editTplKey').value = key || '';
+
+  const source = !isNew ? JSON.parse(JSON.stringify(TPL[key])) : {
+    nombre: '',
+    div: 'Agrimensura',
+    plazo: 60,
+    honorario: 1000,
+    moneda: 'USD',
+    tec: true,
+    descripcion: '',
+    entregables: ['Certificación Oficial', 'Carpeta Técnica'],
+    condiciones: '50% anticipo al iniciar, 50% a la entrega.',
+    objeto: { provincia: 'Provincia', sector: 'Sector', referencia: 'Referencia' },
+    docs: [
+      ['CLIENTE', 'Cédula o pasaporte', 'cliente'],
+      ['INMUEBLE', 'Certificado de título', 'cliente'],
+      ['PROCESO', 'Informe técnico de cierre', 'gsd']
+    ],
+    fases: [
+      ['Diagnóstico', ['Recepción de documentos', 'Evaluación técnica preliminar']],
+      ['Ejecución', ['Trabajo técnico y legal', 'Revisión y firmas']],
+      ['Cierre', ['Entrega de resultados al cliente']]
+    ]
+  };
+
+  _editTplData = source;
+
+  // Set Tab 1 Form Fields
+  $('editTplNombre').value = source.nombre || '';
+  $('editTplDiv').value = source.div || 'Agrimensura';
+  $('editTplPlazo').value = source.plazo || 30;
+  $('editTplHonorario').value = source.honorario || 0;
+  $('editTplMoneda').value = source.moneda || 'USD';
+  $('editTplTec').checked = Boolean(source.tec);
+
+  // Set Tab 2 Fields
+  $('editTplDesc').value = source.descripcion || '';
+  $('editTplCondiciones').value = source.condiciones || '';
+  renderEditTplDeliverables();
+
+  // Set Tab 3 & 4
+  renderEditTplPhases();
+  renderEditTplDocs();
+
+  switchTplEditTab('general');
+  openM('mTplEdit');
+}
+
+/* Tab 2 Deliverables Helpers */
+function renderEditTplDeliverables() {
+  const container = $('editTplDeliverablesList');
+  if (!container || !_editTplData) return;
+  const arr = _editTplData.entregables || [];
+
+  container.innerHTML = arr.map((item, idx) => `
+    <div style="display:flex;gap:6px;align-items:center;">
+      <input type="text" value="${item.replace(/"/g, '&quot;')}" oninput="_editTplData.entregables[${idx}] = this.value" placeholder="Ej. Certificado de Título Definitivo" style="flex:1;">
+      <button type="button" class="btn sm ghost" onclick="deleteEditTplDeliverable(${idx})" style="padding:4px 8px;color:var(--red);" title="Eliminar entregable"><i data-lucide="trash-2"></i></button>
+    </div>
+  `).join('') || '<div style="font-size:11.5px;color:var(--gray);font-style:italic;">No hay entregables configurados. Haz clic en "+ Agregar entregable".</div>';
+  icons();
+}
+
+function addEditTplDeliverable(text = '') {
+  if (!_editTplData) return;
+  if (!_editTplData.entregables) _editTplData.entregables = [];
+  _editTplData.entregables.push(text || 'Nuevo entregable garantizado');
+  renderEditTplDeliverables();
+}
+
+function deleteEditTplDeliverable(idx) {
+  if (!_editTplData || !_editTplData.entregables) return;
+  _editTplData.entregables.splice(idx, 1);
+  renderEditTplDeliverables();
+}
+
+/* Tab 3 Phases & Tasks Helpers */
+function renderEditTplPhases() {
+  const container = $('editTplPhasesList');
+  if (!container || !_editTplData) return;
+  const fases = _editTplData.fases || [];
+
+  container.innerHTML = fases.map((f, pi) => `
+    <div style="background:#f8fafc;border:1px solid var(--line);border-radius:8px;padding:12px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px;">
+        <div style="display:flex;align-items:center;gap:8px;flex:1;">
+          <span style="font-size:11px;font-weight:700;color:#fff;background:var(--navy);padding:2px 6px;border-radius:4px;">Etapa ${pi+1}</span>
+          <input type="text" value="${(f[0] || '').replace(/"/g, '&quot;')}" oninput="_editTplData.fases[${pi}][0] = this.value" placeholder="Nombre de la etapa" style="flex:1;font-weight:600;">
+        </div>
+        <button type="button" class="btn sm ghost" onclick="deleteEditTplPhase(${pi})" style="padding:4px 6px;color:var(--red);" title="Eliminar etapa"><i data-lucide="trash-2"></i></button>
+      </div>
+
+      <div style="padding-left:14px;border-left:2px solid #e2e8f0;margin-top:6px;">
+        <div style="font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center;">
+          <span>Tareas predeterminadas</span>
+          <button type="button" class="btn sm" onclick="addEditTplTask(${pi})" style="padding:2px 6px;font-size:10.5px;"><i data-lucide="plus"></i>Tarea</button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          ${(f[1] || []).map((task, ti) => `
+            <div style="display:flex;gap:6px;align-items:center;">
+              <input type="text" value="${task.replace(/"/g, '&quot;')}" oninput="_editTplData.fases[${pi}][1][${ti}] = this.value" placeholder="Nombre de la tarea" style="flex:1;font-size:11.5px;padding:4px 8px;">
+              <button type="button" class="btn sm ghost" onclick="deleteEditTplTask(${pi}, ${ti})" style="padding:2px 5px;color:var(--red);"><i data-lucide="x"></i></button>
+            </div>
+          `).join('') || '<div style="font-size:11px;color:var(--gray);font-style:italic;">Sin tareas en esta etapa.</div>'}
+        </div>
+      </div>
+    </div>
+  `).join('') || '<div style="font-size:12px;color:var(--gray);text-align:center;padding:16px;">No hay etapas creadas. Haz clic en "Agregar Etapa".</div>';
+  icons();
+}
+
+function addEditTplPhase() {
+  if (!_editTplData) return;
+  if (!_editTplData.fases) _editTplData.fases = [];
+  _editTplData.fases.push([`Etapa ${_editTplData.fases.length + 1}`, ['Tarea inicial']]);
+  renderEditTplPhases();
+}
+
+function deleteEditTplPhase(pi) {
+  if (!_editTplData || !_editTplData.fases) return;
+  _editTplData.fases.splice(pi, 1);
+  renderEditTplPhases();
+}
+
+function addEditTplTask(pi) {
+  if (!_editTplData || !_editTplData.fases || !_editTplData.fases[pi]) return;
+  if (!_editTplData.fases[pi][1]) _editTplData.fases[pi][1] = [];
+  _editTplData.fases[pi][1].push('Nueva tarea operativa');
+  renderEditTplPhases();
+}
+
+function deleteEditTplTask(pi, ti) {
+  if (!_editTplData || !_editTplData.fases || !_editTplData.fases[pi]) return;
+  _editTplData.fases[pi][1].splice(ti, 1);
+  renderEditTplPhases();
+}
+
+/* Tab 4 Docs Helpers */
+function renderEditTplDocs() {
+  const tbody = $('editTplDocsTableBody');
+  if (!tbody || !_editTplData) return;
+  const docs = _editTplData.docs || [];
+
+  tbody.innerHTML = docs.map((d, di) => `
+    <tr>
+      <td>
+        <select onchange="_editTplData.docs[${di}][0] = this.value" style="padding:4px 6px;font-size:11px;">
+          <option value="CLIENTE" ${d[0]==='CLIENTE'?'selected':''}>CLIENTE</option>
+          <option value="INMUEBLE" ${d[0]==='INMUEBLE'?'selected':''}>INMUEBLE</option>
+          <option value="TÉCNICO" ${d[0]==='TÉCNICO'?'selected':''}>TÉCNICO</option>
+          <option value="PROCESO" ${d[0]==='PROCESO'?'selected':''}>PROCESO</option>
+          <option value="FINANCIERO" ${d[0]==='FINANCIERO'?'selected':''}>FINANCIERO</option>
+          <option value="GSD" ${d[0]==='GSD'?'selected':''}>GSD</option>
+        </select>
+      </td>
+      <td>
+        <input type="text" value="${(d[1] || '').replace(/"/g, '&quot;')}" oninput="_editTplData.docs[${di}][1] = this.value" placeholder="Nombre del documento" style="font-size:11.5px;padding:4px 8px;">
+      </td>
+      <td>
+        <select onchange="_editTplData.docs[${di}][2] = this.value" style="padding:4px 6px;font-size:11px;">
+          <option value="cliente" ${d[2]==='cliente'?'selected':''}>Cliente</option>
+          <option value="gsd" ${d[2]==='gsd'?'selected':''}>GSD</option>
+        </select>
+      </td>
+      <td style="text-align:center;">
+        <button type="button" class="btn sm ghost" onclick="deleteEditTplDoc(${di})" style="padding:3px 6px;color:var(--red);"><i data-lucide="trash-2"></i></button>
+      </td>
+    </tr>
+  `).join('') || '<tr><td colspan="4" class="empty" style="text-align:center;padding:16px;">No hay documentos registrados.</td></tr>';
+  icons();
+}
+
+function addEditTplDoc() {
+  if (!_editTplData) return;
+  if (!_editTplData.docs) _editTplData.docs = [];
+  _editTplData.docs.push(['CLIENTE', 'Nuevo documento requerido', 'cliente']);
+  renderEditTplDocs();
+}
+
+function deleteEditTplDoc(di) {
+  if (!_editTplData || !_editTplData.docs) return;
+  _editTplData.docs.splice(di, 1);
+  renderEditTplDocs();
+}
+
+/* Guardar Cambios en Plantilla */
+function saveTplModal() {
+  const nombre = $('editTplNombre').value.trim();
+  if (!nombre) {
+    toast('El nombre del servicio es obligatorio');
+    switchTplEditTab('general');
+    $('editTplNombre').focus();
+    return;
+  }
+
+  let key = $('editTplKey').value.trim();
+  if (!key) {
+    key = nombre.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+  }
+
+  _editTplData.nombre = nombre;
+  _editTplData.div = $('editTplDiv').value;
+  _editTplData.plazo = parseInt($('editTplPlazo').value, 10) || 30;
+  _editTplData.honorario = parseFloat($('editTplHonorario').value) || 0;
+  _editTplData.moneda = $('editTplMoneda').value;
+  _editTplData.tec = $('editTplTec').checked;
+  _editTplData.descripcion = $('editTplDesc').value.trim();
+  _editTplData.condiciones = $('editTplCondiciones').value.trim();
+
+  // Save to TPL object
+  TPL[key] = JSON.parse(JSON.stringify(_editTplData));
+
+  // Persist custom templates
+  try {
+    const savedCustom = JSON.parse(localStorage.getItem(TPL_STORAGE_KEY) || '{}');
+    savedCustom[key] = TPL[key];
+    localStorage.setItem(TPL_STORAGE_KEY, JSON.stringify(savedCustom));
+  } catch(e) {}
+
+  closeM('mTplEdit');
+  renderTpl();
+  toast(`Plantilla "${nombre}" guardada con éxito`);
+}
+
+function restoreTplDefault() {
+  const key = $('editTplKey').value.trim();
+  if (!key || !DEFAULT_TPL[key]) {
+    toast('No hay versión predeterminada para esta plantilla personalizada.');
+    return;
+  }
+  if (!confirm(`¿Restablecer la plantilla "${TPL[key].nombre}" a sus valores originales de fábrica?`)) return;
+
+  TPL[key] = JSON.parse(JSON.stringify(DEFAULT_TPL[key]));
+  try {
+    const savedCustom = JSON.parse(localStorage.getItem(TPL_STORAGE_KEY) || '{}');
+    delete savedCustom[key];
+    localStorage.setItem(TPL_STORAGE_KEY, JSON.stringify(savedCustom));
+  } catch(e) {}
+
+  openTplEditModal(key);
+  renderTpl();
+  toast('Valores predeterminados restaurados');
+}
+
+/* ===== VISTA PREVIA PDF OFICIAL ===== */
+function openTplPdfModal(key) {
+  _curTplKey = key;
+  const t = TPL[key];
+  if (!t) return;
+
+  const paper = $('tplPdfPaper');
+  if (!paper) return;
+
+  const divColor = DIV_COLOR[t.div] || 'var(--navy)';
+  const divBg = DIV_BG[t.div] || '#EEF2F5';
+  const logoSrc = window.GSD_LOGO_URL || (document.querySelector('.side .logo img')?.src || '/img/logo-gsd.png');
+  const clientDocs = (t.docs || []).filter(d => d[2] === 'cliente');
+  const gsdDocs = (t.docs || []).filter(d => d[2] === 'gsd');
+  const feeText = t.honorario ? `${t.moneda === 'DOP' ? 'RD$' : 'US$'}${Number(t.honorario).toLocaleString('en-US', {minimumFractionDigits: 2})}` : 'A cotizar según especificaciones';
+
+  paper.innerHTML = `
+    <!-- Encabezado Institucional GSD -->
+    <div class="tpl-pdf-hdr">
+      <div class="tpl-pdf-hdr-left">
+        <img src="${logoSrc}" alt="Logo GSD" class="tpl-pdf-hdr-logo">
+        <div class="tpl-pdf-hdr-company">
+          <b>Geosolutions Source Dominicana, S.R.L.</b>
+          <span>RNC: 1-33-79694-5 · Agrimensura, Notaría & Asesoría Inmobiliaria</span>
+          <span>Av. Barceló, Plaza Roque III, Punta Cana, R.D. · Tel: (829) 493-7254</span>
+        </div>
+      </div>
+      <div style="text-align:right;">
+        <span class="tpl-pdf-badge">DOCUMENTO OFICIAL GSD</span>
+        <div style="font-size:10px;color:var(--gray);margin-top:4px;font-family:monospace;font-weight:700;">REF: GSD-TPL-${key.toUpperCase()}-${new Date().getFullYear()}</div>
+        <div style="font-size:10px;color:var(--gray);">Emisión: ${fd(TODAY)}</div>
+      </div>
+    </div>
+
+    <!-- Título Principal & División -->
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;border-bottom:1px solid #e2e8f0;padding-bottom:12px;margin-bottom:16px;">
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:1px;">FICHA TÉCNICA DE SERVICIO & EXPEDIENTE</div>
+        <h1 style="margin:2px 0 0 0;font-size:22px;color:var(--navy);font-weight:800;">${t.nombre}</h1>
+      </div>
+      <div style="display:flex;gap:6px;align-items:center;">
+        <span style="display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700;background:${divBg};color:${divColor};">
+          División ${t.div}
+        </span>
+        <span class="tag proc" style="font-size:11px;padding:3px 8px;">Plazo: ${t.plazo} días hábiles</span>
+      </div>
+    </div>
+
+    <!-- 1. Visión y Alcance del Servicio -->
+    <div class="tpl-pdf-sec-title">
+      <i data-lucide="shield-check" style="width:14px;height:14px;color:${divColor};"></i>
+      <span>1. Visión del Servicio y Alcance Profesional</span>
+    </div>
+    <p style="margin:0 0 12px 0;font-size:12px;color:#334155;line-height:1.6;text-align:justify;">
+      ${t.descripcion || 'Este servicio está diseñado bajo estrictos estándares técnicos y jurídicos para garantizar la total seguridad jurídica, delimitación pericial y saneamiento registral del patrimonio inmobiliario del cliente.'}
+    </p>
+
+    <!-- 2. Entregables Tangibles Garantizados -->
+    <div class="tpl-pdf-sec-title">
+      <i data-lucide="package-check" style="width:14px;height:14px;color:var(--green);"></i>
+      <span>2. Entregables Tangibles Garantizados al Cliente</span>
+    </div>
+    <div class="tpl-pdf-deliverables">
+      ${(t.entregables && t.entregables.length > 0 ? t.entregables : ['Certificación final emitida', 'Carpeta legal y técnica completa']).map(item => `
+        <div class="tpl-pdf-deliv-item">
+          <i data-lucide="check-circle-2" style="width:15px;height:15px;color:var(--green);flex-shrink:0;"></i>
+          <span>${item}</span>
+        </div>
+      `).join('')}
+    </div>
+
+    <!-- 3. Hoja de Ruta y Etapas del Proceso -->
+    <div class="tpl-pdf-sec-title">
+      <i data-lucide="git-branch" style="width:14px;height:14px;color:var(--navy);"></i>
+      <span>3. Hoja de Ruta y Flujo Operativo (${(t.fases || []).length} Etapas)</span>
+    </div>
+    <div class="tpl-pdf-roadmap">
+      ${(t.fases || []).map((f, i) => `
+        <div class="tpl-pdf-road-step">
+          <div class="tpl-pdf-road-num">${i + 1}.</div>
+          <div style="flex:1;">
+            <b style="color:var(--navy);font-size:12px;display:block;">${f[0]}</b>
+            <span style="font-size:11px;color:#64748b;">${(f[1] || []).join(' · ')}</span>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+
+    <!-- 4. Checklist de Requisitos Documentales -->
+    <div class="tpl-pdf-sec-title">
+      <i data-lucide="clipboard-check" style="width:14px;height:14px;color:var(--navy);"></i>
+      <span>4. Checklist de Requisitos y Documentación</span>
+    </div>
+    <div class="tpl-pdf-docs-grid">
+      <div class="tpl-pdf-doc-col">
+        <h4><i data-lucide="user" style="width:12px;height:12px;display:inline-block;vertical-align:middle;"></i> Aportados por el Cliente</h4>
+        <ul class="tpl-pdf-doc-list">
+          ${clientDocs.map(d => `<li><b>${d[1]}</b> <small style="color:#64748b;">(${d[0]})</small></li>`).join('') || '<li>Sin documentos específicos requeridos al cliente.</li>'}
+        </ul>
+      </div>
+      <div class="tpl-pdf-doc-col">
+        <h4><i data-lucide="award" style="width:12px;height:12px;display:inline-block;vertical-align:middle;"></i> Procesados y Emitidos por GSD</h4>
+        <ul class="tpl-pdf-doc-list">
+          ${gsdDocs.map(d => `<li><b>${d[1]}</b> <small style="color:#64748b;">(${d[0]})</small></li>`).join('') || '<li>Informes técnicos y constancias oficiales.</li>'}
+        </ul>
+      </div>
+    </div>
+
+    <!-- 5. Honorarios Profesionales y Plan de Pagos -->
+    <div class="tpl-pdf-sec-title">
+      <i data-lucide="receipt" style="width:14px;height:14px;color:var(--green);"></i>
+      <span>5. Esquema de Honorarios y Condiciones</span>
+    </div>
+    <div class="tpl-pdf-fee-box">
+      <div>
+        <span style="font-size:11px;color:#166534;font-weight:700;text-transform:uppercase;">Honorario Base Estimado</span>
+        <div style="font-size:18px;font-weight:800;color:#14532d;margin-top:2px;">${feeText}</div>
+        <small style="font-size:10.5px;color:#166534;">* Sujeto a variaciones según superficie, ubicación y complejidad registral.</small>
+      </div>
+      <div style="text-align:right;max-width:320px;">
+        <span style="font-size:11px;color:#166534;font-weight:700;display:block;">Esquema de Pago Sugerido:</span>
+        <span style="font-size:11px;color:#334155;line-height:1.4;display:block;margin-top:2px;">
+          ${t.condiciones || '50% anticipo al inicio y firma de contrato, 50% contra entrega de resultados finales.'}
+        </span>
+      </div>
+    </div>
+
+    <!-- 6. Firmas y Validez Institucional -->
+    <div class="tpl-pdf-signatures">
+      <div class="tpl-pdf-sig-box">
+        <b>Lic. Esteban Mejía</b>
+        <span>Director General & Notario Público</span>
+        <div style="font-size:9.5px;color:var(--gray);">Geosolutions Source Dominicana, S.R.L.</div>
+      </div>
+      <div class="tpl-pdf-sig-box">
+        <b>Ing. Carlos Rodríguez</b>
+        <span>Agrimensor Senior / Perito Catastral (CODIA)</span>
+        <div style="font-size:9.5px;color:var(--gray);">Dirección Técnica & Geomática</div>
+      </div>
+    </div>
+  `;
+
+  openM('mTplPdf');
+  icons();
+}
+
+function previewTplPdfFromEditor() {
+  if (!_editTplData) return;
+  const tempKey = $('editTplKey').value.trim() || 'preview';
+  _editTplData.nombre = $('editTplNombre').value.trim() || 'Nuevo Servicio';
+  _editTplData.div = $('editTplDiv').value;
+  _editTplData.plazo = parseInt($('editTplPlazo').value, 10) || 30;
+  _editTplData.honorario = parseFloat($('editTplHonorario').value) || 0;
+  _editTplData.moneda = $('editTplMoneda').value;
+  _editTplData.tec = $('editTplTec').checked;
+  _editTplData.descripcion = $('editTplDesc').value.trim();
+  _editTplData.condiciones = $('editTplCondiciones').value.trim();
+
+  TPL[tempKey] = JSON.parse(JSON.stringify(_editTplData));
+  closeM('mTplEdit');
+  openTplPdfModal(tempKey);
+}
+
+function editCurTplFromPdf() {
+  closeM('mTplPdf');
+  if (_curTplKey && TPL[_curTplKey]) {
+    openTplEditModal(_curTplKey);
+  }
+}
+
+function printTplPdf() {
+  window.print();
+}
+
+function newExpFromTpl(key) {
+  openNewExpModal();
+  const rM = document.querySelector('input[name=orig][value="m"]');
+  if (rM) { 
+    rM.checked = true; 
+    rM.dispatchEvent(new Event('change')); 
+  }
+  const sel = $('nSvc');
+  if (sel) {
+    sel.value = key;
+  }
+  const t = TPL[key];
+  if (t && t.honorario && $('nHon')) {
+    $('nHon').value = `${t.moneda === 'DOP' ? 'RD$' : 'US$'}${t.honorario}`;
+  }
+  if ($('nCli')) $('nCli').focus();
+}
 
 // ===== EXPEDIENTE: control center =====
 let cur=null,tab='resumen',openPhase=null;
