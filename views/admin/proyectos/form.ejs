@@ -1,5 +1,7 @@
 <%- include('../partials/layout-start', { pageTitle: isEdit ? 'Editar Proyecto' : 'Nuevo Proyecto', page: 'proyectos' }) %>
 
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+
 <style>
   .builder-tabs {
     display: flex;
@@ -37,11 +39,16 @@
     border-radius: 12px;
     margin-bottom: 16px;
     box-shadow: 0 2px 6px rgba(26,58,82,0.04);
-    transition: border-color .15s, box-shadow .15s;
+    transition: border-color .15s, box-shadow .15s, transform .15s;
     overflow: hidden;
   }
-  .fb-container:hover {
-    border-color: #CBD5E1;
+  .fb-container.sortable-ghost {
+    opacity: 0.4;
+    background: #E8F4EF;
+    border: 2px dashed var(--green);
+  }
+  .fb-container.sortable-chosen {
+    box-shadow: 0 10px 25px rgba(26,58,82,0.15);
   }
   .fb-header {
     background: #F8FAFC;
@@ -51,6 +58,19 @@
     justify-content: space-between;
     border-bottom: 1px solid var(--line);
     user-select: none;
+  }
+  .fb-drag-handle {
+    cursor: grab;
+    color: var(--gray);
+    display: flex;
+    align-items: center;
+    padding: 4px;
+    border-radius: 4px;
+    margin-right: 4px;
+  }
+  .fb-drag-handle:hover {
+    color: var(--navy);
+    background: #E2E8F0;
   }
   .fb-title-wrap {
     display: flex;
@@ -113,7 +133,7 @@
     padding: 18px 20px;
   }
   
-  /* Flex direction badge controls */
+  /* Flex controls bar */
   .fb-controls-bar {
     display: flex;
     align-items: center;
@@ -134,6 +154,39 @@
     padding: 14px;
     margin-bottom: 12px;
     position: relative;
+  }
+
+  /* Amenity chips selector */
+  .amenity-chip-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .amenity-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #fff;
+    border: 1px solid var(--line);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink);
+    cursor: pointer;
+    transition: all .15s;
+    user-select: none;
+  }
+  .amenity-chip:hover {
+    border-color: var(--green);
+    background: #F0FDF4;
+  }
+  .amenity-chip.active {
+    background: var(--green-l);
+    border-color: var(--green);
+    color: #2F6B4A;
+    font-weight: 600;
   }
 
   /* Live Preview Box */
@@ -157,6 +210,42 @@
     max-height: 700px;
     overflow-y: auto;
     background: #fff;
+  }
+
+  /* Icon Modal Grid */
+  .icon-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+    gap: 8px;
+    max-height: 320px;
+    overflow-y: auto;
+    padding: 10px 0;
+  }
+  .icon-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 4px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all .15s;
+    background: #fff;
+  }
+  .icon-option:hover {
+    border-color: var(--green);
+    background: var(--green-l);
+    transform: scale(1.05);
+  }
+  .icon-option span {
+    font-size: 10px;
+    color: var(--gray);
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 60px;
   }
 </style>
 
@@ -217,21 +306,21 @@
           <b style="font-size:14px;color:var(--navy);display:flex;align-items:center;gap:6px">
             <i data-lucide="layers" style="color:var(--green)"></i> Añadir Bloque / Contenedor Flexbox
           </b>
-          <span style="font-size:11.5px;color:var(--gray)">Personaliza la estructura modular de la página como en Elementor.</span>
+          <span style="font-size:11.5px;color:var(--gray)">Arrastra los bloques con <b>⠿ Mover</b> para reordenar la página.</span>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <button type="button" class="btn sm" onclick="addBlock('metricas')"><i data-lucide="bar-chart-2"></i> + Métricas Clave</button>
           <button type="button" class="btn sm" onclick="addBlock('tipologias')"><i data-lucide="building-2"></i> + Tipologías & Planos</button>
-          <button type="button" class="btn sm" onclick="addBlock('galeria')"><i data-lucide="image"></i> + Galería Masonry</button>
           <button type="button" class="btn sm" onclick="addBlock('amenidades')"><i data-lucide="sparkles"></i> + Amenidades Resort</button>
           <button type="button" class="btn sm" onclick="addBlock('plan_pago')"><i data-lucide="credit-card"></i> + Plan de Pago</button>
           <button type="button" class="btn sm" onclick="addBlock('distancias')"><i data-lucide="map-pin"></i> + Ubicación & Entorno</button>
+          <button type="button" class="btn sm" onclick="addBlock('galeria')"><i data-lucide="image"></i> + Galería Masonry</button>
           <button type="button" class="btn sm" onclick="addBlock('editorial')"><i data-lucide="file-text"></i> + Texto Editorial</button>
         </div>
       </div>
     </div>
 
-    <!-- CONTAINERS LIST -->
+    <!-- CONTAINERS LIST (SORTABLE) -->
     <div id="containersList"></div>
 
   </div>
@@ -328,7 +417,68 @@
 
 </form>
 
+<!-- ICON PICKER MODAL -->
+<div class="modal" id="mIconPicker" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.6);backdrop-filter:blur(4px);z-index:999;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:14px;width:480px;max-width:92vw;padding:22px;box-shadow:0 20px 35px rgba(0,0,0,0.2)">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <h3 style="font-size:15px;color:var(--navy);margin:0;display:flex;align-items:center;gap:6px">
+        <i data-lucide="sparkles" style="color:var(--green)"></i> Seleccionar Icono de Lujo
+      </h3>
+      <button type="button" onclick="closeIconModal()" style="border:none;background:none;font-size:18px;cursor:pointer;color:var(--gray)">✕</button>
+    </div>
+    <div class="icon-grid" id="iconPickerGrid"></div>
+    <div style="display:flex;justify-content:flex-end;margin-top:14px">
+      <button type="button" class="btn sm" onclick="closeIconModal()">Cerrar</button>
+    </div>
+  </div>
+</div>
+
 <script>
+  const POPULAR_AMENITIES = [
+    { name: 'Piscina infinita', icon: 'waves' },
+    { name: 'Gym & Wellness', icon: 'dumbbell' },
+    { name: 'Spa & Sauna', icon: 'sparkles' },
+    { name: 'Concierge 24/7', icon: 'bell-ring' },
+    { name: 'Playa privada', icon: 'palmtree' },
+    { name: 'Club de Playa', icon: 'sun' },
+    { name: 'Coworking & Lounge', icon: 'laptop' },
+    { name: 'Seguridad 24/7', icon: 'shield-check' },
+    { name: 'Restaurante gourmet', icon: 'utensils' },
+    { name: 'Rooftop Bar & BBQ', icon: 'flame' },
+    { name: 'Parqueo privado', icon: 'car' },
+    { name: 'Marina & Muelle', icon: 'anchor' },
+    { name: 'Jardines tropicales', icon: 'trees' },
+    { name: 'Cava de Vinos', icon: 'wine' },
+    { name: 'Coffee Shop', icon: 'coffee' },
+    { name: 'Wifi & Smart Home', icon: 'wifi' }
+  ];
+
+  const ICONS_CATALOG = [
+    { id: 'waves', label: 'Piscina' },
+    { id: 'dumbbell', label: 'Gym' },
+    { id: 'sparkles', label: 'Spa' },
+    { id: 'bell-ring', label: 'Concierge' },
+    { id: 'palmtree', label: 'Playa' },
+    { id: 'sun', label: 'Solarium' },
+    { id: 'laptop', label: 'Coworking' },
+    { id: 'shield-check', label: 'Seguridad' },
+    { id: 'utensils', label: 'Restaurante' },
+    { id: 'flame', label: 'BBQ/Rooftop' },
+    { id: 'car', label: 'Parqueo' },
+    { id: 'anchor', label: 'Marina' },
+    { id: 'plane', label: 'Helipuerto' },
+    { id: 'trees', label: 'Jardines' },
+    { id: 'wine', label: 'Cava' },
+    { id: 'coffee', label: 'Café' },
+    { id: 'wifi', label: 'Smart Home' },
+    { id: 'building-2', label: 'Edificio' },
+    { id: 'home', label: 'Villa' },
+    { id: 'dollar-sign', label: 'Inversión' },
+    { id: 'percent', label: 'Retorno' },
+    { id: 'compass', label: 'Ubicación' },
+    { id: 'check-circle', label: 'Garantía' }
+  ];
+
   // Initial state from server
   const INITIAL_PROJECT = <%- JSON.stringify(proyecto || null) %>;
   
@@ -387,7 +537,7 @@
         type: 'amenidades',
         title: 'Amenidades de Estilo Resort & Bienestar',
         flex_dir: 'row',
-        items: ['Piscina infinita central', 'Gym & Fitness Center', 'Spa & Zona Wellness', 'Club de Playa privado', 'Concierge 24/7', 'Coworking & Lounge', 'Seguridad perimetral con cámaras', 'Restaurante gourmet']
+        items: ['Piscina infinita', 'Gym & Wellness', 'Spa & Sauna', 'Concierge 24/7', 'Playa privada', 'Coworking & Lounge', 'Seguridad 24/7', 'Restaurante gourmet']
       },
       {
         id: 'blk_pago',
@@ -493,9 +643,24 @@
           </div>
         `;
       } else if (b.type === 'amenidades') {
+        const selectedList = b.items || [];
         bodyHtml = `
-          <div class="f"><label>Amenidades (separadas por comas)</label>
-            <textarea style="min-height:80px" oninput="bAmenidadesInput(${idx}, this.value)">${(b.items||[]).join(', ')}</textarea>
+          <div class="fb-controls-bar">
+            <span>Selección rápida de amenidades con iconos preconfigurados:</span>
+          </div>
+          <div class="amenity-chip-grid">
+            ${POPULAR_AMENITIES.map(pop => {
+              const isSelected = selectedList.includes(pop.name);
+              return `
+                <div class="amenity-chip ${isSelected ? 'active' : ''}" onclick="toggleAmenityChip(${idx}, '${pop.name}')">
+                  <i data-lucide="${pop.icon}"></i>
+                  <span>${pop.name}</span>
+                </div>
+              `;
+            }).join('')}
+          </div>
+          <div class="f"><label>Amenidades personalizadas adicionales (separadas por comas)</label>
+            <textarea style="min-height:70px" oninput="bAmenidadesInput(${idx}, this.value)">${selectedList.join(', ')}</textarea>
           </div>
         `;
       } else if (b.type === 'plan_pago') {
@@ -545,9 +710,12 @@
       }
 
       return `
-        <div class="fb-container" id="fb_card_${idx}">
+        <div class="fb-container" id="fb_card_${idx}" data-idx="${idx}">
           <div class="fb-header">
             <div class="fb-title-wrap">
+              <div class="fb-drag-handle" title="Arrastrar para mover">
+                <i data-lucide="grip-vertical"></i>
+              </div>
               <div class="fb-icon-badge"><i data-lucide="${getBlockIcon(b.type)}"></i></div>
               <div>
                 <span class="fb-title">${b.title || getBlockDefaultTitle(b.type)}</span>
@@ -572,7 +740,44 @@
     }).join('');
 
     if (window.lucide) lucide.createIcons();
+    initSortable();
     syncHiddenJson();
+  }
+
+  function initSortable() {
+    const list = document.getElementById('containersList');
+    if (!list || !window.Sortable) return;
+    
+    if (list._sortable) {
+      list._sortable.destroy();
+    }
+
+    list._sortable = new Sortable(list, {
+      handle: '.fb-drag-handle',
+      animation: 180,
+      ghostClass: 'sortable-ghost',
+      chosenClass: 'sortable-chosen',
+      onEnd: function(evt) {
+        const oldIndex = evt.oldIndex;
+        const newIndex = evt.newIndex;
+        if (oldIndex === newIndex) return;
+
+        const moved = blocksState.splice(oldIndex, 1)[0];
+        blocksState.splice(newIndex, 0, moved);
+        renderContainers();
+      }
+    });
+  }
+
+  function toggleAmenityChip(bIdx, name) {
+    blocksState[bIdx].items = blocksState[bIdx].items || [];
+    const pos = blocksState[bIdx].items.indexOf(name);
+    if (pos > -1) {
+      blocksState[bIdx].items.splice(pos, 1);
+    } else {
+      blocksState[bIdx].items.push(name);
+    }
+    renderContainers();
   }
 
   function getBlockIcon(type) {
@@ -600,11 +805,11 @@
     } else if (type === 'tipologias') {
       newB.units = [{ name: 'Suite 1 Hab', area: '65 m²', habs: '1 Hab · 1 Baño', precio: 'US$150,000', plano_url: '', desc: 'Balcón privado.' }];
     } else if (type === 'amenidades') {
-      newB.items = ['Piscina', 'Gym', 'Seguridad 24/7'];
+      newB.items = ['Piscina infinita', 'Gym & Wellness', 'Seguridad 24/7'];
     } else if (type === 'plan_pago') {
       newB.steps = [{ pct: 'US$3,000', title: 'Reserva', desc: 'Inmediata' }, { pct: '20%', title: 'Inicial', desc: '30 días' }, { pct: '80%', title: 'Entrega', desc: 'Contra entrega' }];
     } else if (type === 'distancias') {
-      newB.points = [{ place: 'Playa', time: '5 min' }, { place: 'Aeropuerto', time: '15 min' }];
+      newB.points = [{ place: 'Playa Bávaro', time: '5 min' }, { place: 'Aeropuerto PUJ', time: '15 min' }];
     } else if (type === 'galeria') {
       newB.images = [];
     } else if (type === 'editorial') {
@@ -758,8 +963,13 @@
         return `
           <div style="margin:28px 0">
             <h4 style="font-size:15px;color:#1A3A52;margin-bottom:14px;border-bottom:2px solid #4A9B6F;padding-bottom:6px">${b.title}</h4>
-            <div style="display:flex;flex-wrap:wrap;gap:8px">
-              ${(b.items||[]).map(a => `<span style="padding:6px 12px;background:#E8F4EF;color:#2F6B4A;border-radius:20px;font-size:12px;font-weight:600">✓ ${a}</span>`).join('')}
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px">
+              ${(b.items||[]).map(a => `
+                <div style="display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #E2E8F0;border-radius:10px;padding:10px 14px">
+                  <span style="color:#4A9B6F;font-weight:700">✓</span>
+                  <span style="font-size:13px;font-weight:600;color:#1A3A52">${a}</span>
+                </div>
+              `).join('')}
             </div>
           </div>
         `;
