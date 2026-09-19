@@ -583,7 +583,7 @@ proyRouter.get('/nuevo', async (req, res) => {
 });
 
 proyRouter.post('/nuevo', async (req, res) => {
-  const { nombre, slug, promotor, ubicacion, tipologias, precio_desde, moneda, estado, entrega, descripcion, cover_image, galeria, amenidades, featured } = req.body;
+  const { nombre, slug, promotor, ubicacion, tipologias, precio_desde, moneda, estado, entrega, descripcion, cover_image, galeria, amenidades, featured, bloques } = req.body;
   
   const finalSlug = (slug || nombre || 'proyecto').toLowerCase().trim()
     .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
@@ -591,21 +591,26 @@ proyRouter.post('/nuevo', async (req, res) => {
   
   const galeriaArr = (galeria || '').split(/[\n,]/).map(s => s.trim()).filter(Boolean);
   const amenidadesArr = (amenidades || '').split(',').map(s => s.trim()).filter(Boolean);
+  let bloquesVal = '[]';
+  if (bloques) {
+    bloquesVal = typeof bloques === 'string' ? bloques : JSON.stringify(bloques);
+  }
 
   await getDb();
   try {
     run(
-      `INSERT INTO proyectos (slug, nombre, promotor, ubicacion, tipologias, precio_desde, moneda, estado, entrega, descripcion, cover_image, galeria, amenidades, featured)
-       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+      `INSERT INTO proyectos (slug, nombre, promotor, ubicacion, tipologias, precio_desde, moneda, estado, entrega, descripcion, cover_image, galeria, amenidades, featured, bloques)
+       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
       [
         finalSlug, nombre, promotor || 'GSD Real Estate', ubicacion, tipologias || 'Apartamentos',
         parseFloat(precio_desde) || 0, moneda || 'USD', estado || 'En construcción', entrega || '2026',
-        descripcion || '', cover_image || '', JSON.stringify(galeriaArr), JSON.stringify(amenidadesArr), featured ? 1 : 0
+        descripcion || '', cover_image || '', JSON.stringify(galeriaArr), JSON.stringify(amenidadesArr), featured ? 1 : 0,
+        bloquesVal
       ]
     );
     res.redirect('/admin/proyectos');
   } catch (err) {
-    res.render('admin/proyectos/form', { page: 'proyectos', proyecto: req.body, isEdit: false, error: 'Error al guardar el proyecto. El slug o nombre ya existe.' });
+    res.render('admin/proyectos/form', { page: 'proyectos', proyecto: req.body, isEdit: false, error: 'Error al guardar el proyecto. ' + err.message });
   }
 });
 
@@ -615,11 +620,12 @@ proyRouter.get('/:id/editar', async (req, res) => {
   if (!proyecto) return res.redirect('/admin/proyectos');
   try { proyecto.galeria = JSON.parse(proyecto.galeria || '[]'); } catch(e) { proyecto.galeria = []; }
   try { proyecto.amenidades = JSON.parse(proyecto.amenidades || '[]'); } catch(e) { proyecto.amenidades = []; }
+  try { proyecto.bloques = JSON.parse(proyecto.bloques || '[]'); } catch(e) { proyecto.bloques = []; }
   res.render('admin/proyectos/form', { page: 'proyectos', proyecto, isEdit: true, error: null });
 });
 
 proyRouter.post('/:id/editar', async (req, res) => {
-  const { nombre, slug, promotor, ubicacion, tipologias, precio_desde, moneda, estado, entrega, descripcion, cover_image, galeria, amenidades, featured } = req.body;
+  const { nombre, slug, promotor, ubicacion, tipologias, precio_desde, moneda, estado, entrega, descripcion, cover_image, galeria, amenidades, featured, bloques } = req.body;
   
   const finalSlug = (slug || nombre || 'proyecto').toLowerCase().trim()
     .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
@@ -627,17 +633,22 @@ proyRouter.post('/:id/editar', async (req, res) => {
   
   const galeriaArr = (galeria || '').split(/[\n,]/).map(s => s.trim()).filter(Boolean);
   const amenidadesArr = (amenidades || '').split(',').map(s => s.trim()).filter(Boolean);
+  let bloquesVal = '[]';
+  if (bloques) {
+    bloquesVal = typeof bloques === 'string' ? bloques : JSON.stringify(bloques);
+  }
 
   await getDb();
   try {
     run(
       `UPDATE proyectos SET 
-        slug=?, nombre=?, promotor=?, ubicacion=?, tipologias=?, precio_desde=?, moneda=?, estado=?, entrega=?, descripcion=?, cover_image=?, galeria=?, amenidades=?, featured=?, updated_at=datetime('now','localtime')
+        slug=?, nombre=?, promotor=?, ubicacion=?, tipologias=?, precio_desde=?, moneda=?, estado=?, entrega=?, descripcion=?, cover_image=?, galeria=?, amenidades=?, featured=?, bloques=?, updated_at=datetime('now','localtime')
        WHERE id=?`,
       [
         finalSlug, nombre, promotor || 'GSD Real Estate', ubicacion, tipologias || 'Apartamentos',
         parseFloat(precio_desde) || 0, moneda || 'USD', estado || 'En construcción', entrega || '2026',
         descripcion || '', cover_image || '', JSON.stringify(galeriaArr), JSON.stringify(amenidadesArr), featured ? 1 : 0,
+        bloquesVal,
         req.params.id
       ]
     );
@@ -665,8 +676,10 @@ app.get('/api/proyectos', async (req, res) => {
     const formatted = rows.map(r => {
       let galeria = [];
       let amenidades = [];
+      let bloques = [];
       try { galeria = JSON.parse(r.galeria || '[]'); } catch(e){}
       try { amenidades = JSON.parse(r.amenidades || '[]'); } catch(e){}
+      try { bloques = JSON.parse(r.bloques || '[]'); } catch(e){}
       return {
         slug: r.slug,
         nombre: r.nombre,
@@ -681,6 +694,7 @@ app.get('/api/proyectos', async (req, res) => {
         cover_image: r.cover_image,
         galeria,
         amenidades,
+        bloques,
         featured: Boolean(r.featured)
       };
     });

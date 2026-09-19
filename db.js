@@ -61,6 +61,7 @@ async function getDb() {
     ['categoria TEXT DEFAULT "Inversión"', 'tags TEXT DEFAULT ""', 'meta_title TEXT DEFAULT ""', 'meta_description TEXT DEFAULT ""', 'keywords TEXT DEFAULT ""', 'seo_score INTEGER DEFAULT 0', 'autor TEXT DEFAULT "GSD"', 'fecha_publicacion TEXT'].forEach(col => {
       try { db.run(`ALTER TABLE blogs ADD COLUMN ${col};`); } catch(e) {}
     });
+    try { db.run(`ALTER TABLE proyectos ADD COLUMN bloques TEXT DEFAULT '[]';`); } catch(e) {}
     try {
       db.run(`
         CREATE TABLE IF NOT EXISTS client_types (

@@ -1,122 +1,821 @@
 <%- include('../partials/layout-start', { pageTitle: isEdit ? 'Editar Proyecto' : 'Nuevo Proyecto', page: 'proyectos' }) %>
 
-<div style="margin-bottom:16px">
+<style>
+  .builder-tabs {
+    display: flex;
+    gap: 4px;
+    border-bottom: 2px solid var(--line);
+    margin-bottom: 20px;
+  }
+  .builder-tab {
+    padding: 10px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray);
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all .15s;
+  }
+  .builder-tab:hover { color: var(--navy); }
+  .builder-tab.active {
+    color: var(--green);
+    border-bottom-color: var(--green);
+  }
+  .tab-pane { display: none; }
+  .tab-pane.active { display: block; }
+
+  /* Flexbox Container Card */
+  .fb-container {
+    background: #ffffff;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 6px rgba(26,58,82,0.04);
+    transition: border-color .15s, box-shadow .15s;
+    overflow: hidden;
+  }
+  .fb-container:hover {
+    border-color: #CBD5E1;
+  }
+  .fb-header {
+    background: #F8FAFC;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--line);
+    user-select: none;
+  }
+  .fb-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .fb-icon-badge {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: var(--navy);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+  }
+  .fb-title {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--navy);
+  }
+  .fb-badge {
+    font-size: 10.5px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: #E2E8F0;
+    color: #475569;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+  .fb-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .fb-btn {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--navy);
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .fb-btn:hover {
+    background: #F1F5F9;
+    border-color: #94A3B8;
+  }
+  .fb-btn.delete:hover {
+    background: var(--red-l);
+    color: var(--red);
+    border-color: var(--red);
+  }
+  .fb-body {
+    padding: 18px 20px;
+  }
+  
+  /* Flex direction badge controls */
+  .fb-controls-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    background: #F1F5F9;
+    border-radius: 8px;
+    margin-bottom: 14px;
+    font-size: 12px;
+    color: var(--navy);
+  }
+
+  /* Unit typology item */
+  .unit-card {
+    background: #FAFAFA;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 14px;
+    margin-bottom: 12px;
+    position: relative;
+  }
+
+  /* Live Preview Box */
+  .preview-viewport {
+    background: #F9FAFB;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  }
+  .preview-topbar {
+    background: var(--navy);
+    color: #fff;
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+  }
+  .preview-content {
+    max-height: 700px;
+    overflow-y: auto;
+    background: #fff;
+  }
+</style>
+
+<div style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:center">
   <a href="/admin/proyectos" class="link" style="display:inline-flex;align-items:center;gap:6px;font-size:13px">
     <i data-lucide="arrow-left"></i> Volver al catálogo de proyectos
   </a>
+  <% if (isEdit && proyecto && proyecto.slug) { %>
+    <a href="http://localhost:3001/proyectos/<%= proyecto.slug %>" target="_blank" class="btn sm" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px">
+      <i data-lucide="external-link"></i> Ver página pública en vivo
+    </a>
+  <% } %>
 </div>
 
-<div class="card" style="max-width:920px;margin:0 auto 30px;padding:26px">
-  <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding-bottom:14px;margin-bottom:20px">
-    <div>
-      <h2 style="font-size:20px;color:var(--navy);margin:0"><%= isEdit ? 'Editar Proyecto Inmobiliario' : 'Crear Nuevo Proyecto Inmobiliario' %></h2>
-      <p style="font-size:12px;color:var(--gray);margin-top:4px">La información se sincronizará con la página web editorial de GSD.</p>
+<form id="projectForm" method="POST" action="<%= isEdit ? '/admin/proyectos/' + proyecto.id + '/editar' : '/admin/proyectos/nuevo' %>">
+  
+  <input type="hidden" name="bloques" id="bloquesJson">
+
+  <!-- TOP BAR & PROJECT MAIN TITLE -->
+  <div class="card" style="margin-bottom:16px;padding:18px 24px">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+      <div style="flex:1;min-width:280px">
+        <label style="font-size:11px;text-transform:uppercase;color:var(--gray);font-weight:600">Nombre del Proyecto</label>
+        <input type="text" name="nombre" id="pNombre" value="<%= proyecto?.nombre || '' %>" placeholder="Ej: Stellar Residences" style="font-size:18px;font-weight:700;color:var(--navy);padding:6px 10px" required>
+      </div>
+      <div style="width:240px">
+        <label style="font-size:11px;text-transform:uppercase;color:var(--gray);font-weight:600">Slug URL</label>
+        <input type="text" name="slug" id="pSlug" value="<%= proyecto?.slug || '' %>" placeholder="ej: stellar-punta-cana" style="font-size:12.5px" required>
+      </div>
+      <div style="display:flex;gap:10px;align-items:flex-end">
+        <button type="submit" class="btn p" style="height:40px;padding:0 20px;font-weight:600">
+          <i data-lucide="save"></i> <%= isEdit ? 'Actualizar Proyecto' : 'Publicar Proyecto' %>
+        </button>
+      </div>
     </div>
-    <% if (isEdit && proyecto && proyecto.slug) { %>
-      <a href="http://localhost:3001/proyectos/<%= proyecto.slug %>" target="_blank" class="btn sm" style="text-decoration:none">
-        <i data-lucide="external-link"></i> Ver página pública
-      </a>
-    <% } %>
   </div>
 
-  <% if (typeof error !== 'undefined' && error) { %>
-    <div style="background:var(--red-l);color:var(--red);padding:12px 16px;border-radius:8px;margin-bottom:18px;font-size:12.5px;border:1px solid rgba(192,57,43,0.2)">
-      <%= error %>
-    </div>
-  <% } %>
+  <!-- BUILDER TABS -->
+  <div class="builder-tabs">
+    <button type="button" class="builder-tab active" onclick="switchTab('builder')">
+      <i data-lucide="layout"></i> Constructor Visual Flexbox
+    </button>
+    <button type="button" class="builder-tab" onclick="switchTab('general')">
+      <i data-lucide="sliders"></i> Parámetros Básicos & Portada
+    </button>
+    <button type="button" class="builder-tab" onclick="switchTab('preview'); renderLivePreview();">
+      <i data-lucide="eye"></i> Vista Previa en Tiempo Real
+    </button>
+  </div>
 
-  <form method="POST" action="<%= isEdit ? '/admin/proyectos/' + proyecto.id + '/editar' : '/admin/proyectos/nuevo' %>">
-    <div class="g2">
-      <div class="f">
-        <label>Nombre comercial del proyecto *</label>
-        <input type="text" name="nombre" id="pNombre" value="<%= proyecto?.nombre || '' %>" placeholder="Ej: Stellar Residences" required>
-      </div>
-      <div class="f">
-        <label>Slug URL (automático o personalizado)</label>
-        <input type="text" name="slug" id="pSlug" value="<%= proyecto?.slug || '' %>" placeholder="ej: stellar-punta-cana">
-      </div>
-    </div>
-
-    <div class="g3">
-      <div class="f">
-        <label>Promotor / Desarrollador</label>
-        <input type="text" name="promotor" value="<%= proyecto?.promotor || 'GSD Real Estate' %>" placeholder="Ej: Blue Coast Realty">
-      </div>
-      <div class="f">
-        <label>Ubicación / Sector *</label>
-        <input type="text" name="ubicacion" value="<%= proyecto?.ubicacion || '' %>" placeholder="Ej: Bávaro, Punta Cana" required>
-      </div>
-      <div class="f">
-        <label>Tipologías disponibles</label>
-        <input type="text" name="tipologias" value="<%= proyecto?.tipologias || 'Apartamentos 1-3 Hab, Penthouses' %>" placeholder="Ej: Villas, Estudios">
-      </div>
-    </div>
-
-    <div class="g3">
-      <div class="f">
-        <label>Precio Desde *</label>
-        <input type="number" step="any" min="0" name="precio_desde" value="<%= proyecto?.precio_desde || '' %>" placeholder="180000" required>
-      </div>
-      <div class="f">
-        <label>Moneda</label>
-        <select name="moneda">
-          <option value="USD" <%= (proyecto?.moneda === 'USD' || !proyecto) ? 'selected' : '' %>>USD (US$ Dólares)</option>
-          <option value="DOP" <%= proyecto?.moneda === 'DOP' ? 'selected' : '' %>>DOP (RD$ Pesos)</option>
-        </select>
-      </div>
-      <div class="f">
-        <label>Estado del desarrollo</label>
-        <select name="estado">
-          <option value="En construcción" <%= (proyecto?.estado === 'En construcción' || !proyecto) ? 'selected' : '' %>>En construcción</option>
-          <option value="Entrega inmediata" <%= proyecto?.estado === 'Entrega inmediata' ? 'selected' : '' %>>Entrega inmediata</option>
-          <option value="En planos / Pre-venta" <%= proyecto?.estado === 'En planos / Pre-venta' ? 'selected' : '' %>>En planos / Pre-venta</option>
-        </select>
+  <!-- TAB 1: BUILDER VISUAL FLEXBOX -->
+  <div id="tab-builder" class="tab-pane active">
+    
+    <!-- BLOCK ADDER TOOLBAR -->
+    <div class="card" style="background:#F8FAFC;border:1px dashed #94A3B8;margin-bottom:20px;padding:16px 20px">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+        <div>
+          <b style="font-size:14px;color:var(--navy);display:flex;align-items:center;gap:6px">
+            <i data-lucide="layers" style="color:var(--green)"></i> Añadir Bloque / Contenedor Flexbox
+          </b>
+          <span style="font-size:11.5px;color:var(--gray)">Personaliza la estructura modular de la página como en Elementor.</span>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button type="button" class="btn sm" onclick="addBlock('metricas')"><i data-lucide="bar-chart-2"></i> + Métricas Clave</button>
+          <button type="button" class="btn sm" onclick="addBlock('tipologias')"><i data-lucide="building-2"></i> + Tipologías & Planos</button>
+          <button type="button" class="btn sm" onclick="addBlock('galeria')"><i data-lucide="image"></i> + Galería Masonry</button>
+          <button type="button" class="btn sm" onclick="addBlock('amenidades')"><i data-lucide="sparkles"></i> + Amenidades Resort</button>
+          <button type="button" class="btn sm" onclick="addBlock('plan_pago')"><i data-lucide="credit-card"></i> + Plan de Pago</button>
+          <button type="button" class="btn sm" onclick="addBlock('distancias')"><i data-lucide="map-pin"></i> + Ubicación & Entorno</button>
+          <button type="button" class="btn sm" onclick="addBlock('editorial')"><i data-lucide="file-text"></i> + Texto Editorial</button>
+        </div>
       </div>
     </div>
 
-    <div class="g2">
+    <!-- CONTAINERS LIST -->
+    <div id="containersList"></div>
+
+  </div>
+
+  <!-- TAB 2: GENERAL SETTINGS -->
+  <div id="tab-general" class="tab-pane">
+    <div class="card" style="padding:24px">
+      <h3 style="font-size:16px;color:var(--navy);margin-bottom:16px">Configuración General del Proyecto</h3>
+      
+      <div class="g3">
+        <div class="f">
+          <label>Promotor / Desarrollador</label>
+          <input type="text" name="promotor" id="pPromotor" value="<%= proyecto?.promotor || 'GSD Real Estate' %>" placeholder="Ej: Blue Coast Realty">
+        </div>
+        <div class="f">
+          <label>Ubicación / Sector *</label>
+          <input type="text" name="ubicacion" id="pUbicacion" value="<%= proyecto?.ubicacion || '' %>" placeholder="Ej: Bávaro, Punta Cana" required>
+        </div>
+        <div class="f">
+          <label>Tipologías resumidas (Badge)</label>
+          <input type="text" name="tipologias" id="pTipologias" value="<%= proyecto?.tipologias || 'Apartamentos 1-3 Hab, Penthouses' %>" placeholder="Ej: Villas, Estudios">
+        </div>
+      </div>
+
+      <div class="g3">
+        <div class="f">
+          <label>Precio Desde *</label>
+          <input type="number" step="any" min="0" name="precio_desde" id="pPrecio" value="<%= proyecto?.precio_desde || '' %>" placeholder="180000" required>
+        </div>
+        <div class="f">
+          <label>Moneda</label>
+          <select name="moneda" id="pMoneda">
+            <option value="USD" <%= (proyecto?.moneda === 'USD' || !proyecto) ? 'selected' : '' %>>USD (US$ Dólares)</option>
+            <option value="DOP" <%= proyecto?.moneda === 'DOP' ? 'selected' : '' %>>DOP (RD$ Pesos)</option>
+          </select>
+        </div>
+        <div class="f">
+          <label>Estado del desarrollo</label>
+          <select name="estado" id="pEstado">
+            <option value="En construcción" <%= (proyecto?.estado === 'En construcción' || !proyecto) ? 'selected' : '' %>>En construcción</option>
+            <option value="Entrega inmediata" <%= proyecto?.estado === 'Entrega inmediata' ? 'selected' : '' %>>Entrega inmediata</option>
+            <option value="En planos / Pre-venta" <%= proyecto?.estado === 'En planos / Pre-venta' ? 'selected' : '' %>>En planos / Pre-venta</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="g2">
+        <div class="f">
+          <label>Año estimado de entrega</label>
+          <input type="text" name="entrega" id="pEntrega" value="<%= proyecto?.entrega || '2027' %>" placeholder="Ej: 2027 o Inmediata">
+        </div>
+        <div class="f" style="display:flex;align-items:center;padding-top:22px">
+          <label style="display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--navy);cursor:pointer">
+            <input type="checkbox" name="featured" id="pFeatured" style="width:auto" <%= (proyecto?.featured) ? 'checked' : '' %>>
+            ★ Destacar en portada del catálogo de Bienes Raíces
+          </label>
+        </div>
+      </div>
+
       <div class="f">
-        <label>Año estimado de entrega</label>
-        <input type="text" name="entrega" value="<%= proyecto?.entrega || '2026' %>" placeholder="Ej: 2026 o Inmediata">
+        <label>Descripción / Introducción Principal</label>
+        <textarea name="descripcion" id="pDescripcion" style="min-height:100px;line-height:1.6" placeholder="Describe la visión, entorno y amenidades..."><%= proyecto?.descripcion || '' %></textarea>
       </div>
-      <div class="f" style="display:flex;align-items:center;padding-top:22px">
-        <label style="display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--navy);cursor:pointer">
-          <input type="checkbox" name="featured" style="width:auto" <%= (proyecto?.featured) ? 'checked' : '' %>>
-          ★ Destacar en portada del catálogo
-        </label>
+
+      <div class="f">
+        <label>Imagen de Portada Principal (Hero Cover HTTPS)</label>
+        <input type="url" name="cover_image" id="pCover" value="<%= proyecto?.cover_image || '' %>" placeholder="https://images.unsplash.com/..." required>
+      </div>
+
+      <div class="f">
+        <label>Galería de fotos rápida (URLs separadas por comas o saltos de línea)</label>
+        <textarea name="galeria" id="pGaleria" style="min-height:80px" placeholder="https://..., https://..."><%= Array.isArray(proyecto?.galeria) ? proyecto.galeria.join('\n') : (proyecto?.galeria_str || '') %></textarea>
+      </div>
+
+      <div class="f">
+        <label>Amenidades rápidas (separadas por comas)</label>
+        <input type="text" name="amenidades" id="pAmenidades" value="<%= Array.isArray(proyecto?.amenidades) ? proyecto.amenidades.join(', ') : (proyecto?.amenidades_str || '') %>" placeholder="Piscina infinita, Gym & Spa, Playa privada, Seguridad 24/7">
       </div>
     </div>
+  </div>
 
-    <div class="f">
-      <label>Descripción editorial del proyecto (formato revista / blog)</label>
-      <textarea name="descripcion" style="min-height:120px;line-height:1.6" placeholder="Describe los atractivos principales, concepto arquitectónico, entorno y propuesta de valor para el inversionista..."><%= proyecto?.descripcion || '' %></textarea>
+  <!-- TAB 3: LIVE PREVIEW -->
+  <div id="tab-preview" class="tab-pane">
+    <div class="preview-viewport">
+      <div class="preview-topbar">
+        <span><b>GSD REAL ESTATE</b> · Vista Previa de Ficha Editorial</span>
+        <span style="font-size:11px;opacity:0.8">http://localhost:3001/proyectos/<span id="prevSlug">stellar-punta-cana</span></span>
+      </div>
+      <div class="preview-content" id="livePreviewContainer">
+        <!-- Rendered via JS -->
+      </div>
     </div>
+  </div>
 
-    <div class="f">
-      <label>Imagen de portada principal (URL HTTPS)</label>
-      <input type="url" name="cover_image" value="<%= proyecto?.cover_image || '' %>" placeholder="https://images.unsplash.com/..." required>
-    </div>
-
-    <div class="f">
-      <label>Galería de fotos (URLs separadas por comas o saltos de línea)</label>
-      <textarea name="galeria" style="min-height:80px" placeholder="https://..., https://..."><%= Array.isArray(proyecto?.galeria) ? proyecto.galeria.join('\n') : (proyecto?.galeria_str || '') %></textarea>
-    </div>
-
-    <div class="f">
-      <label>Amenidades y servicios (separadas por comas)</label>
-      <input type="text" name="amenidades" value="<%= Array.isArray(proyecto?.amenidades) ? proyecto.amenidades.join(', ') : (proyecto?.amenidades_str || '') %>" placeholder="Piscina infinita, Gym & Spa, Playa privada, Seguridad 24/7">
-    </div>
-
-    <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:24px;padding-top:16px;border-top:1px solid var(--line)">
-      <a href="/admin/proyectos" class="btn">Cancelar</a>
-      <button type="submit" class="btn p">
-        <i data-lucide="save"></i> <%= isEdit ? 'Actualizar Proyecto' : 'Publicar Proyecto' %>
-      </button>
-    </div>
-  </form>
-</div>
+</form>
 
 <script>
+  // Initial state from server
+  const INITIAL_PROJECT = <%- JSON.stringify(proyecto || null) %>;
+  
+  let blocksState = [];
+  if (INITIAL_PROJECT && Array.isArray(INITIAL_PROJECT.bloques) && INITIAL_PROJECT.bloques.length > 0) {
+    blocksState = INITIAL_PROJECT.bloques;
+  } else {
+    // Default blocks preset for high-end luxury property
+    blocksState = [
+      {
+        id: 'blk_met',
+        type: 'metricas',
+        title: 'Métricas Clave & Beneficios de Inversión',
+        flex_dir: 'row',
+        items: [
+          { label: 'Superficie desde', value: '72 m²', sub: 'Apartamentos & Penthouses' },
+          { label: 'Retorno Estimado', value: '11.5% Anual', sub: 'Rentabilidad vacacional' },
+          { label: 'Ley Confotur', value: '15 Años Exento', sub: '0% IPI y 0% Transferencia' },
+          { label: 'Distancia Playa', value: '3 Minutos', sub: 'Acceso directo a Bávaro' }
+        ]
+      },
+      {
+        id: 'blk_tip',
+        type: 'tipologias',
+        title: 'Tipologías de Unidades & Planos Arquitectónicos',
+        flex_dir: 'column',
+        units: [
+          {
+            name: 'Suite 1 Habitación',
+            area: '72 m²',
+            habs: '1 Hab · 1.5 Baños',
+            precio: 'US$180,000',
+            plano_url: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=900&q=80',
+            desc: 'Balcón panorámico, sala-comedor integrada, cocina modular importada.'
+          },
+          {
+            name: 'Apartamento 2 Habitaciones',
+            area: '115 m²',
+            habs: '2 Habs · 2.5 Baños · 1 Pq',
+            precio: 'US$245,000',
+            plano_url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=900&q=80',
+            desc: 'Habitación principal con walk-in closet, terraza amplia con vista a la piscina.'
+          },
+          {
+            name: 'Penthouse Exclusivo con Rooftop',
+            area: '190 m²',
+            habs: '3 Habs · 3.5 Baños · Jacuzzi',
+            precio: 'US$360,000',
+            plano_url: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=900&q=80',
+            desc: 'Doble altura, terraza privada con picuzzi y zona BBQ con vista 360° al mar.'
+          }
+        ]
+      },
+      {
+        id: 'blk_amen',
+        type: 'amenidades',
+        title: 'Amenidades de Estilo Resort & Bienestar',
+        flex_dir: 'row',
+        items: ['Piscina infinita central', 'Gym & Fitness Center', 'Spa & Zona Wellness', 'Club de Playa privado', 'Concierge 24/7', 'Coworking & Lounge', 'Seguridad perimetral con cámaras', 'Restaurante gourmet']
+      },
+      {
+        id: 'blk_pago',
+        type: 'plan_pago',
+        title: 'Estructura del Plan de Pago',
+        flex_dir: 'row',
+        steps: [
+          { pct: 'US$3,000', title: 'Reserva', desc: 'Bloqueo de unidad en inventario' },
+          { pct: '20%', title: 'Firma de Contrato', desc: 'Completado a los 30 días' },
+          { pct: '40%', title: 'Durante Construcción', desc: 'En cómodas cuotas mensuales' },
+          { pct: '40%', title: 'Contra Entrega', desc: 'Financiamiento disponible' }
+        ]
+      },
+      {
+        id: 'blk_dist',
+        type: 'distancias',
+        title: 'Ubicación Estratégica & Puntos de Interés',
+        flex_dir: 'row',
+        points: [
+          { place: 'Playa Bávaro / Los Corales', time: '3 min' },
+          { place: 'Aeropuerto Internacional PUJ', time: '15 min' },
+          { place: 'Downtown Punta Cana / Coco Bongo', time: '8 min' },
+          { place: 'BlueMall Punta Cana', time: '14 min' },
+          { place: 'Centro Médico Internacional', time: '6 min' }
+        ]
+      }
+    ];
+  }
+
+  function switchTab(tabId) {
+    document.querySelectorAll('.builder-tab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+    
+    event.target.closest('.builder-tab').classList.add('active');
+    document.getElementById('tab-' + tabId).classList.add('active');
+  }
+
+  // Render Visual Builder Containers
+  function renderContainers() {
+    const list = document.getElementById('containersList');
+    if (!list) return;
+
+    if (blocksState.length === 0) {
+      list.innerHTML = `
+        <div class="card" style="text-align:center;padding:36px;color:var(--gray)">
+          <i data-lucide="layout-grid" style="width:36px;height:36px;opacity:0.4;margin-bottom:8px"></i>
+          <p>No hay bloques añadidos. Usa la barra superior para agregar contenedores Flexbox.</p>
+        </div>
+      `;
+      if (window.lucide) lucide.createIcons();
+      return;
+    }
+
+    list.innerHTML = blocksState.map((b, idx) => {
+      let bodyHtml = '';
+
+      if (b.type === 'metricas') {
+        bodyHtml = `
+          <div class="fb-controls-bar">
+            <span><b>Orientación Flex:</b></span>
+            <select onchange="updateBlockField(${idx}, 'flex_dir', this.value)" style="width:auto;padding:3px 8px;font-size:12px">
+              <option value="row" ${b.flex_dir==='row'?'selected':''}>Fila (Horizontal Grid)</option>
+              <option value="column" ${b.flex_dir==='column'?'selected':''}>Columna (Vertical Stack)</option>
+            </select>
+            <button type="button" class="btn sm" onclick="addMetricItem(${idx})" style="margin-left:auto">+ Añadir Métrica</button>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">
+            ${(b.items||[]).map((it, itIdx) => `
+              <div style="background:#FAFAFA;border:1px solid var(--line);border-radius:8px;padding:10px;position:relative">
+                <button type="button" onclick="removeSubItem(${idx}, 'items', ${itIdx})" style="position:absolute;top:6px;right:6px;border:none;background:none;color:var(--red);cursor:pointer" title="Eliminar">×</button>
+                <div class="f" style="margin-bottom:6px"><label style="font-size:11px">Etiqueta</label><input type="text" value="${it.label||''}" oninput="bItemsInput(${idx}, ${itIdx}, 'label', this.value)"></div>
+                <div class="f" style="margin-bottom:6px"><label style="font-size:11px">Valor Destacado</label><input type="text" value="${it.value||''}" oninput="bItemsInput(${idx}, ${itIdx}, 'value', this.value)" style="font-weight:600;color:var(--navy)"></div>
+                <div class="f" style="margin-bottom:0"><label style="font-size:11px">Detalle / Subtexto</label><input type="text" value="${it.sub||''}" oninput="bItemsInput(${idx}, ${itIdx}, 'sub', this.value)"></div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      } else if (b.type === 'tipologias') {
+        bodyHtml = `
+          <div class="fb-controls-bar">
+            <span>Modelos y planos de apartamentos configurables:</span>
+            <button type="button" class="btn sm p" onclick="addUnitItem(${idx})" style="margin-left:auto">+ Añadir Tipología</button>
+          </div>
+          <div>
+            ${(b.units||[]).map((u, uIdx) => `
+              <div class="unit-card">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                  <b style="color:var(--navy);font-size:13px">Modelo #${uIdx+1}: ${u.name||'Sin título'}</b>
+                  <button type="button" class="btn sm" onclick="removeSubItem(${idx}, 'units', ${uIdx})" style="color:var(--red);border-color:var(--red-l)">Eliminar</button>
+                </div>
+                <div class="g3">
+                  <div class="f"><label>Nombre</label><input type="text" value="${u.name||''}" oninput="bUnitInput(${idx}, ${uIdx}, 'name', this.value)"></div>
+                  <div class="f"><label>Metraje / Área</label><input type="text" value="${u.area||''}" oninput="bUnitInput(${idx}, ${uIdx}, 'area', this.value)"></div>
+                  <div class="f"><label>Distribución (Habs / Baños)</label><input type="text" value="${u.habs||''}" oninput="bUnitInput(${idx}, ${uIdx}, 'habs', this.value)"></div>
+                </div>
+                <div class="g2">
+                  <div class="f"><label>Precio Desde</label><input type="text" value="${u.precio||''}" oninput="bUnitInput(${idx}, ${uIdx}, 'precio', this.value)" style="font-weight:700;color:var(--green)"></div>
+                  <div class="f"><label>Foto del Plano / Render (URL)</label><input type="url" value="${u.plano_url||''}" oninput="bUnitInput(${idx}, ${uIdx}, 'plano_url', this.value)"></div>
+                </div>
+                <div class="f" style="margin-bottom:0"><label>Detalles / Descripción</label><input type="text" value="${u.desc||''}" oninput="bUnitInput(${idx}, ${uIdx}, 'desc', this.value)"></div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      } else if (b.type === 'amenidades') {
+        bodyHtml = `
+          <div class="f"><label>Amenidades (separadas por comas)</label>
+            <textarea style="min-height:80px" oninput="bAmenidadesInput(${idx}, this.value)">${(b.items||[]).join(', ')}</textarea>
+          </div>
+        `;
+      } else if (b.type === 'plan_pago') {
+        bodyHtml = `
+          <div class="fb-controls-bar">
+            <span>Pasos y porcentajes del plan de financiamiento:</span>
+            <button type="button" class="btn sm" onclick="addPaymentStep(${idx})" style="margin-left:auto">+ Añadir Hito</button>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">
+            ${(b.steps||[]).map((st, stIdx) => `
+              <div style="background:#FAFAFA;border:1px solid var(--line);border-radius:8px;padding:10px;position:relative">
+                <button type="button" onclick="removeSubItem(${idx}, 'steps', ${stIdx})" style="position:absolute;top:6px;right:6px;border:none;background:none;color:var(--red);cursor:pointer">×</button>
+                <div class="f" style="margin-bottom:6px"><label style="font-size:11px">Porcentaje / Monto</label><input type="text" value="${st.pct||''}" oninput="bStepInput(${idx}, ${stIdx}, 'pct', this.value)" style="font-weight:700;color:var(--green)"></div>
+                <div class="f" style="margin-bottom:6px"><label style="font-size:11px">Hito / Título</label><input type="text" value="${st.title||''}" oninput="bStepInput(${idx}, ${stIdx}, 'title', this.value)"></div>
+                <div class="f" style="margin-bottom:0"><label style="font-size:11px">Condición / Tiempo</label><input type="text" value="${st.desc||''}" oninput="bStepInput(${idx}, ${stIdx}, 'desc', this.value)"></div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      } else if (b.type === 'distancias') {
+        bodyHtml = `
+          <div class="fb-controls-bar">
+            <span>Puntos de interés cercanos y tiempos de traslado:</span>
+            <button type="button" class="btn sm" onclick="addDistancePoint(${idx})" style="margin-left:auto">+ Añadir Punto</button>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px">
+            ${(b.points||[]).map((pt, ptIdx) => `
+              <div style="display:flex;gap:8px;align-items:center;background:#FAFAFA;border:1px solid var(--line);padding:8px 10px;border-radius:6px">
+                <input type="text" placeholder="Lugar" value="${pt.place||''}" oninput="bPointInput(${idx}, ${ptIdx}, 'place', this.value)" style="flex:2">
+                <input type="text" placeholder="3 min" value="${pt.time||''}" oninput="bPointInput(${idx}, ${ptIdx}, 'time', this.value)" style="flex:1;font-weight:600">
+                <button type="button" onclick="removeSubItem(${idx}, 'points', ${ptIdx})" style="border:none;background:none;color:var(--red);cursor:pointer">×</button>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      } else if (b.type === 'galeria') {
+        bodyHtml = `
+          <div class="f"><label>Fotos de la Galería (URLs por línea)</label>
+            <textarea style="min-height:90px" oninput="bGaleriaInput(${idx}, this.value)">${(b.images||[]).join('\n')}</textarea>
+          </div>
+        `;
+      } else if (b.type === 'editorial') {
+        bodyHtml = `
+          <div class="f"><label>Título del Bloque</label><input type="text" value="${b.heading||''}" oninput="updateBlockField(${idx}, 'heading', this.value)"></div>
+          <div class="f"><label>Texto Conceptual</label><textarea style="min-height:90px" oninput="updateBlockField(${idx}, 'content', this.value)">${b.content||''}</textarea></div>
+        `;
+      }
+
+      return `
+        <div class="fb-container" id="fb_card_${idx}">
+          <div class="fb-header">
+            <div class="fb-title-wrap">
+              <div class="fb-icon-badge"><i data-lucide="${getBlockIcon(b.type)}"></i></div>
+              <div>
+                <span class="fb-title">${b.title || getBlockDefaultTitle(b.type)}</span>
+                <span class="fb-badge" style="margin-left:6px">${b.type}</span>
+              </div>
+            </div>
+            <div class="fb-actions">
+              <button type="button" class="fb-btn" onclick="moveBlock(${idx}, -1)" title="Subir bloque" ${idx===0?'disabled style="opacity:0.4"':''}>▲</button>
+              <button type="button" class="fb-btn" onclick="moveBlock(${idx}, 1)" title="Bajar bloque" ${idx===blocksState.length-1?'disabled style="opacity:0.4"':''}>▼</button>
+              <button type="button" class="fb-btn delete" onclick="deleteBlock(${idx})" title="Eliminar contenedor"><i data-lucide="trash-2"></i></button>
+            </div>
+          </div>
+          <div class="fb-body">
+            <div class="f" style="margin-bottom:12px">
+              <label style="font-size:11px;color:var(--gray)">Título visible de la sección</label>
+              <input type="text" value="${b.title||''}" oninput="updateBlockField(${idx}, 'title', this.value)" style="font-weight:600">
+            </div>
+            ${bodyHtml}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    if (window.lucide) lucide.createIcons();
+    syncHiddenJson();
+  }
+
+  function getBlockIcon(type) {
+    const map = { metricas: 'bar-chart-2', tipologias: 'building-2', galeria: 'image', amenidades: 'sparkles', plan_pago: 'credit-card', distancias: 'map-pin', editorial: 'file-text' };
+    return map[type] || 'box';
+  }
+
+  function getBlockDefaultTitle(type) {
+    const map = {
+      metricas: 'Métricas Clave de Inversión',
+      tipologias: 'Tipologías & Planos Arquitectónicos',
+      galeria: 'Galería de Fotos & Masterplan',
+      amenidades: 'Amenidades de Resort',
+      plan_pago: 'Plan de Pagos Flexible',
+      distancias: 'Ubicación & Puntos de Interés',
+      editorial: 'Concepto Arquitectónico'
+    };
+    return map[type] || 'Contenedor Modular';
+  }
+
+  function addBlock(type) {
+    let newB = { id: 'blk_' + Date.now(), type, title: getBlockDefaultTitle(type), flex_dir: 'row' };
+    if (type === 'metricas') {
+      newB.items = [{ label: 'Superficie', value: '75 m²', sub: 'Desde' }, { label: 'ROI Estimado', value: '10%', sub: 'Anual' }];
+    } else if (type === 'tipologias') {
+      newB.units = [{ name: 'Suite 1 Hab', area: '65 m²', habs: '1 Hab · 1 Baño', precio: 'US$150,000', plano_url: '', desc: 'Balcón privado.' }];
+    } else if (type === 'amenidades') {
+      newB.items = ['Piscina', 'Gym', 'Seguridad 24/7'];
+    } else if (type === 'plan_pago') {
+      newB.steps = [{ pct: 'US$3,000', title: 'Reserva', desc: 'Inmediata' }, { pct: '20%', title: 'Inicial', desc: '30 días' }, { pct: '80%', title: 'Entrega', desc: 'Contra entrega' }];
+    } else if (type === 'distancias') {
+      newB.points = [{ place: 'Playa', time: '5 min' }, { place: 'Aeropuerto', time: '15 min' }];
+    } else if (type === 'galeria') {
+      newB.images = [];
+    } else if (type === 'editorial') {
+      newB.heading = 'Visión del Desarrollo';
+      newB.content = '';
+    }
+    blocksState.push(newB);
+    renderContainers();
+  }
+
+  function deleteBlock(idx) {
+    if (confirm('¿Eliminar este contenedor?')) {
+      blocksState.splice(idx, 1);
+      renderContainers();
+    }
+  }
+
+  function moveBlock(idx, dir) {
+    const target = idx + dir;
+    if (target < 0 || target >= blocksState.length) return;
+    const temp = blocksState[idx];
+    blocksState[idx] = blocksState[target];
+    blocksState[target] = temp;
+    renderContainers();
+  }
+
+  function updateBlockField(bIdx, field, val) {
+    blocksState[bIdx][field] = val;
+    syncHiddenJson();
+  }
+
+  function addMetricItem(bIdx) {
+    blocksState[bIdx].items = blocksState[bIdx].items || [];
+    blocksState[bIdx].items.push({ label: 'Nuevo dato', value: 'Valor', sub: 'Detalle' });
+    renderContainers();
+  }
+
+  function addUnitItem(bIdx) {
+    blocksState[bIdx].units = blocksState[bIdx].units || [];
+    blocksState[bIdx].units.push({ name: 'Nueva Tipología', area: '80 m²', habs: '2 Habs', precio: 'US$200,000', plano_url: '', desc: '' });
+    renderContainers();
+  }
+
+  function addPaymentStep(bIdx) {
+    blocksState[bIdx].steps = blocksState[bIdx].steps || [];
+    blocksState[bIdx].steps.push({ pct: '10%', title: 'Nuevo hito', desc: 'Descripción' });
+    renderContainers();
+  }
+
+  function addDistancePoint(bIdx) {
+    blocksState[bIdx].points = blocksState[bIdx].points || [];
+    blocksState[bIdx].points.push({ place: 'Punto de interés', time: '10 min' });
+    renderContainers();
+  }
+
+  function removeSubItem(bIdx, arrayName, subIdx) {
+    if (blocksState[bIdx][arrayName]) {
+      blocksState[bIdx][arrayName].splice(subIdx, 1);
+      renderContainers();
+    }
+  }
+
+  function bItemsInput(bIdx, itIdx, field, val) {
+    blocksState[bIdx].items[itIdx][field] = val;
+    syncHiddenJson();
+  }
+
+  function bUnitInput(bIdx, uIdx, field, val) {
+    blocksState[bIdx].units[uIdx][field] = val;
+    syncHiddenJson();
+  }
+
+  function bStepInput(bIdx, stIdx, field, val) {
+    blocksState[bIdx].steps[stIdx][field] = val;
+    syncHiddenJson();
+  }
+
+  function bPointInput(bIdx, ptIdx, field, val) {
+    blocksState[bIdx].points[ptIdx][field] = val;
+    syncHiddenJson();
+  }
+
+  function bAmenidadesInput(bIdx, text) {
+    blocksState[bIdx].items = text.split(',').map(s => s.trim()).filter(Boolean);
+    syncHiddenJson();
+  }
+
+  function bGaleriaInput(bIdx, text) {
+    blocksState[bIdx].images = text.split('\n').map(s => s.trim()).filter(Boolean);
+    syncHiddenJson();
+  }
+
+  function syncHiddenJson() {
+    const jsonField = document.getElementById('bloquesJson');
+    if (jsonField) {
+      jsonField.value = JSON.stringify(blocksState);
+    }
+  }
+
+  // Live Preview Renderer
+  function renderLivePreview() {
+    const prev = document.getElementById('livePreviewContainer');
+    const slugP = document.getElementById('prevSlug');
+    if (slugP) slugP.textContent = document.getElementById('pSlug').value || 'proyecto';
+    if (!prev) return;
+
+    const nombre = document.getElementById('pNombre').value || 'Nombre del Proyecto';
+    const ubicacion = document.getElementById('pUbicacion').value || 'Bávaro, Punta Cana';
+    const precio = document.getElementById('pPrecio').value || '180000';
+    const estado = document.getElementById('pEstado').value || 'En construcción';
+    const entrega = document.getElementById('pEntrega').value || '2027';
+    const desc = document.getElementById('pDescripcion').value || '';
+    const cover = document.getElementById('pCover').value || 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1200&q=80';
+
+    let blocksHtml = blocksState.map(b => {
+      if (b.type === 'metricas') {
+        return `
+          <div style="margin:24px 0;padding:20px;background:#F8FAFC;border-radius:12px;border:1px solid #E2E8F0">
+            <h4 style="font-size:13px;color:#1A3A52;text-transform:uppercase;margin-bottom:14px;letter-spacing:1px">${b.title}</h4>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px">
+              ${(b.items||[]).map(it => `
+                <div style="background:#fff;padding:14px;border-radius:8px;border:1px solid #E2E8F0">
+                  <span style="font-size:11px;color:#64748B;display:block">${it.label}</span>
+                  <strong style="font-size:18px;color:#1A3A52;display:block;margin:4px 0">${it.value}</strong>
+                  <small style="font-size:11px;color:#4A9B6F">${it.sub||''}</small>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      } else if (b.type === 'tipologias') {
+        return `
+          <div style="margin:28px 0">
+            <h4 style="font-size:15px;color:#1A3A52;margin-bottom:14px;border-bottom:2px solid #4A9B6F;padding-bottom:6px">${b.title}</h4>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px">
+              ${(b.units||[]).map(u => `
+                <div style="border:1px solid #E2E8F0;border-radius:10px;overflow:hidden;background:#fff">
+                  ${u.plano_url ? `<img src="${u.plano_url}" style="width:100%;height:140px;object-fit:cover">` : ''}
+                  <div style="padding:14px">
+                    <strong style="font-size:15px;color:#1A3A52;display:block">${u.name}</strong>
+                    <span style="font-size:12px;color:#64748B;display:block;margin:4px 0">${u.area} · ${u.habs}</span>
+                    <p style="font-size:12px;color:#475569;margin:8px 0">${u.desc||''}</p>
+                    <div style="font-size:16px;font-weight:700;color:#4A9B6F;margin-top:10px">${u.precio}</div>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      } else if (b.type === 'amenidades') {
+        return `
+          <div style="margin:28px 0">
+            <h4 style="font-size:15px;color:#1A3A52;margin-bottom:14px;border-bottom:2px solid #4A9B6F;padding-bottom:6px">${b.title}</h4>
+            <div style="display:flex;flex-wrap:wrap;gap:8px">
+              ${(b.items||[]).map(a => `<span style="padding:6px 12px;background:#E8F4EF;color:#2F6B4A;border-radius:20px;font-size:12px;font-weight:600">✓ ${a}</span>`).join('')}
+            </div>
+          </div>
+        `;
+      } else if (b.type === 'plan_pago') {
+        return `
+          <div style="margin:28px 0;background:#1A3A52;color:#fff;padding:24px;border-radius:12px">
+            <h4 style="font-size:15px;color:#fff;margin-bottom:16px">${b.title}</h4>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px">
+              ${(b.steps||[]).map(st => `
+                <div style="background:rgba(255,255,255,0.08);padding:14px;border-radius:8px;border:1px solid rgba(255,255,255,0.15)">
+                  <span style="font-size:20px;font-weight:700;color:#4A9B6F;display:block">${st.pct}</span>
+                  <strong style="font-size:12.5px;color:#fff;display:block;margin:4px 0">${st.title}</strong>
+                  <small style="font-size:11px;color:#CBD5E1">${st.desc}</small>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      } else if (b.type === 'distancias') {
+        return `
+          <div style="margin:28px 0">
+            <h4 style="font-size:15px;color:#1A3A52;margin-bottom:14px;border-bottom:2px solid #4A9B6F;padding-bottom:6px">${b.title}</h4>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px">
+              ${(b.points||[]).map(pt => `
+                <div style="display:flex;justify-content:space-between;padding:10px 12px;border:1px solid #E2E8F0;border-radius:8px;font-size:12px">
+                  <span>📍 ${pt.place}</span>
+                  <strong style="color:#4A9B6F">${pt.time}</strong>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+      return '';
+    }).join('');
+
+    prev.innerHTML = `
+      <div style="position:relative;height:260px;background:url('${cover}') center/cover no-repeat;display:flex;align-items:flex-end;padding:24px">
+        <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(15,23,42,0.9), transparent)"></div>
+        <div style="position:relative;z-index:2;color:#fff">
+          <span style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#CBD5E1">📍 ${ubicacion}</span>
+          <h1 style="font-size:26px;color:#fff;margin:4px 0">${nombre}</h1>
+          <div style="display:flex;gap:8px;margin-top:6px">
+            <span style="background:#4A9B6F;color:#fff;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">${estado}</span>
+            <span style="background:rgba(255,255,255,0.2);color:#fff;padding:2px 8px;border-radius:10px;font-size:11px">Entrega ${entrega}</span>
+          </div>
+        </div>
+      </div>
+      <div style="padding:28px;max-width:960px;margin:0 auto">
+        <p style="font-size:14px;line-height:1.7;color:#475569;border-left:3px solid #4A9B6F;padding-left:14px">${desc || 'Descripción editorial del proyecto...'}</p>
+        ${blocksHtml}
+      </div>
+    `;
+  }
+
+  // Auto slug generator
   const nombreInput = document.getElementById('pNombre');
   const slugInput = document.getElementById('pSlug');
   if (nombreInput && slugInput && !slugInput.value) {
@@ -130,6 +829,16 @@
         .replace(/--+/g, "-");
     });
   }
+
+  // Form submit handler to guarantee serialization
+  document.getElementById('projectForm').addEventListener('submit', () => {
+    syncHiddenJson();
+  });
+
+  // Init
+  document.addEventListener('DOMContentLoaded', () => {
+    renderContainers();
+  });
 </script>
 
 <%- include('../partials/layout-end') %>
