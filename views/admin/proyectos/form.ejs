@@ -1,8 +1,31 @@
 <%- include('../partials/layout-start', { pageTitle: isEdit ? 'Editar Proyecto' : 'Nuevo Proyecto', page: 'proyectos' }) %>
 
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
 
 <style>
+  /* Quill styling */
+  .ql-toolbar.ql-snow {
+    border: 1px solid var(--line, #E5E7EB);
+    border-radius: 8px 8px 0 0;
+    background: #F8FAFC;
+    font-family: inherit;
+  }
+  .ql-container.ql-snow {
+    border: 1px solid var(--line, #E5E7EB);
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    background: #fff;
+    font-family: inherit;
+    font-size: 13.5px;
+  }
+  .ql-editor {
+    min-height: 180px;
+    line-height: 1.6;
+    color: var(--ink, #1F2937);
+  }
+
   .builder-tabs {
     display: flex;
     gap: 4px;
@@ -266,17 +289,31 @@
 
   <!-- TOP BAR & PROJECT MAIN TITLE -->
   <div class="card" style="margin-bottom:16px;padding:18px 24px">
-    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px">
       <div style="flex:1;min-width:280px">
-        <label style="font-size:11px;text-transform:uppercase;color:var(--gray);font-weight:600">Nombre del Proyecto</label>
-        <input type="text" name="nombre" id="pNombre" value="<%= proyecto?.nombre || '' %>" placeholder="Ej: Stellar Residences" style="font-size:18px;font-weight:700;color:var(--navy);padding:6px 10px" required>
+        <label style="font-size:11px;text-transform:uppercase;color:var(--gray);font-weight:600">Nombre del Proyecto *</label>
+        <input type="text" name="nombre" id="pNombre" value="<%= proyecto?.nombre || '' %>" placeholder="Ej: Stellar Residences" style="font-size:18px;font-weight:700;color:var(--navy);padding:8px 12px;border-radius:8px" required oninput="handleProjectTitleInput(this.value)">
       </div>
-      <div style="width:240px">
-        <label style="font-size:11px;text-transform:uppercase;color:var(--gray);font-weight:600">Slug URL</label>
-        <input type="text" name="slug" id="pSlug" value="<%= proyecto?.slug || '' %>" placeholder="ej: stellar-punta-cana" style="font-size:12.5px" required>
+      <div style="flex:1;min-width:320px">
+        <label style="font-size:11px;text-transform:uppercase;color:var(--gray);font-weight:600">Enlace Web (Slug URL)</label>
+        <div style="display:flex;align-items:center;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:8px 12px;gap:8px;box-shadow:inset 0 1px 2px rgba(0,0,0,0.02)">
+          <i data-lucide="link" style="width:13px;height:13px;color:var(--gray);flex-shrink:0"></i>
+          <span style="color:var(--gray);font-size:12px;font-weight:500;user-select:none">/proyectos/</span>
+          <span id="pSlugBadge" style="font-weight:600;color:var(--navy);font-size:12.5px;background:#E2E8F0;padding:2px 8px;border-radius:4px"><%= proyecto?.slug || 'slug-auto' %></span>
+          <input type="hidden" name="slug" id="pSlug" value="<%= proyecto?.slug || '' %>">
+          <button type="button" class="btn sm ghost" id="btnToggleCustomProjectSlug" onclick="toggleCustomProjectSlug()" style="margin-left:auto;font-size:11px;padding:2px 6px;gap:4px">
+            <i data-lucide="edit-2" style="width:11px;height:11px"></i> Personalizar
+          </button>
+        </div>
+        <div id="pSlugCustomWrap" style="display:none;margin-top:6px;padding:6px 10px;background:#fff;border:1px solid var(--line);border-radius:6px">
+          <div style="display:flex;gap:6px;align-items:center">
+            <input type="text" id="pSlugCustom" class="form-input" style="font-size:12px;padding:4px 8px" placeholder="slug-personalizado" value="<%= proyecto?.slug || '' %>" oninput="handleCustomProjectSlug(this.value)">
+            <button type="button" class="btn sm" onclick="resetProjectAutoSlug()" style="font-size:11px;white-space:nowrap">Restaurar auto</button>
+          </div>
+        </div>
       </div>
       <div style="display:flex;gap:10px;align-items:flex-end">
-        <button type="submit" class="btn p" style="height:40px;padding:0 20px;font-weight:600">
+        <button type="submit" class="btn p" style="height:42px;padding:0 22px;font-weight:600;font-size:13px">
           <i data-lucide="save"></i> <%= isEdit ? 'Actualizar Proyecto' : 'Publicar Proyecto' %>
         </button>
       </div>
@@ -482,91 +519,6 @@
   // Initial state from server
   const INITIAL_PROJECT = <%- JSON.stringify(proyecto || null) %>;
   
-  let blocksState = [];
-  if (INITIAL_PROJECT && Array.isArray(INITIAL_PROJECT.bloques) && INITIAL_PROJECT.bloques.length > 0) {
-    blocksState = INITIAL_PROJECT.bloques;
-  } else {
-    // Default blocks preset for high-end luxury property
-    blocksState = [
-      {
-        id: 'blk_met',
-        type: 'metricas',
-        title: 'Métricas Clave & Beneficios de Inversión',
-        flex_dir: 'row',
-        items: [
-          { label: 'Superficie desde', value: '72 m²', sub: 'Apartamentos & Penthouses' },
-          { label: 'Retorno Estimado', value: '11.5% Anual', sub: 'Rentabilidad vacacional' },
-          { label: 'Ley Confotur', value: '15 Años Exento', sub: '0% IPI y 0% Transferencia' },
-          { label: 'Distancia Playa', value: '3 Minutos', sub: 'Acceso directo a Bávaro' }
-        ]
-      },
-      {
-        id: 'blk_tip',
-        type: 'tipologias',
-        title: 'Tipologías de Unidades & Planos Arquitectónicos',
-        flex_dir: 'column',
-        units: [
-          {
-            name: 'Suite 1 Habitación',
-            area: '72 m²',
-            habs: '1 Hab · 1.5 Baños',
-            precio: 'US$180,000',
-            plano_url: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=900&q=80',
-            desc: 'Balcón panorámico, sala-comedor integrada, cocina modular importada.'
-          },
-          {
-            name: 'Apartamento 2 Habitaciones',
-            area: '115 m²',
-            habs: '2 Habs · 2.5 Baños · 1 Pq',
-            precio: 'US$245,000',
-            plano_url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=900&q=80',
-            desc: 'Habitación principal con walk-in closet, terraza amplia con vista a la piscina.'
-          },
-          {
-            name: 'Penthouse Exclusivo con Rooftop',
-            area: '190 m²',
-            habs: '3 Habs · 3.5 Baños · Jacuzzi',
-            precio: 'US$360,000',
-            plano_url: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=900&q=80',
-            desc: 'Doble altura, terraza privada con picuzzi y zona BBQ con vista 360° al mar.'
-          }
-        ]
-      },
-      {
-        id: 'blk_amen',
-        type: 'amenidades',
-        title: 'Amenidades de Estilo Resort & Bienestar',
-        flex_dir: 'row',
-        items: ['Piscina infinita', 'Gym & Wellness', 'Spa & Sauna', 'Concierge 24/7', 'Playa privada', 'Coworking & Lounge', 'Seguridad 24/7', 'Restaurante gourmet']
-      },
-      {
-        id: 'blk_pago',
-        type: 'plan_pago',
-        title: 'Estructura del Plan de Pago',
-        flex_dir: 'row',
-        steps: [
-          { pct: 'US$3,000', title: 'Reserva', desc: 'Bloqueo de unidad en inventario' },
-          { pct: '20%', title: 'Firma de Contrato', desc: 'Completado a los 30 días' },
-          { pct: '40%', title: 'Durante Construcción', desc: 'En cómodas cuotas mensuales' },
-          { pct: '40%', title: 'Contra Entrega', desc: 'Financiamiento disponible' }
-        ]
-      },
-      {
-        id: 'blk_dist',
-        type: 'distancias',
-        title: 'Ubicación Estratégica & Puntos de Interés',
-        flex_dir: 'row',
-        points: [
-          { place: 'Playa Bávaro / Los Corales', time: '3 min' },
-          { place: 'Aeropuerto Internacional PUJ', time: '15 min' },
-          { place: 'Downtown Punta Cana / Coco Bongo', time: '8 min' },
-          { place: 'BlueMall Punta Cana', time: '14 min' },
-          { place: 'Centro Médico Internacional', time: '6 min' }
-        ]
-      }
-    ];
-  }
-
   function switchTab(tabId) {
     document.querySelectorAll('.builder-tab').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
@@ -617,27 +569,36 @@
         `;
       } else if (b.type === 'tipologias') {
         bodyHtml = `
-          <div class="fb-controls-bar">
-            <span>Modelos y planos de apartamentos configurables:</span>
-            <button type="button" class="btn sm p" onclick="addUnitItem(${idx})" style="margin-left:auto">+ Añadir Tipología</button>
+          <div class="fb-controls-bar" style="display:flex;justify-content:space-between;align-items:center;background:#F8FAFC;padding:10px 14px;border-radius:8px;margin-bottom:14px">
+            <span style="font-weight:600;font-size:12.5px;color:var(--navy)">Modelos y tipologías de unidades:</span>
+            <button type="button" class="btn sm p" onclick="addUnitItem(${idx})" style="gap:4px"><i data-lucide="plus"></i> Añadir Tipología</button>
           </div>
-          <div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(350px, 1fr));gap:14px">
             ${(b.units||[]).map((u, uIdx) => `
-              <div class="unit-card">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-                  <b style="color:var(--navy);font-size:13px">Modelo #${uIdx+1}: ${u.name||'Sin título'}</b>
-                  <button type="button" class="btn sm" onclick="removeSubItem(${idx}, 'units', ${uIdx})" style="color:var(--red);border-color:var(--red-l)">Eliminar</button>
+              <div class="unit-card" style="background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,0.03);position:relative">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--line)">
+                  <div style="display:flex;align-items:center;gap:6px">
+                    <span style="font-size:10.5px;font-weight:700;background:var(--navy);color:#fff;padding:2px 8px;border-radius:10px">Modelo #${uIdx+1}</span>
+                    <b style="color:var(--navy);font-size:12.5px">${u.name||'Sin nombre'}</b>
+                  </div>
+                  <button type="button" class="btn sm ghost" onclick="removeSubItem(${idx}, 'units', ${uIdx})" style="color:var(--red);padding:2px 6px;font-size:11px" title="Eliminar"><i data-lucide="trash-2"></i></button>
                 </div>
-                <div class="g3">
-                  <div class="f"><label>Nombre</label><input type="text" value="${u.name||''}" oninput="bUnitInput(${idx}, ${uIdx}, 'name', this.value)"></div>
-                  <div class="f"><label>Metraje / Área</label><input type="text" value="${u.area||''}" oninput="bUnitInput(${idx}, ${uIdx}, 'area', this.value)"></div>
-                  <div class="f"><label>Distribución (Habs / Baños)</label><input type="text" value="${u.habs||''}" oninput="bUnitInput(${idx}, ${uIdx}, 'habs', this.value)"></div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+                  <div class="f" style="margin-bottom:0"><label style="font-size:10.5px">Nombre</label><input type="text" style="font-size:12px;padding:6px 8px" value="${u.name||''}" placeholder="Ej: Apto 2 Habs" oninput="bUnitInput(${idx}, ${uIdx}, 'name', this.value)"></div>
+                  <div class="f" style="margin-bottom:0"><label style="font-size:10.5px">Metraje</label><input type="text" style="font-size:12px;padding:6px 8px" value="${u.area||''}" placeholder="Ej: 115 m²" oninput="bUnitInput(${idx}, ${uIdx}, 'area', this.value)"></div>
                 </div>
-                <div class="g2">
-                  <div class="f"><label>Precio Desde</label><input type="text" value="${u.precio||''}" oninput="bUnitInput(${idx}, ${uIdx}, 'precio', this.value)" style="font-weight:700;color:var(--green)"></div>
-                  <div class="f"><label>Foto del Plano / Render (URL)</label><input type="url" value="${u.plano_url||''}" oninput="bUnitInput(${idx}, ${uIdx}, 'plano_url', this.value)"></div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+                  <div class="f" style="margin-bottom:0"><label style="font-size:10.5px">Distribución</label><input type="text" style="font-size:12px;padding:6px 8px" value="${u.habs||''}" placeholder="2 Habs · 2 Baños" oninput="bUnitInput(${idx}, ${uIdx}, 'habs', this.value)"></div>
+                  <div class="f" style="margin-bottom:0"><label style="font-size:10.5px">Precio Desde</label><input type="text" style="font-size:12px;padding:6px 8px;font-weight:700;color:var(--green)" value="${u.precio||''}" placeholder="US$ 180,000" oninput="bUnitInput(${idx}, ${uIdx}, 'precio', this.value)"></div>
                 </div>
-                <div class="f" style="margin-bottom:0"><label>Detalles / Descripción</label><input type="text" value="${u.desc||''}" oninput="bUnitInput(${idx}, ${uIdx}, 'desc', this.value)"></div>
+                <div class="f" style="margin-bottom:8px">
+                  <label style="font-size:10.5px">Foto / Render / Plano (URL)</label>
+                  <div style="display:flex;gap:6px;align-items:center">
+                    <input type="url" style="font-size:11.5px;padding:6px 8px;flex:1" value="${u.plano_url||''}" placeholder="https://..." oninput="bUnitInput(${idx}, ${uIdx}, 'plano_url', this.value)">
+                    ${u.plano_url ? `<a href="${u.plano_url}" target="_blank" class="btn sm ghost" style="padding:4px 6px" title="Ver imagen"><i data-lucide="eye"></i></a>` : ''}
+                  </div>
+                </div>
+                <div class="f" style="margin-bottom:0"><label style="font-size:10.5px">Detalles / Acabados</label><input type="text" style="font-size:11.5px;padding:6px 8px" value="${u.desc||''}" placeholder="Balcón, sala-comedor, cocina modular..." oninput="bUnitInput(${idx}, ${uIdx}, 'desc', this.value)"></div>
               </div>
             `).join('')}
           </div>

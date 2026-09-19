@@ -1,6 +1,34 @@
 <%- include('../../admin/partials/layout-start', { pageTitle: isEdit ? 'Editar Propiedad' : 'Nueva Propiedad', page: 'propiedades' }) %>
 
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+
 <style>
+  /* Quill styling */
+  .ql-toolbar.ql-snow {
+    border: 1px solid var(--line, #E5E7EB);
+    border-radius: 8px 8px 0 0;
+    background: #F8FAFC;
+    font-family: inherit;
+  }
+  .ql-container.ql-snow {
+    border: 1px solid var(--line, #E5E7EB);
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    background: #fff;
+    font-family: inherit;
+    font-size: 13.5px;
+  }
+  .ql-editor {
+    min-height: 180px;
+    line-height: 1.6;
+    color: var(--ink, #1F2937);
+  }
+  .ql-editor.ql-blank::before {
+    color: #94A3B8;
+    font-style: normal;
+  }
+
   /* Tabs styling compacto y responsive sin desbordamiento */
   .prop-tabs-nav {
     display: grid;
@@ -261,12 +289,26 @@
           </div>
 
           <div class="form-group">
-            <label class="form-label">Slug URL (Auto-generado)</label>
-            <div style="display:flex;gap:0.5rem;align-items:center;">
-              <span style="color:var(--gris-500);font-size:0.875rem;">/propiedades/</span>
-              <input type="text" id="slug" name="slug" class="form-input" value="<%= isEdit ? (prop.slug || '') : '' %>" placeholder="villa-stella-marina" style="flex:1;">
+            <label class="form-label" style="display:flex;align-items:center;justify-content:space-between">
+              <span>Enlace Web del Inmueble (Slug URL)</span>
+              <span style="font-size:0.75rem;color:var(--gray);font-weight:400">Auto-generado desde el título</span>
+            </label>
+            <div style="display:flex;align-items:center;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:8px 12px;gap:8px;box-shadow:inset 0 1px 2px rgba(0,0,0,0.02)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--gray);flex-shrink:0"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+              <span style="color:var(--gray);font-size:0.82rem;font-weight:500;user-select:none">https://gsd.do/propiedades/</span>
+              <span id="slug-badge-preview" style="font-weight:600;color:var(--navy);font-size:0.85rem;background:#E2E8F0;padding:2px 8px;border-radius:4px;letter-spacing:0.3px"><%= isEdit ? (prop.slug || 'slug-auto') : 'slug-auto' %></span>
+              <input type="hidden" id="slug" name="slug" value="<%= isEdit ? (prop.slug || '') : '' %>">
+              <button type="button" class="btn sm ghost" id="btnToggleCustomSlug" onclick="toggleCustomSlug()" style="margin-left:auto;font-size:11px;padding:3px 8px;gap:4px">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                Personalizar enlace
+              </button>
             </div>
-            <p style="font-size:0.72rem;color:var(--gris-500);margin-top:0.25rem;">Identificador único y amigable para buscadores.</p>
+            <div id="custom-slug-box" style="display:none;margin-top:6px;padding:8px 12px;background:#fff;border:1px solid var(--line);border-radius:6px;">
+              <div style="display:flex;align-items:center;gap:8px">
+                <input type="text" id="slug_custom_input" class="form-input" style="font-size:12px;padding:5px 8px" placeholder="slug-personalizado" value="<%= isEdit ? (prop.slug || '') : '' %>" oninput="handleCustomSlugInput(this.value)">
+                <button type="button" class="btn sm" onclick="resetToAutoSlug()" style="font-size:11px;white-space:nowrap">Restaurar auto</button>
+              </div>
+            </div>
           </div>
 
           <div class="form-row">
@@ -307,8 +349,11 @@
           </div>
 
           <div class="form-group">
-            <label class="form-label">Descripción Completa (Memoria descriptiva)</label>
-            <textarea id="descripcion" name="descripcion" class="form-textarea" style="min-height:180px;" placeholder="Detalla los acabados, distribución, facilidades del proyecto y entorno..."><%= isEdit ? (prop.descripcion || '') : '' %></textarea>
+            <label class="form-label">Descripción Completa (Memoria descriptiva enriquecida)</label>
+            <div id="quillEditorDescripcion" style="min-height:180px;background:#fff;">
+              <%- isEdit ? (prop.descripcion || '') : '' %>
+            </div>
+            <textarea id="descripcion" name="descripcion" style="display:none;"><%= isEdit ? (prop.descripcion || '') : '' %></textarea>
           </div>
         </div>
       </div>
@@ -318,27 +363,27 @@
         <div class="admin-form-card">
           <h3 style="display:flex;align-items:center;gap:8px;">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-            Ubicación Geográfica
+            Ubicación Geográfica del Inmueble
           </h3>
 
-          <div class="form-row">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:12px">
             <div class="form-group">
               <label class="form-label">Provincia</label>
               <input type="text" id="provincia" name="provincia" class="form-input" value="<%= isEdit ? (prop.provincia || '') : '' %>" placeholder="Ej: La Altagracia">
             </div>
             <div class="form-group">
               <label class="form-label">Ciudad / Destino</label>
-              <input type="text" id="ciudad" name="ciudad" class="form-input" value="<%= isEdit ? (prop.ciudad || '') : '' %>" placeholder="Ej: Punta Cana">
+              <input type="text" id="ciudad" name="ciudad" class="form-input" value="<%= isEdit ? (prop.ciudad || '') : '' %>" placeholder="Ej: Punta Cana / Bávaro">
             </div>
           </div>
 
-          <div class="form-row">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
             <div class="form-group">
-              <label class="form-label">Sector / Urbanización</label>
-              <input type="text" id="sector" name="sector" class="form-input" value="<%= isEdit ? (prop.sector || '') : '' %>" placeholder="Ej: Cap Cana / Los Corales">
+              <label class="form-label">Sector / Urbanización / Residencial</label>
+              <input type="text" id="sector" name="sector" class="form-input" value="<%= isEdit ? (prop.sector || '') : '' %>" placeholder="Ej: Cap Cana / Cocotal / Los Corales">
             </div>
             <div class="form-group">
-              <label class="form-label">Ubicación Completa (Etiqueta visible)</label>
+              <label class="form-label">Etiqueta de Ubicación Visible en Web</label>
               <input type="text" id="ubicacion" name="ubicacion" class="form-input" value="<%= isEdit ? (prop.ubicacion || '') : '' %>" placeholder="Ej: Cap Cana, Punta Cana, RD">
             </div>
           </div>
@@ -350,33 +395,49 @@
         <div class="admin-form-card">
           <h3 style="display:flex;align-items:center;gap:8px;">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="m9 12 2 2 4-4"/></svg>
-            Ficha Técnica & Métricas
+            Ficha Técnica & Métricas Principales
           </h3>
 
-          <div class="form-row" style="grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));">
-            <div class="form-group">
-              <label class="form-label">Habitaciones</label>
-              <input type="number" step="1" min="0" name="habitaciones" class="form-input" value="<%= isEdit ? (prop.habitaciones ?? prop.beds ?? 0) : 0 %>">
+          <!-- Strip de Métricas en 5 columnas -->
+          <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(110px, 1fr));gap:12px;margin:14px 0 18px;background:#F8FAFC;padding:14px;border-radius:10px;border:1px solid var(--line)">
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label" style="font-size:0.75rem;display:flex;align-items:center;gap:4px">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7v11a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7"/><path d="M21 7H3"/><path d="M7 7V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"/></svg>
+                Habs
+              </label>
+              <input type="number" step="1" min="0" name="habitaciones" class="form-input" value="<%= isEdit ? (prop.habitaciones ?? prop.beds ?? 0) : 0 %>" style="font-weight:700;color:var(--navy)">
             </div>
-            <div class="form-group">
-              <label class="form-label">Baños (ej: 2.5)</label>
-              <input type="number" step="0.5" min="0" name="banos" class="form-input" value="<%= isEdit ? (prop.banos ?? prop.baths ?? 0) : 0 %>">
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label" style="font-size:0.75rem;display:flex;align-items:center;gap:4px">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6 6.5 3.5a1.5 1.5 0 0 0-2 0l-1 1a1.5 1.5 0 0 0 0 2L6 9"/><path d="m14 11 7-7"/><path d="m20 10 2-2"/></svg>
+                Baños
+              </label>
+              <input type="number" step="0.5" min="0" name="banos" class="form-input" value="<%= isEdit ? (prop.banos ?? prop.baths ?? 0) : 0 %>" style="font-weight:700;color:var(--navy)">
             </div>
-            <div class="form-group">
-              <label class="form-label">Parqueos</label>
-              <input type="number" step="1" min="0" name="parqueos" class="form-input" value="<%= isEdit ? (prop.parqueos ?? prop.parkinglot ?? 0) : 0 %>">
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label" style="font-size:0.75rem;display:flex;align-items:center;gap:4px">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                Parqueos
+              </label>
+              <input type="number" step="1" min="0" name="parqueos" class="form-input" value="<%= isEdit ? (prop.parqueos ?? prop.parkinglot ?? 0) : 0 %>" style="font-weight:700;color:var(--navy)">
             </div>
-            <div class="form-group">
-              <label class="form-label">Construcción m²</label>
-              <input type="number" step="any" min="0" name="area_construccion" class="form-input" value="<%= isEdit ? (prop.area_construccion ?? prop.area ?? 0) : 0 %>">
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label" style="font-size:0.75rem;display:flex;align-items:center;gap:4px">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M9 8h1"/><path d="M9 12h1"/><path d="M9 16h1"/><path d="M14 8h1"/><path d="M14 12h1"/><path d="M14 16h1"/><path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/></svg>
+                Construcción (m²)
+              </label>
+              <input type="number" step="any" min="0" name="area_construccion" class="form-input" value="<%= isEdit ? (prop.area_construccion ?? prop.area ?? 0) : 0 %>" style="font-weight:700;color:var(--navy)">
             </div>
-            <div class="form-group">
-              <label class="form-label">Solar m²</label>
-              <input type="number" step="any" min="0" name="area_solar" class="form-input" value="<%= isEdit ? (prop.area_solar ?? prop.terrain_area ?? 0) : 0 %>">
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label" style="font-size:0.75rem;display:flex;align-items:center;gap:4px">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m2 22 1-1h18l1 1"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M4 22V4a2 2 0 0 1 2-2h8.5L20 7.5V22"/></svg>
+                Solar (m²)
+              </label>
+              <input type="number" step="any" min="0" name="area_solar" class="form-input" value="<%= isEdit ? (prop.area_solar ?? prop.terrain_area ?? 0) : 0 %>" style="font-weight:700;color:var(--navy)">
             </div>
           </div>
 
-          <div class="form-row">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
             <div class="form-group">
               <label class="form-label">Estado de la Construcción</label>
               <select name="condicion" class="form-select">
@@ -588,6 +649,35 @@
 </form>
 
 <script>
+// Inicialización de Quill Editor
+let quillDescripcion = null;
+if (document.getElementById('quillEditorDescripcion') && typeof Quill !== 'undefined') {
+  quillDescripcion = new Quill('#quillEditorDescripcion', {
+    theme: 'snow',
+    placeholder: 'Escribe la memoria descriptiva completa, acabados, características y amenidades del inmueble...',
+    modules: {
+      toolbar: [
+        [{ 'header': [2, 3, false] }],
+        ['bold', 'italic', 'underline', 'strike'],
+        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+        ['blockquote', 'link'],
+        ['clean']
+      ]
+    }
+  });
+
+  // Sync on form submit
+  const propForm = document.getElementById('propertyForm');
+  if (propForm) {
+    propForm.addEventListener('submit', function() {
+      const descInput = document.getElementById('descripcion');
+      if (descInput && quillDescripcion) {
+        descInput.value = quillDescripcion.root.innerHTML;
+      }
+    });
+  }
+}
+
 // Manejo de pestañas
 function switchTab(tabId) {
   document.querySelectorAll('.prop-tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -598,13 +688,18 @@ function switchTab(tabId) {
   if (target) target.classList.add('active');
 }
 
-// Slug Generator
+// Slug Generator & Preview
 const titleInput = document.getElementById('titulo');
-const slugInput = document.getElementById('slug');
+const slugHiddenInput = document.getElementById('slug');
+const slugBadge = document.getElementById('slug-badge-preview');
+const customSlugBox = document.getElementById('custom-slug-box');
+const customSlugInput = document.getElementById('slug_custom_input');
 const metaTitleInput = document.getElementById('meta_title');
 const metaDescInput = document.getElementById('meta_description');
 const shortDescInput = document.getElementById('short_description');
 const keywordsInput = document.getElementById('keywords');
+
+let isCustomSlug = false;
 
 function generateSlug(text) {
   return text.toString().toLowerCase().trim()
@@ -614,21 +709,50 @@ function generateSlug(text) {
     .replace(/\-\-+/g, '-');
 }
 
+function toggleCustomSlug() {
+  if (customSlugBox.style.display === 'none' || !customSlugBox.style.display) {
+    customSlugBox.style.display = 'block';
+    customSlugInput.value = slugHiddenInput.value || '';
+    customSlugInput.focus();
+  } else {
+    customSlugBox.style.display = 'none';
+  }
+}
+
+function handleCustomSlugInput(val) {
+  isCustomSlug = true;
+  const clean = generateSlug(val);
+  slugHiddenInput.value = clean;
+  if (slugBadge) slugBadge.textContent = clean || 'slug-personalizado';
+  const slugPrev = document.getElementById('slug-preview');
+  if (slugPrev) slugPrev.textContent = clean || 'propiedad';
+  analyzePropertySeo();
+}
+
+function resetToAutoSlug() {
+  isCustomSlug = false;
+  const auto = generateSlug(titleInput?.value || '');
+  slugHiddenInput.value = auto;
+  if (slugBadge) slugBadge.textContent = auto || 'slug-auto';
+  if (customSlugInput) customSlugInput.value = auto;
+  customSlugBox.style.display = 'none';
+  const slugPrev = document.getElementById('slug-preview');
+  if (slugPrev) slugPrev.textContent = auto || 'propiedad';
+  analyzePropertySeo();
+}
+
 titleInput?.addEventListener('input', function() {
-  if (!slugInput.dataset.manual) {
-    slugInput.value = generateSlug(this.value);
-    document.getElementById('slug-preview').textContent = slugInput.value || 'propiedad';
+  if (!isCustomSlug) {
+    const s = generateSlug(this.value);
+    slugHiddenInput.value = s;
+    if (slugBadge) slugBadge.textContent = s || 'slug-auto';
+    const slugPrev = document.getElementById('slug-preview');
+    if (slugPrev) slugPrev.textContent = s || 'propiedad';
   }
   if (!metaTitleInput.dataset.manual) {
     metaTitleInput.value = this.value;
     document.getElementById('seo-title-preview').textContent = this.value || 'Título de la propiedad';
   }
-  analyzePropertySeo();
-});
-
-slugInput?.addEventListener('input', function() {
-  this.dataset.manual = '1';
-  document.getElementById('slug-preview').textContent = this.value || 'propiedad';
   analyzePropertySeo();
 });
 
