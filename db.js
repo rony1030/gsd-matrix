@@ -58,6 +58,9 @@ async function getDb() {
         ALTER TABLE leads ADD COLUMN tags TEXT DEFAULT '';
       `);
     } catch(e) {}
+    ['categoria TEXT DEFAULT "Inversión"', 'tags TEXT DEFAULT ""', 'meta_title TEXT DEFAULT ""', 'meta_description TEXT DEFAULT ""', 'keywords TEXT DEFAULT ""', 'seo_score INTEGER DEFAULT 0', 'autor TEXT DEFAULT "GSD"', 'fecha_publicacion TEXT'].forEach(col => {
+      try { db.run(`ALTER TABLE blogs ADD COLUMN ${col};`); } catch(e) {}
+    });
     try {
       db.run(`
         CREATE TABLE IF NOT EXISTS client_types (
@@ -232,6 +235,54 @@ async function getDb() {
           fecha_publicacion TEXT,
           created_at TEXT DEFAULT (datetime('now','localtime')),
           updated_at TEXT DEFAULT (datetime('now','localtime'))
+        );
+
+        INSERT OR IGNORE INTO blogs (titulo, slug, categoria, tags, contenido, imagen_portada, estado, meta_title, meta_description, keywords, seo_score, autor, fecha_publicacion)
+        VALUES
+        (
+          'Cómo elegir el destino ideal para tu próxima propiedad en RD',
+          'guia-elegir-destino-propiedad-rd',
+          'Guía Inmobiliaria',
+          'Punta Cana, Inversión, Plusvalía',
+          'Invertir en bienes raíces en República Dominicana requiere evaluar tanto el retorno por alquileres de corta estancia como la seguridad jurídica del inmueble. Punta Cana, Samaná y Santo Domingo ofrecen perfiles de rentabilidad distintos que deben alinearse con tus metas patrimoniales.',
+          'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1200&q=80',
+          'publicado',
+          'Cómo elegir el destino ideal para tu propiedad en RD — GSD',
+          'Punta Cana, Samaná o Santo Domingo: comparativa de rentabilidad y plusvalía.',
+          'inversion inmobiliaria, punta cana, bienes raices rd',
+          92,
+          'GSD Real Estate',
+          datetime('now','localtime')
+        ),
+        (
+          'Detalles que transforman la experiencia de un hogar contemporáneo',
+          'detalles-transforman-experiencia-hogar',
+          'Arquitectura & Estilo',
+          'Diseño, Confort, Vanguardia',
+          'La verdadera exclusividad de un inmueble no se mide solo en metros cuadrados, sino en la distribución inteligente de sus áreas sociales, iluminación natural y ventilación cruzada. Conoce los aspectos clave a revisar antes de reservar.',
+          'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
+          'publicado',
+          'Detalles de un hogar contemporáneo — GSD Real Estate',
+          'Iluminación, ventilación y distribución en inmuebles de lujo.',
+          'diseño residencial, arquitectura caribeña, lujo',
+          88,
+          'GSD Real Estate',
+          datetime('now','localtime')
+        ),
+        (
+          'El blindaje legal imprescindible antes de reservar una propiedad',
+          'blindaje-legal-compra-inmueble',
+          'Seguridad Jurídica',
+          'Deslinde, Título, Legal',
+          'En GSD asesoramos a compradores e inversionistas para garantizar que cada título esté saneado y libre de gravámenes antes de depositar reservas. El deslinde catastral y la debida diligencia registral son la clave de una compra segura.',
+          'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80',
+          'publicado',
+          'Blindaje legal en la compra de inmuebles — GSD Jurídico',
+          'Auditoría técnica de deslinde y depuración de gravámenes en RD.',
+          'deslinde catastral, seguridad juridica, abogados inmobiliarios rd',
+          95,
+          'GSD Jurídico',
+          datetime('now','localtime')
         );
       `);
       saveDb();

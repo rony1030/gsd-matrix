@@ -690,8 +690,29 @@ app.get('/api/proyectos', async (req, res) => {
   }
 });
 
+// Public API endpoint for Blogs (consumible by gsd-bienes-raices)
+app.get('/api/blogs', async (req, res) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Cache-Control', 'public, max-age=60');
+  try {
+    await getDb();
+    const rows = queryAll("SELECT * FROM blogs WHERE estado='publicado' ORDER BY fecha_publicacion DESC, created_at DESC") || [];
+    const formatted = rows.map(r => ({
+      slug: r.slug,
+      title: r.titulo,
+      category: r.categoria,
+      excerpt: r.meta_description || (r.contenido ? r.contenido.substring(0, 160) + '...' : ''),
+      content: r.contenido,
+      cover_image: r.imagen_portada,
+      author: r.autor || 'GSD Real Estate',
+      created_at: r.fecha_publicacion || r.created_at
+    }));
+    res.json(formatted);
+  } catch(e) {
+    res.status(500).json({ error: 'Error consultando blogs' });
+  }
+});
 
-// ─── LEADS ────────────────────────────────────────────
 const leadsRouter = express.Router();
 leadsRouter.use(requireAuth);
 
