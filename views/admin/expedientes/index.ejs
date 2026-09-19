@@ -215,6 +215,37 @@ tr.row:hover td{background:var(--bg);cursor:pointer}
 /* Table Responsive */
 .table-responsive{width:100%;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:#CBD5E1 transparent}
 
+/* ===== EXECUTIVE TIMELINE STEPPER ===== */
+.exp-stepper{
+  background:#F8FAFC;
+  border-top:1px solid var(--line);
+  padding:10px 14px;
+  margin-top:10px;
+  border-radius:0 0 10px 10px;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+}
+.exp-stepper::-webkit-scrollbar{display:none}
+.stepper-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.stepper-header h3{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--navy);margin:0;display:flex;align-items:center;gap:6px}
+.stepper-track{display:flex;align-items:flex-start;justify-content:space-between;position:relative;min-width:580px;padding:0 6px}
+.stepper-line{position:absolute;top:12px;left:24px;right:24px;height:2px;background:#CBD5E1;z-index:1}
+.stepper-line-fill{position:absolute;top:0;left:0;height:100%;background:var(--green);transition:width 0.4s ease}
+.step-node{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;text-align:center;cursor:pointer;flex:1;max-width:110px;padding:0 2px;background:none;border:none;font-family:inherit;transition:transform 0.15s ease}
+.step-node:hover{transform:translateY(-1px)}
+.step-circle{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;transition:all 0.2s ease;margin-bottom:4px;background:#fff;border:1.5px solid #CBD5E1;color:#64748B;box-shadow:0 0 0 2px #F8FAFC}
+.step-node.done .step-circle{background:var(--green);border-color:var(--green);color:#fff;box-shadow:0 0 0 2px #F8FAFC,0 1px 3px rgba(74,155,111,0.25)}
+.step-node.cur .step-circle{background:#fff;border:2px solid var(--amber);color:var(--amber);box-shadow:0 0 0 2px #F8FAFC,0 0 6px rgba(217,119,6,0.3)}
+.step-node.open .step-circle{border-color:var(--navy);box-shadow:0 0 0 3px rgba(30,57,98,0.15)}
+.step-label{font-size:10.5px;font-weight:600;color:var(--navy);line-height:1.2;margin-bottom:1px;white-space:nowrap}
+.step-node.pend .step-label{color:#64748B;font-weight:500}
+.step-status{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.3px}
+.step-node.done .step-status{color:var(--green)}
+.step-node.cur .step-status{color:var(--amber)}
+.step-node.pend .step-status{color:#94A3B8}
+.step-drawer{margin-top:8px;padding:10px 12px;background:#fff;border:1px solid var(--line);border-radius:6px;animation:pop 0.18s ease}
+
 /* Mobile Drawer Controls */
 .btn-sidebar-toggle{display:none;background:none;border:none;color:var(--navy);padding:6px;border-radius:6px;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
 .btn-sidebar-toggle:hover{background:var(--bg)}
@@ -822,63 +853,150 @@ function renderTpl(){$('tplCards').innerHTML=Object.entries(TPL).map(([k,t])=>`<
 
 // ===== EXPEDIENTE: control center =====
 let cur=null,tab='resumen',openPhase=null;
-function openExp(id,t){cur=DB.find(e=>e.id===id);tab=t||'resumen';openPhase=null;$('v-exp').innerHTML='<div class="sk" style="width:180px"></div><div class="sk" style="width:320px;height:26px"></div><div class="sk" style="width:240px"></div><div class="card" style="margin-top:18px"><div class="sk"></div><div class="sk" style="width:60%"></div></div><div class="card"><div class="sk"></div><div class="sk"></div><div class="sk" style="width:40%"></div></div>';setTimeout(renderExp,260);document.querySelectorAll('.view').forEach(x=>x.classList.remove('on'));$('v-exp').classList.add('on');document.querySelectorAll('.side a').forEach(a=>a.classList.toggle('on',a.dataset.view==='list'));$('main').scrollTop=0;icons();}
-const TAB_NAMES={resumen:'Vista 360°',documentos:'Documentos',finanzas:'Facturación & Recibos',informacion:'Datos / Objeto',checklist:'Checklist',proceso:'Línea de Tiempo',tareas:'Tareas',avances:'Avances',bitacora:'Bitácora',evidencias:'Fotos'};
+function openExp(id,t){
+  cur=DB.find(e=>e.id===id);
+  tab=t||'resumen';
+  openPhase=null;
+  $('v-exp').innerHTML='<div class="sk" style="width:180px"></div><div class="sk" style="width:320px;height:26px"></div><div class="sk" style="width:240px"></div><div class="card" style="margin-top:18px"><div class="sk"></div><div class="sk" style="width:60%"></div></div><div class="card"><div class="sk"></div><div class="sk"></div><div class="sk" style="width:40%"></div></div>';
+  setTimeout(renderExp,220);
+  document.querySelectorAll('.view').forEach(x=>x.classList.remove('on'));
+  $('v-exp').classList.add('on');
+  document.querySelectorAll('.side a').forEach(a=>a.classList.toggle('on',a.dataset.view==='list'));
+  $('main').scrollTop=0;
+  icons();
+}
+
+const TAB_NAMES={
+  resumen:'Vista 360°',
+  checklist:'Checklist',
+  tareas:'Tareas',
+  documentos:'Documentos',
+  finanzas:'Facturación & Recibos',
+  informacion:'Datos / Objeto',
+  avances:'Avances',
+  bitacora:'Bitácora',
+  evidencias:'Fotos'
+};
+
+function renderStepper(e, T) {
+  const fases = (T && T.fases) ? T.fases : [];
+  if (!fases.length) return '';
+  const total = fases.length;
+  const doneCount = fases.filter((_, i) => phaseState(e, i) === 'done').length;
+  const fillPct = total > 1 ? Math.min(100, Math.round((doneCount / (total - 1)) * 100)) : (doneCount ? 100 : 0);
+
+  return `
+  <div class="exp-stepper">
+    <div class="stepper-header">
+      <h3><i data-lucide="git-commit" style="width:14px;height:14px;color:var(--navy)"></i> Línea de Tiempo del Proceso</h3>
+      <span style="font-size:11.5px;color:var(--gray)"><b>${doneCount}</b> de ${total} etapas completadas</span>
+    </div>
+    <div class="stepper-track">
+      <div class="stepper-line">
+        <div class="stepper-line-fill" style="width:${fillPct}%"></div>
+      </div>
+      ${fases.map((f, i) => {
+        const s = phaseState(e, i);
+        const isOpen = openPhase === i;
+        const stateClass = s === 'done' ? 'done' : s === 'cur' ? 'cur' : 'pend';
+        const stateText = s === 'done' ? 'Completado' : s === 'cur' ? 'En proceso' : 'Pendiente';
+        return `
+        <button class="step-node ${stateClass} ${isOpen ? 'open' : ''}" onclick="togglePhaseDrawer(${i})" title="Etapa ${i+1}: ${f[0]}">
+          <div class="step-circle">
+            ${s === 'done' ? '<i data-lucide="check" style="width:14px;height:14px;stroke-width:3"></i>' : (i + 1)}
+          </div>
+          <span class="step-label">${f[0]}</span>
+          <span class="step-status">${stateText}</span>
+        </button>
+        `;
+      }).join('')}
+    </div>
+    ${openPhase !== null && fases[openPhase] ? (() => {
+      const fi = openPhase;
+      const ts = (e.tasks || []).filter(t => t.phase === fi);
+      const d = ts.filter(t => t.st === 'done').length;
+      const pct = ts.length ? Math.round(d / ts.length * 100) : 0;
+      const who = [...new Set(ts.map(t => t.who))].filter(Boolean).join(', ');
+      const dues = ts.filter(t => t.due).map(t => t.due).sort();
+      return `
+      <div class="step-drawer">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="tag ${phaseState(e, fi) === 'done' ? 'proc' : phaseState(e, fi) === 'cur' ? 'wait' : 'done'}">Etapa ${fi+1}</span>
+            <b style="font-size:13px;color:var(--navy)">${fases[fi][0]}</b>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:11.5px;color:var(--gray)">${pct}% (${d}/${ts.length} tareas)</span>
+            <button class="btn sm ghost" onclick="togglePhaseDrawer(null)" style="padding:2px 6px" title="Cerrar detalle"><i data-lucide="x"></i></button>
+          </div>
+        </div>
+        <div class="kv" style="grid-template-columns:120px 1fr;margin-bottom:8px;font-size:11.5px">
+          <span class="k">Responsables:</span><span class="v">${who || '—'}</span>
+          <span class="k">Fechas:</span><span class="v">${dues.length ? fd(dues[0]) + ' → ' + fd(dues[dues.length-1]) : 'Sin fechas asignadas'}</span>
+        </div>
+        <div style="max-height:160px;overflow-y:auto">
+          ${ts.map(t => taskRow(t)).join('') || '<p class="sub" style="font-size:11.5px;padding:4px 0">Sin tareas en esta etapa.</p>'}
+        </div>
+      </div>
+      `;
+    })() : ''}
+  </div>
+  `;
+}
+
+function togglePhaseDrawer(i) {
+  openPhase = openPhase === i ? null : i;
+  renderExp();
+}
 
 function renderExp(){
   const e=cur,T=TPL[e.svc]||TPL.deslinde,p=progress(e),es=ESTADO[e.estado];
   const obj=e.objeto||{};
   const sub=e.svc==='deslinde'?`Parcela ${obj.parcela||'—'} · ${obj.areaReg||''} · ${obj.sector||''}, ${obj.provincia||''}`:e.svc==='transferencia'?`Matrícula ${obj.matricula||'—'} · ${obj.sector||''} · ${obj.precio||''}`:`${obj.empresa||obj.proyecto||obj.parcela||'Asunto'} · Nivel ${obj.nivel||'1'}`;
-  const tabs=['resumen','documentos','finanzas','informacion','checklist','proceso','tareas','avances','bitacora','evidencias'];
+  const tabs=['resumen','checklist','tareas','documentos','finanzas','informacion','avances','bitacora','evidencias'];
 
   $('v-exp').innerHTML=`
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
-    <a class="link" onclick="go('list')" style="display:inline-flex;align-items:center;gap:6px;font-size:13px"><i data-lucide="arrow-left"></i> Volver a expedientes</a>
-    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-      <button class="btn sm" onclick="openClientModal()"><i data-lucide="user-check"></i>Perfil Cliente</button>
-      <button class="btn sm" onclick="clientView()"><i data-lucide="eye"></i>Portal Cliente</button>
-      <button class="btn sm p" onclick="genUpdate()"><i data-lucide="send"></i>Enviar reporte</button>
+  <div class="card exp-unified-card" style="padding:12px 16px;margin-bottom:10px;border-left:4px solid ${DIV_COLOR[T.div]||'var(--navy)'};">
+    <!-- FILA 1: Identificación y Acciones Unificadas -->
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;padding-bottom:10px;border-bottom:1px solid var(--line)">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <b style="font-size:13px;letter-spacing:0.5px;color:var(--navy);font-weight:700">${e.id}</b>
+        ${divBadge(e.svc)}
+        <h1 style="font-size:18px;margin:0 0 0 4px;display:inline;color:var(--navy);font-weight:700">${T.nombre}</h1>
+        <span style="color:var(--ink);font-weight:500;font-size:13.5px">· ${e.cliente.nombre}</span>
+        <button class="btn sm ghost" onclick="openClientModal()" style="padding:2px 5px;font-size:11px" title="Editar cliente"><i data-lucide="pencil" style="width:12px;height:12px"></i></button>
+        <small style="color:var(--gray);font-size:11.5px">(${sub})</small>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+        <span class="tag ${es[1]}" style="font-size:11px;padding:3px 8px">${es[0]}</span>
+        <select onchange="setEstado(this.value)" style="width:auto;padding:3px 8px;font-size:11.5px;border-radius:6px;height:28px">${Object.entries(ESTADO).map(([k,v])=>`<option value="${k}" ${k===e.estado?'selected':''}>${v[0]}</option>`).join('')}</select>
+        <div style="height:18px;width:1px;background:var(--line);margin:0 2px"></div>
+        <button class="btn sm" onclick="openClientModal()" style="height:28px;padding:0 9px;font-size:11.5px"><i data-lucide="user-check" style="width:13px;height:13px"></i>Perfil</button>
+        <button class="btn sm" onclick="clientView()" style="height:28px;padding:0 9px;font-size:11.5px"><i data-lucide="eye" style="width:13px;height:13px"></i>Portal</button>
+        <button class="btn sm p" onclick="genUpdate()" style="height:28px;padding:0 10px;font-size:11.5px"><i data-lucide="send" style="width:13px;height:13px"></i>Reporte</button>
+      </div>
     </div>
+    
+    <!-- FILA 2: Métricas compactas -->
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:8px;padding-bottom:8px;border-bottom:1px solid var(--line);flex-wrap:wrap;font-size:11.5px">
+      <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:200px">
+        <span style="color:var(--gray)">Progreso:</span>
+        <b style="color:var(--navy)">${p.pct}%</b> <small style="color:var(--gray)">(${p.done}/${p.total} tareas)</small>
+        <div class="bar" style="height:6px;width:110px"><i style="width:${p.pct}%"></i></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px;color:var(--ink)">
+        <div><span style="color:var(--gray)">Inicio:</span> <span style="font-weight:500">${fd(e.inicio)}</span></div>
+        <div><span style="color:var(--gray)">Estimado fin:</span> <span style="font-weight:500">${fd(e.fin)}</span></div>
+        <div><span style="color:var(--gray)">Prioridad:</span> <span class="tag ${e.pri==='Alta'?'hi':e.pri==='Media'?'med':'lo'}" style="font-size:10px;padding:1px 6px">${e.pri.toUpperCase()}</span></div>
+        <div><span style="color:var(--gray)">Responsable:</span> <b style="color:var(--navy)">${e.resp}</b></div>
+      </div>
+    </div>
+
+    <!-- FILA 3: Línea de Tiempo del Proceso siempre visible -->
+    ${renderStepper(e, T)}
   </div>
 
-  <div class="card" style="padding:18px 22px;margin-bottom:14px;border-left:4px solid ${DIV_COLOR[T.div]||'var(--navy)'}">
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px">
-      <div style="min-width:240px;flex:1">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">
-          <b style="font-size:13px;letter-spacing:1px;color:var(--gray)">${e.id}</b>
-          ${divBadge(e.svc)}
-          <small style="color:var(--gray)">· Cotización: ${e.quote}</small>
-        </div>
-        <h1 style="font-size:22px;margin:2px 0 4px;color:var(--navy)">${T.nombre}</h1>
-        <div style="font-size:14px;font-weight:500;color:var(--ink);display:flex;align-items:center;gap:8px">
-          <span>${e.cliente.nombre}</span>
-          <button class="btn sm ghost" onclick="openClientModal()" style="padding:2px 6px;font-size:11px" title="Actualizar cliente"><i data-lucide="pencil"></i></button>
-        </div>
-        <div class="sub" style="font-size:12px;margin-top:2px">${sub}</div>
-      </div>
-      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
-        <div style="display:flex;align-items:center;gap:8px">
-          <span class="tag ${es[1]}" style="font-size:11.5px;padding:4px 10px">${es[0]}</span>
-          <select onchange="setEstado(this.value)" style="width:auto;padding:4px 8px;font-size:12px;border-radius:6px">${Object.entries(ESTADO).map(([k,v])=>`<option value="${k}" ${k===e.estado?'selected':''}>${v[0]}</option>`).join('')}</select>
-        </div>
-        <div style="font-size:12px;color:var(--gray)">Responsable: <b style="color:var(--navy)">${e.resp}</b></div>
-      </div>
-    </div>
-    <div class="exp-kpi-grid" style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:14px;margin-top:16px;padding-top:14px;border-top:1px solid var(--line);align-items:center">
-      <div>
-        <div style="display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:4px">
-          <span style="color:var(--gray)">Progreso general</span>
-          <b style="color:var(--navy)">${p.pct}% (${p.done}/${p.total} tareas)</b>
-        </div>
-        <div class="bar" style="height:8px"><i style="width:${p.pct}%"></i></div>
-      </div>
-      <div><span class="k" style="font-size:11px;color:var(--gray);display:block">Inicio</span><span style="font-size:12px;font-weight:500">${fd(e.inicio)}</span></div>
-      <div><span class="k" style="font-size:11px;color:var(--gray);display:block">Estimado fin</span><span style="font-size:12px;font-weight:500">${fd(e.fin)}</span></div>
-      <div><span class="k" style="font-size:11px;color:var(--gray);display:block">Prioridad</span><span class="tag ${e.pri==='Alta'?'hi':e.pri==='Media'?'med':'lo'}">${e.pri.toUpperCase()}</span></div>
-    </div>
-  </div>
-
-  <div class="tabs" style="margin:0 0 16px">${tabs.map(t=>`<button class="${t===tab?'on':''}" data-tab="${t}" onclick="setTab('${t}')">${TAB_NAMES[t]||t}</button>`).join('')}</div>
+  <div class="tabs" style="margin:0 0 10px">${tabs.map(t=>`<button class="${t===tab?'on':''}" data-tab="${t}" onclick="setTab('${t}')">${TAB_NAMES[t]||t}</button>`).join('')}</div>
   <div id="tabBox"></div>`;
   renderTab();
   icons();
@@ -928,49 +1046,55 @@ function resumen(e,T,b){
   const p=progress(e),cp=currentPhase(e),next=e.tasks.filter(t=>t.st!=='done'&&t.st!=='na').slice(0,4),due=e.tasks.filter(t=>t.due&&t.st!=='done'&&t.st!=='na').sort((a,b)=>a.due>b.due?1:-1)[0],last=e.log[0];
   const pag=e.pagos.filter(p=>p.st==='Pagado'&&p.tipo!=='Gasto').reduce((a,p)=>a+p.m,0);
   
-  b.innerHTML=`<div class="resumen-grid" style="display:grid;grid-template-columns:1fr 340px;gap:18px">
+  b.innerHTML=`<div class="resumen-grid" style="display:grid;grid-template-columns:1fr 340px;gap:12px">
   <!-- COLUMNA IZQUIERDA -->
   <div>
-   <div class="card">
-    <h2>Estado actual</h2>
-    <div style="margin:8px 0 4px;font-weight:600;color:var(--green);letter-spacing:0.5px;font-size:12px">${(T.fases[cp]||[''])[0].toUpperCase()}</div>
-    <p style="font-size:13px;line-height:1.6">${cp>0?`La etapa "${T.fases[cp-1][0]}" ha sido completada. `:''}Actualmente en la fase de ${(T.fases[cp]||[''])[0].toLowerCase()}${cp+1<T.fases.length?`; siguiente etapa: ${T.fases[cp+1][0].toLowerCase()}`:''}.</p>
-    <h2 style="margin-top:16px">Próximas acciones</h2>
-    <ol style="padding-left:18px;margin-top:6px;line-height:1.9">
+   <div class="card" style="padding:14px 16px;margin-bottom:10px">
+    <div class="ch" style="margin-bottom:8px"><h2>Estado actual</h2><span class="tag proc" style="font-size:11px">${(T.fases[cp]||[''])[0].toUpperCase()}</span></div>
+    <p style="font-size:12.5px;line-height:1.5;margin:0">${cp>0?`La etapa "${T.fases[cp-1][0]}" ha sido completada. `:''}Actualmente en la fase de ${(T.fases[cp]||[''])[0].toLowerCase()}${cp+1<T.fases.length?`; siguiente etapa: ${T.fases[cp+1][0].toLowerCase()}`:''}.</p>
+    <h2 style="margin-top:12px;margin-bottom:6px">Próximas acciones</h2>
+    <ol style="padding-left:16px;margin:0;line-height:1.7;font-size:12px">
       ${next.map(t=>`<li><label style="display:inline-flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" style="width:auto" onchange="setSt(${t.id},this.checked?'done':'pend')"> <span>${t.name}</span> <small style="color:var(--gray)">· ${t.who.split(' ')[0]}</small></label></li>`).join('')||'<li>Sin acciones pendientes.</li>'}
     </ol>
    </div>
-   <div class="g2" style="margin-top:0">
-    <div class="card">
+   <div class="g2" style="margin-top:0;gap:12px">
+    <div class="card" style="padding:14px 16px;margin-bottom:10px">
       <h2>Próximo vencimiento</h2>
-      ${due?`<div style="margin-top:8px"><b style="font-weight:600;color:var(--navy)">${due.name}</b><br><small style="color:var(--gray)">${fd(due.due)} · ${due.who}</small><div style="margin-top:6px"><span class="tag ${days(due.due)<0?'late':days(due.due)<=3?'wait':'proc'}">${days(due.due)<0?'Vencido hace '+(-days(due.due))+' días':days(due.due)===0?'Vence hoy':days(due.due)+' días restantes'}</span></div></div>`:'<p class="sub">Sin fechas programadas.</p>'}
+      ${due?`<div style="margin-top:6px"><b style="font-weight:600;color:var(--navy);font-size:12.5px">${due.name}</b><br><small style="color:var(--gray);font-size:11px">${fd(due.due)} · ${due.who}</small><div style="margin-top:6px"><span class="tag ${days(due.due)<0?'late':days(due.due)<=3?'wait':'proc'}">${days(due.due)<0?'Vencido hace '+(-days(due.due))+' días':days(due.due)===0?'Vence hoy':days(due.due)+' días restantes'}</span></div></div>`:'<p class="sub" style="font-size:12px">Sin fechas programadas.</p>'}
     </div>
-    <div class="card">
+    <div class="card" style="padding:14px 16px;margin-bottom:10px">
       <h2>Finanzas</h2>
-      <div class="kv" style="margin-top:8px;grid-template-columns:100px 1fr">
+      <div class="kv" style="margin-top:6px;grid-template-columns:80px 1fr;font-size:12px">
         <span class="k">Honorario</span><span class="v" style="font-weight:600">${e.mon}${fmt(e.honorario)}</span>
         <span class="k">Cobrado</span><span class="v" style="color:var(--green)">${e.mon}${fmt(pag)}</span>
         <span class="k">Pendiente</span><span class="v" style="color:${(e.honorario-pag)>0?'var(--red)':'var(--gray)'}">${e.mon}${fmt(Math.max(0,e.honorario-pag))}</span>
       </div>
-      <a class="link" style="font-size:12px;margin-top:8px;display:block" onclick="setTab('finanzas')">Ver detalle financiero →</a>
+      <a class="link" style="font-size:11.5px;margin-top:6px;display:block" onclick="setTab('finanzas')">Ver detalle financiero →</a>
     </div>
    </div>
   </div>
   <!-- COLUMNA DERECHA: Bitácora + Tareas live -->
-  <div style="display:flex;flex-direction:column;gap:14px">
-   <div class="card" style="flex:1">
-    <div class="ch"><h2>Bitácora</h2><span style="font-size:11px;color:var(--gray)">${e.log.length} entradas</span></div>
-    <div style="margin-top:10px">
-     <textarea id="qNote" placeholder="Nota rápida..." style="width:100%;min-height:56px;resize:vertical;font-size:12.5px;padding:8px 10px;border:1px solid var(--line);border-radius:6px;font-family:inherit;box-sizing:border-box"></textarea>
-     <button class="btn p" style="margin-top:6px;width:100%;justify-content:center" onclick="quickNote()"><i data-lucide="plus"></i>Guardar nota</button>
+  <div style="display:flex;flex-direction:column;gap:10px">
+   <div class="card" style="padding:14px 16px;margin-bottom:0">
+    <div class="ch" style="margin-bottom:8px"><h2>Bitácora</h2><span style="font-size:11px;color:var(--gray)">${e.log.length} entradas</span></div>
+    <div>
+     <textarea id="qNote" placeholder="Nota rápida..." style="width:100%;min-height:48px;resize:vertical;font-size:12px;padding:6px 8px;border:1px solid var(--line);border-radius:6px;font-family:inherit;box-sizing:border-box"></textarea>
+     <button class="btn p" style="margin-top:4px;width:100%;justify-content:center;padding:5px 10px;font-size:11.5px" onclick="quickNote()"><i data-lucide="plus"></i>Guardar nota</button>
     </div>
-    <div style="max-height:220px;overflow-y:auto;margin-top:10px">
-     ${e.log.slice(0,8).map(l=>`<div style="padding:6px 0;border-bottom:1px solid var(--line)"><span style="font-size:10.5px;color:var(--gray)">${l.d.replace(' ',' — ')} · ${l.w}</span><div style="font-size:12.5px;color:var(--ink);margin-top:2px">${l.t}</div></div>`).join('')}
+    <div style="max-height:160px;overflow-y:auto;margin-top:8px">
+     ${e.log.slice(0,8).map(l=>`<div style="padding:5px 0;border-bottom:1px solid var(--line)"><span style="font-size:10px;color:var(--gray)">${l.d.replace(' ',' — ')} · ${l.w}</span><div style="font-size:11.5px;color:var(--ink);margin-top:1px">${l.t}</div></div>`).join('')}
     </div>
    </div>
-   <div class="card">
-    <div class="ch"><h2>Tareas activas</h2><button class="btn sm p" onclick="taskModal()"><i data-lucide="plus"></i>Nueva</button></div>
-    <div style="max-height:200px;overflow-y:auto;margin-top:8px">
+   <div class="card" style="padding:14px 16px;margin-bottom:0">
+    <div class="ch" style="margin-bottom:6px"><h2>Tareas activas</h2><button class="btn sm p" style="padding:3px 8px;font-size:11px" onclick="taskModal()"><i data-lucide="plus"></i>Nueva</button></div>
+    <div style="max-height:150px;overflow-y:auto">
+     ${e.tasks.filter(t=>t.st!=='done'&&t.st!=='na').slice(0,6).map(t=>`<div style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid var(--line)"><input type="checkbox" style="width:auto;flex-shrink:0" onchange="setSt(${t.id},this.checked?'done':'pend')"><span style="font-size:11.5px;flex:1">${t.name}</span><small style="color:var(--gray);white-space:nowrap;font-size:10.5px">${t.who.split(' ')[0]}</small></div>`).join('')||'<p class="sub" style="padding:4px 0;font-size:11.5px">Sin tareas pendientes.</p>'}
+    </div>
+    <a class="link" style="font-size:11.5px;margin-top:6px;display:block" onclick="setTab('tareas')">Ver todas las tareas →</a>
+   </div>
+  </div>
+ </div>`;
+}
      ${e.tasks.filter(t=>t.st!=='done'&&t.st!=='na').slice(0,6).map(t=>`<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--line)"><input type="checkbox" style="width:auto;flex-shrink:0" onchange="setSt(${t.id},this.checked?'done':'pend')"><span style="font-size:12.5px;flex:1">${t.name}</span><small style="color:var(--gray);white-space:nowrap">${t.who.split(' ')[0]}</small></div>`).join('')||'<p class="sub" style="padding:6px 0">Sin tareas pendientes.</p>'}
     </div>
     <a class="link" style="font-size:12px;margin-top:8px;display:block" onclick="setTab('tareas')">Ver todas las tareas →</a>
