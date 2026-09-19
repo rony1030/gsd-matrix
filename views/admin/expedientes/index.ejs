@@ -1095,13 +1095,6 @@ function resumen(e,T,b){
   </div>
  </div>`;
 }
-     ${e.tasks.filter(t=>t.st!=='done'&&t.st!=='na').slice(0,6).map(t=>`<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--line)"><input type="checkbox" style="width:auto;flex-shrink:0" onchange="setSt(${t.id},this.checked?'done':'pend')"><span style="font-size:12.5px;flex:1">${t.name}</span><small style="color:var(--gray);white-space:nowrap">${t.who.split(' ')[0]}</small></div>`).join('')||'<p class="sub" style="padding:6px 0">Sin tareas pendientes.</p>'}
-    </div>
-    <a class="link" style="font-size:12px;margin-top:8px;display:block" onclick="setTab('tareas')">Ver todas las tareas →</a>
-   </div>
-  </div>
- </div>`;
-}
 
 function kvBlock(title,obj,labels,path){
   obj = obj || {};
