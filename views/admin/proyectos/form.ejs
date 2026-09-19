@@ -375,7 +375,7 @@
         <div class="f" style="display:flex;align-items:center;padding-top:22px">
           <label style="display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--navy);cursor:pointer">
             <input type="checkbox" name="featured" id="pFeatured" style="width:auto" <%= (proyecto?.featured) ? 'checked' : '' %>>
-            ★ Destacar en portada del catálogo de Bienes Raíces
+            Destacar en portada del catálogo de Bienes Raíces
           </label>
         </div>
       </div>
@@ -424,7 +424,7 @@
       <h3 style="font-size:15px;color:var(--navy);margin:0;display:flex;align-items:center;gap:6px">
         <i data-lucide="sparkles" style="color:var(--green)"></i> Seleccionar Icono de Lujo
       </h3>
-      <button type="button" onclick="closeIconModal()" style="border:none;background:none;font-size:18px;cursor:pointer;color:var(--gray)">✕</button>
+      <button type="button" onclick="closeIconModal()" style="border:none;background:none;font-size:16px;cursor:pointer;color:var(--gray)"><i data-lucide="x"></i></button>
     </div>
     <div class="icon-grid" id="iconPickerGrid"></div>
     <div style="display:flex;justify-content:flex-end;margin-top:14px">
@@ -723,8 +723,8 @@
               </div>
             </div>
             <div class="fb-actions">
-              <button type="button" class="fb-btn" onclick="moveBlock(${idx}, -1)" title="Subir bloque" ${idx===0?'disabled style="opacity:0.4"':''}>▲</button>
-              <button type="button" class="fb-btn" onclick="moveBlock(${idx}, 1)" title="Bajar bloque" ${idx===blocksState.length-1?'disabled style="opacity:0.4"':''}>▼</button>
+              <button type="button" class="fb-btn" onclick="moveBlock(${idx}, -1)" title="Subir bloque" ${idx===0?'disabled style="opacity:0.4"':''}><i data-lucide="chevron-up"></i></button>
+              <button type="button" class="fb-btn" onclick="moveBlock(${idx}, 1)" title="Bajar bloque" ${idx===blocksState.length-1?'disabled style="opacity:0.4"':''}><i data-lucide="chevron-down"></i></button>
               <button type="button" class="fb-btn delete" onclick="deleteBlock(${idx})" title="Eliminar contenedor"><i data-lucide="trash-2"></i></button>
             </div>
           </div>
@@ -966,7 +966,6 @@
             <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px">
               ${(b.items||[]).map(a => `
                 <div style="display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #E2E8F0;border-radius:10px;padding:10px 14px">
-                  <span style="color:#4A9B6F;font-weight:700">✓</span>
                   <span style="font-size:13px;font-weight:600;color:#1A3A52">${a}</span>
                 </div>
               `).join('')}
@@ -995,7 +994,7 @@
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px">
               ${(b.points||[]).map(pt => `
                 <div style="display:flex;justify-content:space-between;padding:10px 12px;border:1px solid #E2E8F0;border-radius:8px;font-size:12px">
-                  <span>📍 ${pt.place}</span>
+                  <span>${pt.place}</span>
                   <strong style="color:#4A9B6F">${pt.time}</strong>
                 </div>
               `).join('')}
@@ -1010,7 +1009,7 @@
       <div style="position:relative;height:260px;background:url('${cover}') center/cover no-repeat;display:flex;align-items:flex-end;padding:24px">
         <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(15,23,42,0.9), transparent)"></div>
         <div style="position:relative;z-index:2;color:#fff">
-          <span style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#CBD5E1">📍 ${ubicacion}</span>
+          <span style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#CBD5E1">${ubicacion}</span>
           <h1 style="font-size:26px;color:#fff;margin:4px 0">${nombre}</h1>
           <div style="display:flex;gap:8px;margin-top:6px">
             <span style="background:#4A9B6F;color:#fff;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">${estado}</span>
