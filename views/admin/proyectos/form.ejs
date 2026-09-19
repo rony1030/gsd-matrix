@@ -272,17 +272,6 @@
   }
 </style>
 
-<div style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:center">
-  <a href="/admin/proyectos" class="link" style="display:inline-flex;align-items:center;gap:6px;font-size:13px">
-    <i data-lucide="arrow-left"></i> Volver al catálogo de proyectos
-  </a>
-  <% if (isEdit && proyecto && proyecto.slug) { %>
-    <a href="http://localhost:3001/proyectos/<%= proyecto.slug %>" target="_blank" class="btn sm" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px">
-      <i data-lucide="external-link"></i> Ver página pública en vivo
-    </a>
-  <% } %>
-</div>
-
 <form id="projectForm" method="POST" action="<%= isEdit ? '/admin/proyectos/' + proyecto.id + '/editar' : '/admin/proyectos/nuevo' %>">
   
   <input type="hidden" name="bloques" id="bloquesJson">
@@ -313,6 +302,11 @@
         </div>
       </div>
       <div style="display:flex;gap:10px;align-items:flex-end">
+        <% if (isEdit && proyecto && proyecto.slug) { %>
+          <a href="http://localhost:3001/proyectos/<%= proyecto.slug %>" target="_blank" class="btn sm ghost" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px;height:42px;padding:0 14px">
+            <i data-lucide="external-link"></i> Ver en vivo
+          </a>
+        <% } %>
         <button type="submit" class="btn p" style="height:42px;padding:0 22px;font-weight:600;font-size:13px">
           <i data-lucide="save"></i> <%= isEdit ? 'Actualizar Proyecto' : 'Publicar Proyecto' %>
         </button>
