@@ -95,7 +95,95 @@
     .btn-icon.delete:hover{border-color:var(--red);color:var(--red)}
     .btn-icon svg{width:14px;height:14px}
     
-    /* Forms */
+    /* Forms & Admin Form System */
+    .admin-form-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 300px;
+      gap: 20px;
+      align-items: start;
+    }
+    @media (max-width: 1024px) {
+      .admin-form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .admin-form-card {
+      background: #ffffff;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 22px 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 3px rgba(26,58,82,0.04);
+    }
+    .admin-form-card h3 {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--navy);
+      margin: 0 0 16px 0;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .form-group {
+      margin-bottom: 16px;
+    }
+    .form-label {
+      display: block;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--navy);
+      margin-bottom: 6px;
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 640px) {
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+    }
+    .form-input, .form-select, .form-textarea {
+      font-family: inherit;
+      font-size: 13px;
+      padding: 9px 12px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #ffffff;
+      width: 100%;
+      color: var(--ink);
+      box-sizing: border-box;
+      transition: all .15s ease;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      outline: none;
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px rgba(74,155,111,.15);
+    }
+    .btn-submit {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: var(--green);
+      border: 1px solid var(--green);
+      color: #ffffff;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .15s ease;
+    }
+    .btn-submit:hover {
+      background: #3E8A5F;
+      border-color: #3E8A5F;
+    }
+
     .f{margin-bottom:14px}
     .f label{display:block;font-size:11.5px;color:var(--gray);margin-bottom:4px;font-weight:500}
     input,select,textarea{font-family:inherit;font-size:13px;padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:#fff;width:100%;color:var(--ink);box-sizing:border-box}

@@ -29,6 +29,59 @@
     font-style: normal;
   }
 
+  /* Form Grid & Responsive 2-Column Rows */
+  .admin-form-grid {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 300px !important;
+    gap: 22px !important;
+    align-items: start !important;
+  }
+  @media (max-width: 1024px) {
+    .admin-form-grid {
+      grid-template-columns: 1fr !important;
+    }
+  }
+  .admin-form-card {
+    background: #ffffff !important;
+    border: 1px solid var(--line, #E5E7EB) !important;
+    border-radius: 12px !important;
+    padding: 22px 24px !important;
+    margin-bottom: 20px !important;
+    box-shadow: 0 1px 3px rgba(26,58,82,0.04) !important;
+  }
+  .admin-form-card h3 {
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    color: var(--navy, #1A3A52) !important;
+    margin: 0 0 16px 0 !important;
+    padding-bottom: 10px !important;
+    border-bottom: 1px solid var(--line, #E5E7EB) !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+  .form-row {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 16px !important;
+    margin-bottom: 16px !important;
+  }
+  @media (max-width: 640px) {
+    .form-row {
+      grid-template-columns: 1fr !important;
+    }
+  }
+  .form-group {
+    margin-bottom: 16px;
+  }
+  .form-label {
+    display: block;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--navy, #1A3A52);
+    margin-bottom: 6px;
+  }
+
   /* Tabs styling compacto y responsive sin desbordamiento */
   .prop-tabs-nav {
     display: grid;
