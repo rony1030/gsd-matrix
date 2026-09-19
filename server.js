@@ -206,10 +206,9 @@ app.get('/admin/logout', (req, res) => {
   res.redirect('/admin/login');
 });
 
-// Helper: Convert DB row to CRM format
 function formatExpedienteRow(row) {
   if (!row) return null;
-  let objeto = {}, ubic = {}, linderos = {}, tecnico = {}, docs = [], tasks = [], avances = [], notas = [], evid = [], log = [];
+  let objeto = {}, ubic = {}, linderos = {}, tecnico = {}, docs = [], tasks = [], avances = [], notas = [], evid = [], log = [], pagos = [];
   try { objeto = JSON.parse(row.objeto_json || '{}'); } catch(e) {}
   try { ubic = JSON.parse(row.ubicacion_json || '{}'); } catch(e) {}
   try { linderos = JSON.parse(row.linderos_json || '{}'); } catch(e) {}
@@ -220,24 +219,33 @@ function formatExpedienteRow(row) {
   try { notas = JSON.parse(row.notas_json || '[]'); } catch(e) {}
   try { evid = JSON.parse(row.evidencias_json || '[]'); } catch(e) {}
   try { log = JSON.parse(row.log_json || '[]'); } catch(e) {}
+  try { pagos = JSON.parse(row.pagos_json || '[]'); } catch(e) {}
+
+  const honorario = parseFloat(row.honorario) || 0;
+  if (!pagos.length && honorario > 0) {
+    pagos = [
+      { d: row.fecha_inicio || '', c: 'Separación / Pago inicial 50%', m: honorario / 2, st: 'Pendiente', tipo: 'Ingreso', nota: '' },
+      { d: '', c: 'Saldo final 50%', m: honorario / 2, st: 'Pendiente', tipo: 'Ingreso', nota: '' }
+    ];
+  }
 
   return {
     id: row.codigo,
     quote: row.cotizacion_ref || '',
-    svc: row.servicio_tipo,
+    svc: row.servicio_tipo || 'deslinde',
     cliente: {
-      nombre: row.cliente_nombre,
+      nombre: row.cliente_nombre || 'Cliente',
       cedula: row.cliente_doc || '',
       tel: row.cliente_tel || '',
       email: row.cliente_email || '',
       dir: row.cliente_dir || ''
     },
-    honorario: parseFloat(row.honorario) || 0,
+    honorario,
     mon: row.moneda || 'USD',
-    pagos: [],
-    aprob: row.fecha_inicio,
-    inicio: row.fecha_inicio,
-    fin: row.fecha_fin,
+    pagos,
+    aprob: row.fecha_inicio || new Date().toISOString().substring(0,10),
+    inicio: row.fecha_inicio || new Date().toISOString().substring(0,10),
+    fin: row.fecha_fin || '',
     resp: row.responsable || 'Esteban Mejía',
     tec: row.tecnico || '',
     pri: row.prioridad || 'Media',
@@ -975,12 +983,16 @@ expeRouter.post('/api/guardar', async (req, res) => {
   const d = req.body;
   await getDb();
   try {
+    try {
+      run(`ALTER TABLE expedientes ADD COLUMN pagos_json TEXT DEFAULT '[]'`);
+    } catch(e) {}
+
     run(
       `INSERT OR REPLACE INTO expedientes (
         codigo, cotizacion_ref, servicio_tipo, cliente_nombre, cliente_doc, cliente_tel, cliente_email, cliente_dir,
         honorario, moneda, responsable, tecnico, prioridad, estado, fecha_inicio, fecha_fin,
-        objeto_json, ubicacion_json, linderos_json, tecnico_json, docs_json, tasks_json, avances_json, notas_json, evidencias_json, log_json
-      ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+        objeto_json, ubicacion_json, linderos_json, tecnico_json, docs_json, tasks_json, avances_json, notas_json, evidencias_json, log_json, pagos_json
+      ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
       [
         d.id || d.codigo, d.quote||'', d.svc||'deslinde', d.cliente?.nombre||d.cliente_nombre||'Cliente',
         d.cliente?.cedula||d.cliente_doc||'', d.cliente?.tel||d.cliente_tel||'', d.cliente?.email||d.cliente_email||'', d.cliente?.dir||d.cliente_dir||'',
@@ -988,7 +1000,7 @@ expeRouter.post('/api/guardar', async (req, res) => {
         d.pri||d.prioridad||'Media', d.estado||'proc', d.inicio||d.fecha_inicio||new Date().toISOString().substring(0,10), d.fin||d.fecha_fin||'',
         JSON.stringify(d.objeto||{}), JSON.stringify(d.ubic||{}), JSON.stringify(d.linderos||{}), JSON.stringify(d.tecnico||{}),
         JSON.stringify(d.docs||[]), JSON.stringify(d.tasks||[]), JSON.stringify(d.avances||[]), JSON.stringify(d.notas||[]),
-        JSON.stringify(d.evid||[]), JSON.stringify(d.log||[])
+        JSON.stringify(d.evid||[]), JSON.stringify(d.log||[]), JSON.stringify(d.pagos||[])
       ]
     );
     res.json({ ok: true });

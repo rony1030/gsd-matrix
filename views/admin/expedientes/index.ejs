@@ -980,16 +980,58 @@ function resumen(e,T,b){
 }
 
 function kvBlock(title,obj,labels,path){
+  obj = obj || {};
+  labels = labels || {};
   return `<div class="card" data-path="${path}"><div class="ch"><h2>${title}</h2><button class="btn sm ghost" onclick="editBlock(this)"><i data-lucide="pencil"></i>Editar</button></div><div class="kv">${Object.keys(labels).map(k=>`<span class="k">${labels[k]}</span><span class="v" data-k="${k}">${obj[k]||'—'}</span>`).join('')}</div></div>`;
 }
 
 function informacion(e,T,b){
-  b.innerHTML=`<div class="g2">${kvBlock('Datos del cliente',e.cliente,{nombre:'Nombre',cedula:'Cédula / RNC',tel:'Teléfono',email:'Email',dir:'Dirección'},'cliente')}
- <div class="card"><div class="ch"><h2>Datos del servicio</h2></div><div class="kv"><span class="k">Servicio</span><span class="v">${T.nombre}</span><span class="k">Cotización</span><span class="v">${e.quote}</span><span class="k">Fecha de aprobación</span><span class="v">${fd(e.aprob)}</span><span class="k">Honorario</span><span class="v">${e.mon}${fmt(e.honorario)}</span><span class="k">Estado</span><span class="v">${ESTADO[e.estado][0]}</span><span class="k">Plazo estimado</span><span class="v">${T.plazo} días</span></div></div>
- ${kvBlock(e.svc==='iguala'?'Datos del cliente corporativo':'Datos del inmueble',e.objeto,T.objeto,'objeto')}
- ${T.tec?`<div class="card" data-path="ubic"><div class="ch"><h2>Ubicación</h2><button class="btn sm ghost" onclick="editBlock(this)"><i data-lucide="pencil"></i>Editar</button></div><div class="map"><div class="poly"></div><div class="pin"><i data-lucide="map-pin"></i></div></div><div class="kv"><span class="k">Coordenadas</span><span class="v" data-k="coord">${e.ubic.coord}</span><span class="k">Dirección</span><span class="v" data-k="dir">${e.ubic.dir||'—'}</span><span class="k">Referencia</span><span class="v" data-k="ref">${e.ubic.ref||'—'}</span></div><div style="margin-top:10px"><a class="btn sm" href="https://www.google.com/maps?q=${e.ubic.coord.replace(/ /g,'')}" target="_blank"><i data-lucide="external-link"></i>Abrir ubicación</a></div></div>
- ${kvBlock('Linderos',e.linderos,{Norte:'Norte',Sur:'Sur',Este:'Este',Oeste:'Oeste'},'linderos')}
- ${kvBlock('Datos técnicos',e.tecnico,{tipo:'Tipo de levantamiento',equipo:'Equipo',sist:'Sistema de coordenadas',zona:'Zona',datum:'Datum',prec:'Precisión'},'tecnico')}`:''}</div>`;
+  const cliente = e.cliente || {};
+  const objeto = e.objeto || {};
+  const ubic = e.ubic || {};
+  const linderos = e.linderos || {};
+  const tecnico = e.tecnico || {};
+  const coordStr = (ubic.coord || '').trim();
+  const objLabels = (T && T.objeto) ? T.objeto : {};
+
+  b.innerHTML=`<div class="g2">
+    ${kvBlock('Datos del cliente', cliente, {nombre:'Nombre', cedula:'Cédula / RNC', tel:'Teléfono', email:'Email', dir:'Dirección'}, 'cliente')}
+    <div class="card">
+      <div class="ch"><h2>Datos del servicio</h2></div>
+      <div class="kv">
+        <span class="k">Servicio</span><span class="v">${T ? T.nombre : (e.svc||'Servicio')}</span>
+        <span class="k">Cotización</span><span class="v">${e.quote || '—'}</span>
+        <span class="k">Fecha de aprobación</span><span class="v">${fd(e.aprob)}</span>
+        <span class="k">Honorario</span><span class="v">${e.mon||'US$'}${fmt(e.honorario||0)}</span>
+        <span class="k">Estado</span><span class="v">${ESTADO[e.estado] ? ESTADO[e.estado][0] : (e.estado||'En proceso')}</span>
+        <span class="k">Plazo estimado</span><span class="v">${T ? T.plazo : '—'} días</span>
+      </div>
+    </div>
+    ${kvBlock(e.svc==='iguala'?'Datos del cliente corporativo':'Datos del inmueble', objeto, objLabels, 'objeto')}
+    ${T && T.tec ? `
+      <div class="card" data-path="ubic">
+        <div class="ch">
+          <h2>Ubicación</h2>
+          <button class="btn sm ghost" onclick="editBlock(this)"><i data-lucide="pencil"></i>Editar</button>
+        </div>
+        <div class="map"><div class="poly"></div><div class="pin"><i data-lucide="map-pin"></i></div></div>
+        <div class="kv">
+          <span class="k">Coordenadas</span><span class="v" data-k="coord">${coordStr || '—'}</span>
+          <span class="k">Dirección</span><span class="v" data-k="dir">${ubic.dir || '—'}</span>
+          <span class="k">Referencia</span><span class="v" data-k="ref">${ubic.ref || '—'}</span>
+        </div>
+        ${coordStr ? `
+          <div style="margin-top:10px">
+            <a class="btn sm" href="https://www.google.com/maps?q=${encodeURIComponent(coordStr.replace(/ /g,''))}" target="_blank">
+              <i data-lucide="external-link"></i>Abrir ubicación
+            </a>
+          </div>
+        ` : ''}
+      </div>
+      ${kvBlock('Linderos', linderos, {Norte:'Norte', Sur:'Sur', Este:'Este', Oeste:'Oeste'}, 'linderos')}
+      ${kvBlock('Datos técnicos', tecnico, {tipo:'Tipo de levantamiento', equipo:'Equipo', sist:'Sistema de coordenadas', zona:'Zona', datum:'Datum', prec:'Precisión'}, 'tecnico')}
+    ` : ''}
+  </div>`;
 }
 
 function editBlock(btn){
@@ -1000,7 +1042,9 @@ function editBlock(btn){
 
 function saveBlock(btn){
   const card=btn.closest('.card');
-  const obj=cur[card.dataset.path];
+  const path=card.dataset.path;
+  if(!cur[path]) cur[path] = {};
+  const obj=cur[path];
   card.querySelectorAll('input[data-k]').forEach(i=>obj[i.dataset.k]=i.value);
   log(cur,`Bloque "${card.querySelector('h2').textContent}" actualizado.`);
   save();renderExp();toast('Cambios guardados');
