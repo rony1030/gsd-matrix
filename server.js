@@ -1036,6 +1036,8 @@ ajustesRouter.get('/', async (req, res) => {
     instaPosts = JSON.parse(handleRow.posts_json || '[]');
   } catch(e) { instaPosts = []; }
 
+  const usuarios = queryAll("SELECT * FROM usuarios ORDER BY id ASC") || [];
+
   res.render('admin/ajustes/index', {
     page: 'ajustes',
     logoUrl: currentLogo,
@@ -1048,10 +1050,120 @@ ajustesRouter.get('/', async (req, res) => {
     companyPhone: compPhone,
     companyEmail: compEmail,
     companyAddress: compAddress,
+    usuarios,
     success: req.query.saved === '1',
     successMsg: req.query.msg ? decodeURIComponent(req.query.msg) : '¡Configuración guardada exitosamente!',
     error: req.query.error ? decodeURIComponent(req.query.error) : null
   });
+});
+
+ajustesRouter.get('/api/usuarios', async (req, res) => {
+  try {
+    await getDb();
+    const users = queryAll("SELECT id, nombre, usuario, email, rol, permisos_json, avatar, telefono, cargo, estado, created_at FROM usuarios ORDER BY id ASC");
+    res.json({ ok: true, data: users });
+  } catch(e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
+ajustesRouter.post('/usuarios/crear', async (req, res) => {
+  try {
+    await getDb();
+    const { nombre, usuario, email, password, rol, cargo, telefono, permisos } = req.body;
+    if (!nombre || !usuario) {
+      return res.redirect('/admin/ajustes?error=' + encodeURIComponent('El nombre y usuario son obligatorios.') + '#usuarios');
+    }
+    const cleanUser = usuario.trim().toLowerCase();
+    const existing = queryOne("SELECT id FROM usuarios WHERE usuario = ?", [cleanUser]);
+    if (existing) {
+      return res.redirect('/admin/ajustes?error=' + encodeURIComponent(`El nombre de usuario "${cleanUser}" ya existe. Elige otro.`) + '#usuarios');
+    }
+    let permisosArr = [];
+    if (Array.isArray(permisos)) {
+      permisosArr = permisos;
+    } else if (typeof permisos === 'string' && permisos) {
+      permisosArr = [permisos];
+    }
+    const permisosJson = JSON.stringify(permisosArr);
+    const pass = password && password.trim() ? password.trim() : 'gsd2026';
+
+    run(`INSERT INTO usuarios (nombre, usuario, email, password, rol, permisos_json, cargo, telefono, estado, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'activo', datetime('now','localtime'), datetime('now','localtime'))`,
+      [nombre.trim(), cleanUser, (email || '').trim(), pass, rol || 'Asistente Operativo', permisosJson, (cargo || '').trim(), (telefono || '').trim()]
+    );
+
+    res.redirect('/admin/ajustes?saved=1&msg=' + encodeURIComponent(`Usuario "${cleanUser}" creado con éxito.`) + '#usuarios');
+  } catch(err) {
+    res.redirect('/admin/ajustes?error=' + encodeURIComponent(err.message) + '#usuarios');
+  }
+});
+
+ajustesRouter.post('/usuarios/:id/editar', async (req, res) => {
+  try {
+    await getDb();
+    const id = parseInt(req.params.id, 10);
+    const { nombre, email, password, rol, cargo, telefono, estado, permisos } = req.body;
+    const user = queryOne("SELECT * FROM usuarios WHERE id = ?", [id]);
+    if (!user) {
+      return res.redirect('/admin/ajustes?error=' + encodeURIComponent('Usuario no encontrado.') + '#usuarios');
+    }
+
+    let permisosArr = [];
+    if (Array.isArray(permisos)) {
+      permisosArr = permisos;
+    } else if (typeof permisos === 'string' && permisos) {
+      permisosArr = [permisos];
+    }
+    const permisosJson = JSON.stringify(permisosArr);
+
+    if (password && password.trim()) {
+      run(`UPDATE usuarios SET nombre=?, email=?, password=?, rol=?, cargo=?, telefono=?, estado=?, permisos_json=?, updated_at=datetime('now','localtime') WHERE id=?`,
+        [nombre.trim(), (email || '').trim(), password.trim(), rol || user.rol, (cargo || '').trim(), (telefono || '').trim(), estado || user.estado, permisosJson, id]
+      );
+    } else {
+      run(`UPDATE usuarios SET nombre=?, email=?, rol=?, cargo=?, telefono=?, estado=?, permisos_json=?, updated_at=datetime('now','localtime') WHERE id=?`,
+        [nombre.trim(), (email || '').trim(), rol || user.rol, (cargo || '').trim(), (telefono || '').trim(), estado || user.estado, permisosJson, id]
+      );
+    }
+
+    res.redirect('/admin/ajustes?saved=1&msg=' + encodeURIComponent(`Usuario "${user.usuario}" actualizado correctamente.`) + '#usuarios');
+  } catch(err) {
+    res.redirect('/admin/ajustes?error=' + encodeURIComponent(err.message) + '#usuarios');
+  }
+});
+
+ajustesRouter.post('/usuarios/:id/toggle-status', async (req, res) => {
+  try {
+    await getDb();
+    const id = parseInt(req.params.id, 10);
+    const user = queryOne("SELECT * FROM usuarios WHERE id = ?", [id]);
+    if (!user) return res.redirect('/admin/ajustes?error=Usuario+no+encontrado#usuarios');
+    if (user.usuario === 'admin' || id === 1) {
+      return res.redirect('/admin/ajustes?error=' + encodeURIComponent('No se puede desactivar la cuenta de Administrador Principal.') + '#usuarios');
+    }
+    const nextStatus = user.estado === 'activo' ? 'inactivo' : 'activo';
+    run("UPDATE usuarios SET estado=?, updated_at=datetime('now','localtime') WHERE id=?", [nextStatus, id]);
+    res.redirect('/admin/ajustes?saved=1&msg=' + encodeURIComponent(`Estado de usuario cambiado a ${nextStatus.toUpperCase()}.`) + '#usuarios');
+  } catch(err) {
+    res.redirect('/admin/ajustes?error=' + encodeURIComponent(err.message) + '#usuarios');
+  }
+});
+
+ajustesRouter.post('/usuarios/:id/eliminar', async (req, res) => {
+  try {
+    await getDb();
+    const id = parseInt(req.params.id, 10);
+    const user = queryOne("SELECT * FROM usuarios WHERE id = ?", [id]);
+    if (!user) return res.redirect('/admin/ajustes?error=Usuario+no+encontrado#usuarios');
+    if (user.usuario === 'admin' || id === 1) {
+      return res.redirect('/admin/ajustes?error=' + encodeURIComponent('No se puede eliminar al Administrador Principal del sistema.') + '#usuarios');
+    }
+    run("DELETE FROM usuarios WHERE id=?", [id]);
+    res.redirect('/admin/ajustes?saved=1&msg=' + encodeURIComponent(`Usuario "${user.usuario}" eliminado del sistema.`) + '#usuarios');
+  } catch(err) {
+    res.redirect('/admin/ajustes?error=' + encodeURIComponent(err.message) + '#usuarios');
+  }
 });
 
 ajustesRouter.post('/logo', upload.single('logo'), async (req, res) => {

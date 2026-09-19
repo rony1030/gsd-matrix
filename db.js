@@ -285,6 +285,69 @@ async function getDb() {
           'GSD Jurídico',
           datetime('now','localtime')
         );
+
+        CREATE TABLE IF NOT EXISTS usuarios (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          nombre TEXT NOT NULL,
+          usuario TEXT UNIQUE NOT NULL,
+          email TEXT,
+          password TEXT,
+          rol TEXT NOT NULL DEFAULT 'Asistente Operativo',
+          permisos_json TEXT DEFAULT '[]',
+          avatar TEXT DEFAULT '',
+          telefono TEXT DEFAULT '',
+          cargo TEXT DEFAULT '',
+          estado TEXT DEFAULT 'activo',
+          created_at TEXT DEFAULT (datetime('now','localtime')),
+          updated_at TEXT DEFAULT (datetime('now','localtime'))
+        );
+
+        INSERT OR IGNORE INTO usuarios (id, nombre, usuario, email, password, rol, permisos_json, cargo, estado)
+        VALUES
+        (
+          1,
+          'Esteban Mejía',
+          'admin',
+          'esteban@geosolutions.com',
+          'admin123',
+          'Administrador / Socio',
+          '["expedientes","cotizaciones","propiedades","proyectos","blog","finanzas","ajustes","usuarios"]',
+          'Director General & Abogado Notario',
+          'activo'
+        ),
+        (
+          2,
+          'Ing. Carlos Rodríguez',
+          'crodriguez',
+          'carlos.r@gsd.do',
+          'gsd2026',
+          'Agrimensor / Técnico',
+          '["expedientes","cotizaciones","propiedades"]',
+          'Agrimensor Senior / Perito Catastral',
+          'activo'
+        ),
+        (
+          3,
+          'Dra. Carmen Valenzuela',
+          'cvalenzuela',
+          'carmen.v@gsd.do',
+          'gsd2026',
+          'Abogado Senior',
+          '["expedientes","cotizaciones","blog"]',
+          'Abogada Inmobiliaria & Litigios',
+          'activo'
+        ),
+        (
+          4,
+          'Jean-Luc Dubois',
+          'jdubois',
+          'jeanluc@gsd.do',
+          'gsd2026',
+          'Asesor Inmobiliario',
+          '["propiedades","proyectos","cotizaciones"]',
+          'Broker Internacional Bávaro / Cap Cana',
+          'activo'
+        );
       `);
       saveDb();
     } catch(e) {
@@ -539,6 +602,69 @@ function initSchema() {
       '["https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=900&q=80","https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=900&q=80"]',
       '["Marina privada","Muelle de atraque","Golf Cart incluido","Club de Playa","Helipuerto","Seguridad perimetral"]',
       0
+    );
+
+    CREATE TABLE IF NOT EXISTS usuarios (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      nombre TEXT NOT NULL,
+      usuario TEXT UNIQUE NOT NULL,
+      email TEXT,
+      password TEXT,
+      rol TEXT NOT NULL DEFAULT 'Asistente Operativo',
+      permisos_json TEXT DEFAULT '[]',
+      avatar TEXT DEFAULT '',
+      telefono TEXT DEFAULT '',
+      cargo TEXT DEFAULT '',
+      estado TEXT DEFAULT 'activo',
+      created_at TEXT DEFAULT (datetime('now','localtime')),
+      updated_at TEXT DEFAULT (datetime('now','localtime'))
+    );
+
+    INSERT OR IGNORE INTO usuarios (id, nombre, usuario, email, password, rol, permisos_json, cargo, estado)
+    VALUES
+    (
+      1,
+      'Esteban Mejía',
+      'admin',
+      'esteban@geosolutions.com',
+      'admin123',
+      'Administrador / Socio',
+      '["expedientes","cotizaciones","propiedades","proyectos","blog","finanzas","ajustes","usuarios"]',
+      'Director General & Abogado Notario',
+      'activo'
+    ),
+    (
+      2,
+      'Ing. Carlos Rodríguez',
+      'crodriguez',
+      'carlos.r@gsd.do',
+      'gsd2026',
+      'Agrimensor / Técnico',
+      '["expedientes","cotizaciones","propiedades"]',
+      'Agrimensor Senior / Perito Catastral',
+      'activo'
+    ),
+    (
+      3,
+      'Dra. Carmen Valenzuela',
+      'cvalenzuela',
+      'carmen.v@gsd.do',
+      'gsd2026',
+      'Abogado Senior',
+      '["expedientes","cotizaciones","blog"]',
+      'Abogada Inmobiliaria & Litigios',
+      'activo'
+    ),
+    (
+      4,
+      'Jean-Luc Dubois',
+      'jdubois',
+      'jeanluc@gsd.do',
+      'gsd2026',
+      'Asesor Inmobiliario',
+      '["propiedades","proyectos","cotizaciones"]',
+      'Broker Internacional Bávaro / Cap Cana',
+      'activo'
     );
   `);
 }
