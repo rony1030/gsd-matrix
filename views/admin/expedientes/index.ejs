@@ -7,6 +7,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="icon" type="image/png" href="/img/isotipo.png">
 <script src="https://cdn.jsdelivr.net/npm/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <style>
 :root{--navy:#1A3A52;--green:#4A9B6F;--green-l:#E8F4EF;--gray:#6B7280;--line:#E5E7EB;--bg:#F9FAFB;--white:#fff;--red:#C0392B;--red-l:#FBEAEA;--amber:#B7791F;--amber-l:#FDF3E1;--blue:#2B6CB0;--blue-l:#E8F0FA;--ink:#1F2937}
 *{box-sizing:border-box;margin:0;padding:0;scrollbar-width:thin;scrollbar-color:#CBD5E1 transparent}
@@ -1029,7 +1031,101 @@ function renderTab(){
   } else if(typeof resumen==='function'){
     resumen(e,T,b);
   }
+  if(tab==='informacion' && T && T.tec){
+    setTimeout(()=>{
+      initExpMap(e.ubic?.coord||'', T?.nombre||e.svc, e.ubic?.dir||e.ubic?.ref||'');
+    }, 60);
+  }
   icons();
+}
+
+let currentLeafletMap = null;
+let currentMapMarker = null;
+
+function parseCoords(str) {
+  if (!str) return null;
+  const m = str.match(/([-+]?\d+(?:\.\d+)?)\s*,\s*([-+]?\d+(?:\.\d+)?)/) || str.match(/([-+]?\d+(?:\.\d+)?)\s+([-+]?\d+(?:\.\d+)?)/);
+  if (m) {
+    const lat = parseFloat(m[1]);
+    const lng = parseFloat(m[2]);
+    if (!isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+      return [lat, lng];
+    }
+  }
+  return null;
+}
+
+function initExpMap(coordStr, title, dir) {
+  const mapEl = document.getElementById('osmMap');
+  if (!mapEl || typeof L === 'undefined') return;
+
+  if (currentLeafletMap) {
+    try { currentLeafletMap.remove(); } catch(e) {}
+    currentLeafletMap = null;
+    currentMapMarker = null;
+  }
+
+  if (L.Icon && L.Icon.Default && !L.Icon.Default._gsdPatched) {
+    delete L.Icon.Default.prototype._getIconUrl;
+    L.Icon.Default.mergeOptions({
+      iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+      iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+      shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+    });
+    L.Icon.Default._gsdPatched = true;
+  }
+
+  const parsed = parseCoords(coordStr);
+  const defaultCenter = [18.5812, -68.4103]; // Bávaro / Punta Cana
+  const center = parsed || defaultCenter;
+  const zoom = parsed ? 16 : 12;
+
+  currentLeafletMap = L.map('osmMap', {
+    center: center,
+    zoom: zoom,
+    zoomControl: true,
+    attributionControl: true
+  });
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>'
+  }).addTo(currentLeafletMap);
+
+  if (parsed) {
+    currentMapMarker = L.marker(parsed, { draggable: true }).addTo(currentLeafletMap);
+    currentMapMarker.bindPopup(`<b>${title || 'Ubicación'}</b><br><small>${dir || coordStr}</small>`).openPopup();
+    currentMapMarker.on('dragend', function(ev) {
+      const pos = ev.target.getLatLng();
+      const lat = pos.lat.toFixed(6);
+      const lng = pos.lng.toFixed(6);
+      const inputCoord = document.querySelector('input[data-k="coord"]');
+      if (inputCoord) {
+        inputCoord.value = `${lat}, ${lng}`;
+        toast('Coordenadas actualizadas');
+      }
+    });
+  }
+
+  currentLeafletMap.on('click', function(ev) {
+    const inputCoord = document.querySelector('input[data-k="coord"]');
+    if (inputCoord) {
+      const lat = ev.latlng.lat.toFixed(6);
+      const lng = ev.latlng.lng.toFixed(6);
+      inputCoord.value = `${lat}, ${lng}`;
+      if (currentMapMarker) {
+        currentMapMarker.setLatLng(ev.latlng);
+      } else {
+        currentMapMarker = L.marker(ev.latlng, { draggable: true }).addTo(currentLeafletMap);
+      }
+      currentMapMarker.bindPopup(`<b>Punto seleccionado</b><br><small>${lat}, ${lng}</small>`).openPopup();
+      toast('Coordenadas capturadas del mapa');
+    }
+  });
+
+  setTimeout(() => {
+    if (currentLeafletMap) currentLeafletMap.invalidateSize();
+  }, 150);
 }
 
 function quickNote(){
@@ -1128,22 +1224,33 @@ function informacion(e,T,b){
     ${T && T.tec ? `
       <div class="card" data-path="ubic">
         <div class="ch">
-          <h2>Ubicación</h2>
+          <h2>Ubicación del inmueble</h2>
           <button class="btn sm ghost" onclick="editBlock(this)"><i data-lucide="pencil"></i>Editar</button>
         </div>
-        <div class="map"><div class="poly"></div><div class="pin"><i data-lucide="map-pin"></i></div></div>
+        <div style="position:relative;margin-bottom:12px">
+          <div id="osmMap" style="height:230px;width:100%;border-radius:8px;border:1px solid var(--line);background:#f3f4f6;z-index:1"></div>
+          <div id="osmMapHint" style="display:none;position:absolute;top:10px;left:50%;transform:translateX(-50%);background:rgba(26,58,82,0.92);color:#fff;padding:4px 12px;border-radius:20px;font-size:11px;z-index:1000;box-shadow:0 2px 8px rgba(0,0,0,0.2);pointer-events:none">
+            Haz clic en el mapa para fijar coordenadas
+          </div>
+        </div>
         <div class="kv">
           <span class="k">Coordenadas</span><span class="v" data-k="coord">${coordStr || '—'}</span>
           <span class="k">Dirección</span><span class="v" data-k="dir">${ubic.dir || '—'}</span>
           <span class="k">Referencia</span><span class="v" data-k="ref">${ubic.ref || '—'}</span>
         </div>
-        ${coordStr ? `
-          <div style="margin-top:10px">
-            <a class="btn sm" href="https://www.google.com/maps?q=${encodeURIComponent(coordStr.replace(/ /g,''))}" target="_blank">
-              <i data-lucide="external-link"></i>Abrir ubicación
+        <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          ${coordStr ? `
+            <a class="btn sm" href="https://www.openstreetmap.org/?mlat=${encodeURIComponent(coordStr.split(',')[0]?.trim())}&mlon=${encodeURIComponent(coordStr.split(',')[1]?.trim())}#map=16/${encodeURIComponent(coordStr.split(',')[0]?.trim())}/${encodeURIComponent(coordStr.split(',')[1]?.trim())}" target="_blank">
+              <i data-lucide="map"></i>OpenStreetMap
             </a>
-          </div>
-        ` : ''}
+            <a class="btn sm ghost" href="https://www.google.com/maps?q=${encodeURIComponent(coordStr.replace(/ /g,''))}" target="_blank">
+              <i data-lucide="external-link"></i>Google Maps
+            </a>
+            <button class="btn sm ghost" onclick="navigator.clipboard.writeText('${coordStr.replace(/'/g,"\\'")}') ; toast('Coordenadas copiadas')"><i data-lucide="copy"></i>Copiar</button>
+          ` : `
+            <small style="color:var(--gray)">Sin coordenadas fijadas. Haz clic en "Editar" para agregarlas o marcar el mapa.</small>
+          `}
+        </div>
       </div>
       ${kvBlock('Linderos', linderos, {Norte:'Norte', Sur:'Sur', Este:'Este', Oeste:'Oeste'}, 'linderos')}
       ${kvBlock('Datos técnicos', tecnico, {tipo:'Tipo de levantamiento', equipo:'Equipo', sist:'Sistema de coordenadas', zona:'Zona', datum:'Datum', prec:'Precisión'}, 'tecnico')}
@@ -1154,6 +1261,8 @@ function informacion(e,T,b){
 function editBlock(btn){
   const card=btn.closest('.card');
   card.querySelectorAll('.v[data-k]').forEach(v=>{const val=v.textContent==='—'?'':v.textContent;v.innerHTML=`<input value="${val.replace(/"/g,'&quot;')}" data-k="${v.dataset.k}">`;});
+  const hint=$('osmMapHint');
+  if(hint) hint.style.display='block';
   btn.parentElement.innerHTML=`<h2>${card.querySelector('h2').textContent}</h2><span><button class="btn sm" onclick="renderTab()">Cancelar</button> <button class="btn sm p" onclick="saveBlock(this)">Guardar cambios</button></span>`;
 }
 
