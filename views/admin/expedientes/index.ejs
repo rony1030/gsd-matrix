@@ -415,6 +415,31 @@ tr.row:hover td{background:var(--bg);cursor:pointer}
 
 <div class="modal" id="mConfirm"><div class="box" style="width:420px"><h2 id="cfTitle">Confirmar</h2><p id="cfText" class="sub" style="margin-bottom:6px"></p><div class="mf"><button class="btn" onclick="closeM('mConfirm')">Cancelar</button><button class="btn p" id="cfOk">Confirmar</button></div></div></div>
 <div class="modal" id="mClient"><div class="box" style="width:600px;padding:0"><div id="clientView"></div><div class="mf" style="padding:0 22px 18px"><button class="btn" onclick="closeM('mClient')">Cerrar vista</button></div></div></div>
+
+<div class="modal" id="mClientEdit"><div class="box" style="width:480px">
+  <h2>Datos del cliente</h2>
+  <div class="f"><label>Nombre completo / Razón social</label><input id="cliNombre"></div>
+  <div class="g2"><div class="f"><label>Cédula / RNC</label><input id="cliCedula"></div><div class="f"><label>Teléfono / WhatsApp</label><input id="cliTel"></div></div>
+  <div class="f"><label>Correo electrónico</label><input id="cliEmail"></div>
+  <div class="f"><label>Dirección física / fiscal</label><input id="cliDir"></div>
+  <div class="mf"><button class="btn" onclick="closeM('mClientEdit')">Cancelar</button><button class="btn p" onclick="saveClientModal()">Guardar datos</button></div>
+</div></div>
+
+<div class="modal" id="mRecibo"><div class="box" style="width:580px">
+  <h2>Recibo de pago / Comprobante</h2>
+  <div class="paper" id="reciboPaper" style="background:#fff;border:1px solid var(--line);border-radius:8px;padding:24px;margin:12px 0;font-size:13px;line-height:1.6"></div>
+  <div class="mf"><button class="btn" onclick="copyRecibo()"><i data-lucide="copy"></i>Copiar texto</button><button class="btn p" onclick="window.print()"><i data-lucide="printer"></i>Imprimir / Guardar PDF</button><button class="btn ghost" onclick="closeM('mRecibo')">Cerrar</button></div>
+</div></div>
+
+<div class="modal" id="mDocNew"><div class="box" style="width:450px">
+  <h2>Agregar documento al expediente</h2>
+  <div class="f"><label>Nombre del documento</label><input id="newDocName" placeholder="Ej: Copia de cheque, Título escaneado..."></div>
+  <div class="f"><label>Categoría</label><select id="newDocCat"><option value="CLIENTE">CLIENTE</option><option value="INMUEBLE">INMUEBLE</option><option value="PROCESO">PROCESO</option><option value="FINANCIERO">FINANCIERO</option><option value="TÉCNICO">TÉCNICO</option><option value="ADICIONAL" selected>ADICIONAL</option></select></div>
+  <div class="f"><label>Aporta</label><select id="newDocBy"><option value="cliente">Cliente</option><option value="gsd" selected>GSD</option></select></div>
+  <div class="f"><label>Seleccionar archivo (PDF, imagen)</label><input type="file" id="newDocFile" accept=".pdf,image/*,.doc,.docx"></div>
+  <div class="mf"><button class="btn" onclick="closeM('mDocNew')">Cancelar</button><button class="btn p" onclick="saveNewDocModal()">Adjuntar documento</button></div>
+</div></div>
+
 <div class="toast" id="toast"></div>
 <script>
 // ===== DATA: plantillas por servicio =====
@@ -596,13 +621,56 @@ function renderTpl(){$('tplCards').innerHTML=Object.entries(TPL).map(([k,t])=>`<
 let cur=null,tab='resumen',openPhase=null;
 function openExp(id,t){cur=DB.find(e=>e.id===id);tab=t||'resumen';openPhase=null;$('v-exp').innerHTML='<div class="sk" style="width:180px"></div><div class="sk" style="width:320px;height:26px"></div><div class="sk" style="width:240px"></div><div class="card" style="margin-top:18px"><div class="sk"></div><div class="sk" style="width:60%"></div></div><div class="card"><div class="sk"></div><div class="sk"></div><div class="sk" style="width:40%"></div></div>';setTimeout(renderExp,260);document.querySelectorAll('.view').forEach(x=>x.classList.remove('on'));$('v-exp').classList.add('on');document.querySelectorAll('.side a').forEach(a=>a.classList.toggle('on',a.dataset.view==='list'));$('main').scrollTop=0;icons();}
 function renderExp(){const e=cur,T=TPL[e.svc]||TPL.deslinde,p=progress(e),es=ESTADO[e.estado];const obj=e.objeto||{};const sub=e.svc==='deslinde'?`Parcela ${obj.parcela||'—'} · ${obj.areaReg||''} · ${obj.sector||''}, ${obj.provincia||''}`:e.svc==='transferencia'?`Matrícula ${obj.matricula||'—'} · ${obj.sector||''} · ${obj.precio||''}`:`${obj.empresa||obj.proyecto||obj.parcela||'Asunto'} · Nivel ${obj.nivel||'1'}`;
- const tabs=['resumen','informacion','documentos','checklist','proceso','tareas','avances','bitacora','evidencias','finanzas'];const tn={resumen:'Resumen',informacion:'Información',documentos:'Documentos',checklist:'Checklist',proceso:'Proceso',tareas:'Tareas',avances:'Avances',bitacora:'Bitácora',evidencias:'Evidencias',finanzas:'Finanzas'};
- $('v-exp').innerHTML=`<span class="link" onclick="go('list')">← Volver a expedientes</span>
- <div class="exp-head" style="margin-top:10px"><div><div class="ref">${e.id} · desde ${e.quote} · ${divBadge(e.svc)}</div><h1>${T.nombre}</h1><div class="cli">${e.cliente.nombre}</div><div class="sub">${sub}</div></div>
- <div class="acts"><span class="tag ${es[1]}" style="font-size:11.5px;padding:5px 12px">● ${es[0]}</span><select onchange="setEstado(this.value)" style="width:auto;padding:6px 8px;font-size:12px">${Object.entries(ESTADO).map(([k,v])=>`<option value="${k}" ${k===e.estado?'selected':''}>${v[0]}</option>`).join('')}</select><button class="btn" onclick="setTab('informacion');toast('Use Editar en cada bloque')"><i data-lucide="pencil"></i>Editar expediente</button><button class="btn" onclick="noteModal(false)"><i data-lucide="sticky-note"></i>Agregar nota</button><button class="btn" onclick="clientView()" data-tip="Cómo lo ve el cliente"><i data-lucide="eye"></i>Vista previa para cliente</button><button class="btn p" onclick="genUpdate()"><i data-lucide="send"></i>Generar actualización</button></div></div>
- <div class="card" style="margin-top:18px"><div class="prog"><div><div style="font-size:11.5px;color:var(--gray)">Progreso del expediente</div><div class="bar"><i style="width:${p.pct}%"></i></div><span class="big">${p.pct}%</span> <span style="color:var(--gray)">${p.done} de ${p.total} tareas completadas</span></div>
- <div><div class="k">Inicio</div><div class="v">${fd(e.inicio)}</div></div><div><div class="k">Fecha estimada</div><div class="v">${fd(e.fin)}</div></div><div><div class="k">Responsable</div><div class="v">${e.resp}</div></div><div><div class="k">${T.tec?'Agrimensor':'Asistente'}</div><div class="v">${e.tec||'—'}</div></div><div><div class="k">Prioridad</div><div class="v"><span class="tag ${e.pri==='Alta'?'hi':e.pri==='Media'?'med':'lo'}">${e.pri.toUpperCase()}</span></div></div></div></div>
- <div class="tabs">${tabs.map(t=>`<button class="${t===tab?'on':''}" onclick="setTab('${t}')">${tn[t]}</button>`).join('')}</div>
+ const tabs=['resumen','documentos','finanzas','informacion','checklist','proceso','tareas','avances','bitacora','evidencias'];
+ const tn={resumen:'Vista 360°',documentos:'Documentos',finanzas:'Facturación & Recibos',informacion:'Datos / Objeto',checklist:'Checklist',proceso:'Línea de Tiempo',tareas:'Tareas',avances:'Avances',bitacora:'Bitácora',evidencias:'Fotos'};
+ $('v-exp').innerHTML=`
+ <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+   <a class="link" onclick="go('list')" style="display:inline-flex;align-items:center;gap:6px;font-size:13px"><i data-lucide="arrow-left"></i> Volver a expedientes</a>
+   <div style="display:flex;gap:8px;align-items:center">
+     <button class="btn sm" onclick="openClientModal()"><i data-lucide="user-check"></i>Perfil Cliente</button>
+     <button class="btn sm" onclick="clientView()"><i data-lucide="eye"></i>Portal Cliente</button>
+     <button class="btn sm p" onclick="genUpdate()"><i data-lucide="send"></i>Enviar reporte</button>
+   </div>
+ </div>
+
+ <div class="card" style="padding:18px 22px;margin-bottom:14px;border-left:4px solid ${DIV_COLOR[T.div]||'var(--navy)'}">
+   <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px">
+     <div>
+       <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+         <b style="font-size:13px;letter-spacing:1px;color:var(--gray)">${e.id}</b>
+         ${divBadge(e.svc)}
+         <small style="color:var(--gray)">· Cotización: ${e.quote}</small>
+       </div>
+       <h1 style="font-size:22px;margin:2px 0 4px;color:var(--navy)">${T.nombre}</h1>
+       <div style="font-size:14px;font-weight:500;color:var(--ink);display:flex;align-items:center;gap:8px">
+         <span>${e.cliente.nombre}</span>
+         <button class="btn sm ghost" onclick="openClientModal()" style="padding:2px 6px;font-size:11px" title="Actualizar cliente"><i data-lucide="pencil"></i></button>
+       </div>
+       <div class="sub" style="font-size:12px;margin-top:2px">${sub}</div>
+     </div>
+     <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+       <div style="display:flex;align-items:center;gap:8px">
+         <span class="tag ${es[1]}" style="font-size:11.5px;padding:4px 10px">● ${es[0]}</span>
+         <select onchange="setEstado(this.value)" style="width:auto;padding:4px 8px;font-size:12px;border-radius:6px">${Object.entries(ESTADO).map(([k,v])=>`<option value="${k}" ${k===e.estado?'selected':''}>${v[0]}</option>`).join('')}</select>
+       </div>
+       <div style="font-size:12px;color:var(--gray)">Responsable: <b style="color:var(--navy)">${e.resp}</b></div>
+     </div>
+   </div>
+   <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:14px;margin-top:16px;padding-top:14px;border-top:1px solid var(--line);align-items:center">
+     <div>
+       <div style="display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:4px">
+         <span style="color:var(--gray)">Progreso general</span>
+         <b style="color:var(--navy)">${p.pct}% (${p.done}/${p.total} tareas)</b>
+       </div>
+       <div class="bar" style="height:8px"><i style="width:${p.pct}%"></i></div>
+     </div>
+     <div><span class="k" style="font-size:11px;color:var(--gray);display:block">Inicio</span><span style="font-size:12px;font-weight:500">${fd(e.inicio)}</span></div>
+     <div><span class="k" style="font-size:11px;color:var(--gray);display:block">Estimado fin</span><span style="font-size:12px;font-weight:500">${fd(e.fin)}</span></div>
+     <div><span class="k" style="font-size:11px;color:var(--gray);display:block">Prioridad</span><span class="tag ${e.pri==='Alta'?'hi':e.pri==='Media'?'med':'lo'}">${e.pri.toUpperCase()}</span></div>
+   </div>
+ </div>
+
+ <div class="tabs" style="margin:0 0 16px">${tabs.map(t=>`<button class="${t===tab?'on':''}" onclick="setTab('${t}')">${tn[t]}</button>`).join('')}</div>
  <div id="tabBox"></div>`;renderTab();icons();}
 function setTab(t){tab=t;document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.textContent===({resumen:'Resumen',informacion:'Información',documentos:'Documentos',checklist:'Checklist',proceso:'Proceso',tareas:'Tareas',avances:'Avances',bitacora:'Bitácora',evidencias:'Evidencias',finanzas:'Finanzas'})[t]));renderTab();icons();}
 function setEstado(v){if(v==='done'){confirmA('Cerrar expediente','El expediente pasará a estado Cerrado y dejará de generar alertas.',()=>{cur.estado='done';log(cur,'Expediente cerrado.');save();renderExp();toast('Expediente cerrado');});renderExp();return;}cur.estado=v;log(cur,`Estado cambiado a "${ESTADO[v][0]}".`);save();renderExp();toast('Estado actualizado');}
@@ -652,61 +720,331 @@ function informacion(e,T,b){b.innerHTML=`<div class="g2">${kvBlock('Datos del cl
 function editBlock(btn){const card=btn.closest('.card');card.querySelectorAll('.v[data-k]').forEach(v=>{const val=v.textContent==='—'?'':v.textContent;v.innerHTML=`<input value="${val.replace(/"/g,'&quot;')}" data-k="${v.dataset.k}">`;});btn.parentElement.innerHTML=`<h2>${card.querySelector('h2').textContent}</h2><span><button class="btn sm" onclick="renderTab()">Cancelar</button> <button class="btn sm p" onclick="saveBlock(this)">Guardar cambios</button></span>`;}
 function saveBlock(btn){const card=btn.closest('.card');const obj=cur[card.dataset.path];card.querySelectorAll('input[data-k]').forEach(i=>obj[i.dataset.k]=i.value);log(cur,`Bloque "${card.querySelector('h2').textContent}" actualizado.`);save();renderExp();toast('Cambios guardados');}
 
+// ===== CLIENT PROFILE MODAL =====
+function openClientModal(){
+  if(!cur || !cur.cliente) return;
+  $('cliNombre').value = cur.cliente.nombre || '';
+  $('cliCedula').value = cur.cliente.cedula || '';
+  $('cliTel').value = cur.cliente.tel || '';
+  $('cliEmail').value = cur.cliente.email || '';
+  $('cliDir').value = cur.cliente.dir || '';
+  openM('mClientEdit');
+}
+function saveClientModal(){
+  const n = $('cliNombre').value.trim();
+  if(!n){ toast('El nombre es obligatorio'); return; }
+  cur.cliente.nombre = n;
+  cur.cliente.cedula = $('cliCedula').value.trim();
+  cur.cliente.tel = $('cliTel').value.trim();
+  cur.cliente.email = $('cliEmail').value.trim();
+  cur.cliente.dir = $('cliDir').value.trim();
+  log(cur, `Datos del cliente actualizados (${n}).`);
+  save();
+  closeM('mClientEdit');
+  renderExp();
+  toast('Datos del cliente guardados');
+}
+
 // ===== DOCUMENTS =====
 let docF='all';
-function documentos(e,T,b){const cats=[...new Set(e.docs.map(d=>d.cat))];const f=d=>docF==='all'||(docF==='ok'&&d.st==='ok')||(docF==='miss'&&d.st!=='ok')||(docF==='late'&&d.st!=='ok'&&d.by==='cliente');
- b.innerHTML=`<div class="card"><div class="ch"><h2>Documentos del expediente <small style="color:var(--gray);font-weight:400">· ${e.docs.filter(d=>d.st==='ok').length} de ${e.docs.length} completos</small></h2><button class="btn p" onclick="uploadDoc()"><i data-lucide="upload"></i>Subir documento</button></div>
- <div class="filters">${[['all','Todos'],['miss','Pendientes'],['ok','Completados'],['late','Esperando cliente']].map(x=>`<button class="${docF===x[0]?'on':''}" onclick="docF='${x[0]}';renderTab()">${x[1]}</button>`).join('')}</div>
- ${cats.map(c=>{const ds=e.docs.map((d,i)=>({...d,i})).filter(d=>d.cat===c&&f(d));if(!ds.length)return '';return `<div class="cat">${c}</div>${ds.map(d=>`<div class="doc"><div class="ic ${d.st==='ok'?'':'miss'}"><i data-lucide="${d.st==='ok'?'file-check':'file'}"></i></div><div><b>${d.st==='ok'?d.file:d.name}</b><small>${d.st==='ok'?`PDF · ${d.size} · subido ${fd(d.date)} por ${d.who.split(' ')[0]}`:`Aporta: ${d.by==='cliente'?'cliente':'GSD'} · ${d.st==='wait'?'solicitado, esperando':'pendiente'}`}</small></div><div class="acts">${d.st==='ok'?`<span class="tag proc">Verificado</span><label style="font-size:11px;color:var(--gray);display:inline-flex;gap:4px;align-items:center;cursor:pointer" data-tip="Visible en el portal del cliente"><input type="checkbox" style="width:auto" ${d.share?'checked':''} onchange="cur.docs[${d.i}].share=this.checked;save();toast(this.checked?'Compartido con el cliente':'Retirado del cliente')">Compartir</label><button class="btn sm" onclick="toast('Vista previa (simulado)')">Ver</button><button class="btn sm" onclick="toast('Descargando (simulado)')">Descargar</button>`:`<span class="tag ${d.st==='wait'?'wait':'late'}">${d.st==='wait'?'Solicitado':'Pendiente'}</span>${d.st!=='wait'?`<button class="btn sm" onclick="docSt(${d.i},'wait')">Solicitar</button>`:''}<button class="btn sm p" onclick="docSt(${d.i},'ok')">Marcar recibido</button>`}</div></div>`).join('')}`;}).join('')}</div>`;}
-function docSt(i,st){const d=cur.docs[i];d.st=st;if(st==='ok'){d.file=d.name.replace(/ /g,'_')+'.pdf';d.size='1.1 MB';d.date=TODAY;d.who='Esteban Mejía';log(cur,`Documento "${d.name}" recibido y verificado.`);}else log(cur,`Documento "${d.name}" solicitado al cliente.`);save();renderTab();toast(st==='ok'?'Documento verificado':'Solicitud registrada');}
-function uploadDoc(){const inp=document.createElement('input');inp.type='file';inp.onchange=()=>{const f=inp.files[0];if(!f)return;cur.docs.push({cat:'ADICIONAL',name:f.name,by:'gsd',st:'ok',file:f.name,size:(f.size/1048576).toFixed(1)+' MB',date:TODAY,who:'Esteban Mejía'});log(cur,`Documento "${f.name}" subido.`);save();renderTab();toast('Documento cargado');};inp.click();}
+function documentos(e,T,b){
+  const cats=[...new Set(e.docs.map(d=>d.cat))];
+  const f=d=>docF==='all'||(docF==='ok'&&d.st==='ok')||(docF==='miss'&&d.st!=='ok')||(docF==='late'&&d.st!=='ok'&&d.by==='cliente');
+  b.innerHTML=`<div class="card">
+    <div class="ch">
+      <h2>Documentos del expediente <small style="color:var(--gray);font-weight:400">· ${e.docs.filter(d=>d.st==='ok').length} de ${e.docs.length} listos</small></h2>
+      <div style="display:flex;gap:8px">
+        <button class="btn sm" onclick="openM('mDocNew')"><i data-lucide="plus"></i>Agregar requisito</button>
+        <button class="btn sm p" onclick="uploadDocQuick()"><i data-lucide="upload"></i>Subir archivo</button>
+      </div>
+    </div>
+    <div class="filters">${[['all','Todos'],['miss','Pendientes'],['ok','Completados'],['late','Esperando cliente']].map(x=>`<button class="${docF===x[0]?'on':''}" onclick="docF='${x[0]}';renderTab()">${x[1]}</button>`).join('')}</div>
+    ${cats.map(c=>{
+      const ds=e.docs.map((d,i)=>({...d,i})).filter(d=>d.cat===c&&f(d));
+      if(!ds.length)return '';
+      return `<div class="cat" style="font-weight:600;font-size:11px;letter-spacing:1px;color:var(--gray);margin:14px 0 6px;text-transform:uppercase">${c}</div>
+      ${ds.map(d=>`
+        <div class="doc" style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border:1px solid var(--line);border-radius:8px;margin-bottom:6px;background:#fff">
+          <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">
+            <div class="ic ${d.st==='ok'?'':'miss'}" style="width:34px;height:34px;border-radius:6px;background:${d.st==='ok'?'var(--green-l)':'var(--red-l)'};color:${d.st==='ok'?'var(--green)':'var(--red)'};display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <i data-lucide="${d.st==='ok'?'file-check':'file'}"></i>
+            </div>
+            <div style="min-width:0;flex:1">
+              <b style="font-size:13px;color:var(--navy);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${d.st==='ok'?(d.file||d.name):d.name}</b>
+              <small style="color:var(--gray);font-size:11px">${d.st==='ok'?`${d.size||'PDF'} · Subido ${fd(d.date)} por ${d.who?.split(' ')[0]||'GSD'}`:`Aporta: ${d.by==='cliente'?'Cliente':'GSD'} · ${d.st==='wait'?'Solicitado':'Pendiente'}`}</small>
+            </div>
+          </div>
+          <div class="acts" style="display:flex;gap:6px;align-items:center">
+            ${d.st==='ok'?`
+              <span class="tag proc">Listo</span>
+              <label style="font-size:11px;color:var(--gray);display:inline-flex;gap:4px;align-items:center;cursor:pointer" title="Visible para cliente">
+                <input type="checkbox" style="width:auto" ${d.share?'checked':''} onchange="cur.docs[${d.i}].share=this.checked;save();toast(this.checked?'Compartido':'Ocultado')"> Compartir
+              </label>
+              ${d.dataUrl?`<a class="btn sm" href="${d.dataUrl}" download="${d.file||'documento'}" target="_blank"><i data-lucide="download"></i>Descargar</a>`:`<button class="btn sm" onclick="toast('Descargando archivo...')"><i data-lucide="download"></i>Descargar</button>`}
+            `:`
+              <span class="tag ${d.st==='wait'?'wait':'late'}">${d.st==='wait'?'Solicitado':'Pendiente'}</span>
+              <button class="btn sm" onclick="triggerDocUpload(${d.i})"><i data-lucide="upload"></i>Subir</button>
+              <button class="btn sm p" onclick="docSt(${d.i},'ok')">Marcar Listo</button>
+            `}
+          </div>
+        </div>
+      `).join('')}
+    `}).join('')}
+  </div>`;
+}
 
-// ===== CHECKLIST / TASKS =====
-function checklist(e,T,b){const p=progress(e);b.innerHTML=`<div class="card"><div class="ch"><h2>Checklist del expediente</h2><div style="display:flex;align-items:center;gap:10px"><span style="color:var(--gray);font-size:12px">${p.done} / ${p.total} completadas</span><div class="bar" style="width:140px"><i style="width:${p.pct}%"></i></div><b style="color:var(--navy)">${p.pct}%</b><button class="btn sm p" onclick="taskModal()"><i data-lucide="plus"></i>Tarea</button></div></div>
- ${T.fases.map((f,fi)=>{const ts=e.tasks.filter(t=>t.phase===fi);const d=ts.filter(t=>t.st==='done').length;return `<div class="phase"><div class="ph"><span>Fase ${fi+1} — ${f[0]}</span><small>${d}/${ts.length}</small></div>${ts.map(t=>taskRow(t)).join('')}</div>`;}).join('')}</div>`;}
-function taskRow(t){const late=t.due&&t.st!=='done'&&t.st!=='na'&&days(t.due)<0;return `<div class="task"><input type="checkbox" style="width:auto" ${t.st==='done'?'checked':''} onchange="setSt(${t.id},this.checked?'done':'pend')"><span class="t ${t.st==='done'?'done':''}" onclick="taskModal(${t.id})" style="cursor:pointer">${t.name}${t.desc?` <small style="color:var(--gray)">· ${t.desc}</small>`:''}</span><span class="who"><i data-lucide="user"></i> ${t.who}</span><span class="due ${late?'late':''}">${t.due?'<i data-lucide="calendar"></i> '+fd(t.due):'—'}</span><select class="${ST[t.st][1]}" onchange="setSt(${t.id},this.value)">${Object.entries(ST).map(([k,v])=>`<option value="${k}" ${k===t.st?'selected':''}>${v[0]}</option>`).join('')}</select><button class="btn sm ghost" onclick="taskModal(${t.id})"><i data-lucide="pencil"></i></button></div>`;}
-function setSt(id,st){const t=cur.tasks.find(x=>x.id===id);const T=TPL[cur.svc];const prev=phaseState(cur,t.phase);t.st=st;if(st==='done')toast('Tarea completada');log(cur,`Tarea "${t.name}" → ${ST[st][0]}.`);if(prev!=='done'&&phaseState(cur,t.phase)==='done'){log(cur,`Etapa "${T.fases[t.phase][0]}" completada. Expediente avanzado automáticamente.`,'Sistema');cur.avances.unshift({date:TODAY,title:`Etapa "${T.fases[t.phase][0]}" completada`,who:'Sistema',desc:`Todas las tareas de la etapa ${T.fases[t.phase][0].toLowerCase()} han sido completadas.`,client:false});}save();renderExp();}
-let editTask=null;
-function taskModal(id){editTask=id?cur.tasks.find(t=>t.id===id):null;$('mTaskTitle').textContent=editTask?'Editar tarea':'Nueva tarea';$('tWho').innerHTML=TEAM.map(n=>`<option>${n}</option>`).join('');$('tPhase').innerHTML=TPL[cur.svc].fases.map((f,i)=>`<option value="${i}">${f[0]}</option>`).join('');
- $('tName').value=editTask?.name||'';$('tDesc').value=editTask?.desc||'';$('tWho').value=editTask?.who||cur.resp;$('tPhase').value=editTask?editTask.phase:currentPhase(cur);$('tPri').value=editTask?.pri||'Media';$('tDue').value=editTask?.due||'';$('tSt').value=editTask?.st||'pend';openM('mTask');}
-function saveTask(){const n=$('tName').value.trim();if(!n){toast('El nombre es obligatorio');return;}const d={name:n,desc:$('tDesc').value,who:$('tWho').value,phase:+$('tPhase').value,pri:$('tPri').value,due:$('tDue').value,st:$('tSt').value};if(editTask){Object.assign(editTask,d);log(cur,`Tarea "${n}" editada.`);}else{cur.tasks.push({id:Math.max(0,...cur.tasks.map(t=>t.id))+1,...d});log(cur,`Tarea "${n}" creada y asignada a ${d.who}.`);}save();closeM('mTask');renderExp();toast('Tarea guardada');}
+function triggerDocUpload(index){
+  const inp=document.createElement('input');
+  inp.type='file';
+  inp.accept='.pdf,image/*,.doc,.docx';
+  inp.onchange=()=>{
+    const f=inp.files[0];
+    if(!f) return;
+    const r=new FileReader();
+    r.onload=()=>{
+      const d=cur.docs[index];
+      d.st='ok';
+      d.file=f.name;
+      d.size=(f.size/1048576).toFixed(2)+' MB';
+      d.date=TODAY;
+      d.who='Esteban Mejía';
+      d.dataUrl=r.result;
+      log(cur,`Documento "${d.name}" cargado (${f.name}).`);
+      save();
+      renderTab();
+      toast('Documento cargado con éxito');
+    };
+    r.readAsDataURL(f);
+  };
+  inp.click();
+}
 
-// ===== TIMELINE =====
-function proceso(e,T,b){const cp=currentPhase(e);b.innerHTML=`<div class="card"><h2>Proceso</h2><div class="tl" style="margin-top:14px">${T.fases.map((f,i)=>{const s=phaseState(e,i);return `<div class="s ${s} ${openPhase===i?'open':''}" onclick="openPhase=${openPhase===i?'null':i};renderTab()"><div class="c">${s==='done'?'✓':i+1}</div><b>${f[0]}</b><small>${s==='done'?'Completado':s==='cur'?'En proceso':'Pendiente'}</small></div>`;}).join('')}</div>
- ${openPhase!==null?(()=>{const fi=openPhase,ts=e.tasks.filter(t=>t.phase===fi),d=ts.filter(t=>t.st==='done').length,pct=ts.length?Math.round(d/ts.length*100):0,who=[...new Set(ts.map(t=>t.who))].join(', '),dues=ts.filter(t=>t.due).map(t=>t.due).sort();return `<div style="border-top:1px solid var(--line);padding-top:14px"><div class="ch"><h2>Etapa ${fi+1} — ${T.fases[fi][0]}</h2><span style="color:var(--gray);font-size:12px">${pct}% · ${d}/${ts.length} tareas</span></div><div class="kv" style="margin-bottom:12px"><span class="k">Responsables</span><span class="v">${who||'—'}</span><span class="k">Fechas</span><span class="v">${dues.length?fd(dues[0])+' → '+fd(dues[dues.length-1]):'sin fechas asignadas'}</span><span class="k">Documentos</span><span class="v">${e.docs.filter(x=>x.st!=='ok').length} pendientes en el expediente</span></div>${ts.map(t=>taskRow(t)).join('')}</div>`;})():'<p class="sub">Haga clic en una etapa para ver sus tareas, responsables y fechas.</p>'}</div>`;}
+function uploadDocQuick(){
+  const inp=document.createElement('input');
+  inp.type='file';
+  inp.accept='.pdf,image/*,.doc,.docx';
+  inp.onchange=()=>{
+    const f=inp.files[0];
+    if(!f) return;
+    const r=new FileReader();
+    r.onload=()=>{
+      cur.docs.push({
+        cat:'ADICIONAL',
+        name:f.name.replace(/\.[^/.]+$/,""),
+        by:'gsd',
+        st:'ok',
+        file:f.name,
+        size:(f.size/1048576).toFixed(2)+' MB',
+        date:TODAY,
+        who:'Esteban Mejía',
+        dataUrl:r.result
+      });
+      log(cur,`Documento adicional subido: ${f.name}.`);
+      save();
+      renderTab();
+      toast('Documento añadido al expediente');
+    };
+    r.readAsDataURL(f);
+  };
+  inp.click();
+}
 
-let tkF='all';
-function tareas(e,T,b){let ts=e.tasks.map(t=>t);if(tkF==='mine')ts=ts.filter(t=>t.who==='Esteban Mejía');if(tkF==='late')ts=ts.filter(t=>t.due&&t.st!=='done'&&days(t.due)<0);if(tkF==='today')ts=ts.filter(t=>t.due===TODAY);if(tkF==='week')ts=ts.filter(t=>t.due&&days(t.due)>=0&&days(t.due)<=7);if(tkF==='done')ts=ts.filter(t=>t.st==='done');if(tkF==='all')ts=ts.filter(t=>t.st!=='done');
- b.innerHTML=`<div class="card"><div class="ch"><h2>Tareas</h2><button class="btn p" onclick="taskModal()"><i data-lucide="plus"></i>Nueva tarea</button></div><div class="filters">${[['all','Todas'],['mine','Mis tareas'],['late','Vencidas'],['today','Hoy'],['week','Esta semana'],['done','Completadas']].map(x=>`<button class="${tkF===x[0]?'on':''}" onclick="tkF='${x[0]}';renderTab()">${x[1]}</button>`).join('')}</div>
- <table><thead><tr><th>Tarea</th><th>Etapa</th><th>Responsable</th><th>Fecha límite</th><th>Prioridad</th><th>Estado</th></tr></thead><tbody>${ts.map(t=>`<tr class="row" onclick="taskModal(${t.id})"><td>${t.name}</td><td>${T.fases[t.phase][0]}</td><td>${t.who}</td><td class="${t.due&&t.st!=='done'&&days(t.due)<0?'st-block':''}">${fd(t.due)}</td><td><span class="tag ${t.pri==='Alta'?'hi':t.pri==='Media'?'med':'lo'}">${t.pri}</span></td><td class="${ST[t.st][1]}">● ${ST[t.st][0]}</td></tr>`).join('')||'<tr><td colspan="6" class="empty">Sin tareas en este filtro.</td></tr>'}</tbody></table></div>`;}
+function saveNewDocModal(){
+  const name=$('newDocName').value.trim();
+  if(!name){ toast('Escribe el nombre del documento'); return; }
+  const cat=$('newDocCat').value;
+  const by=$('newDocBy').value;
+  const fileInput=$('newDocFile');
+  const f=fileInput.files[0];
+  
+  if(f){
+    const r=new FileReader();
+    r.onload=()=>{
+      cur.docs.push({
+        cat,name,by,st:'ok',
+        file:f.name,
+        size:(f.size/1048576).toFixed(2)+' MB',
+        date:TODAY,who:'Esteban Mejía',
+        dataUrl:r.result
+      });
+      log(cur,`Nuevo documento registrado: ${name}.`);
+      save();closeM('mDocNew');renderTab();toast('Documento guardado');
+    };
+    r.readAsDataURL(f);
+  } else {
+    cur.docs.push({cat,name,by,st:'miss',file:'',size:'',date:'',who:'Esteban Mejía'});
+    log(cur,`Requisito documental añadido: ${name}.`);
+    save();closeM('mDocNew');renderTab();toast('Requisito documental añadido');
+  }
+}
 
-// ===== AVANCES / NOTAS / ACTUALIZACIÓN AL CLIENTE =====
-function avances(e,T,b){b.innerHTML=`<div class="card"><div class="ch"><h2>Avances del expediente</h2><div style="display:flex;gap:8px"><button class="btn" onclick="noteModal(true)"><i data-lucide="plus"></i>Registrar avance</button><button class="btn p" onclick="genUpdate()"><i data-lucide="send"></i>Generar actualización</button></div></div><p class="sub" style="margin-bottom:10px">Los avances marcados como visibles alimentan la actualización al cliente y el futuro portal.</p>
- <div class="feed">${e.avances.map((a,i)=>`<div class="it"><div class="d">${fd(a.date).toUpperCase()}</div><div><b>${a.title}</b><p>${a.desc}</p><div class="who">Responsable: ${a.who}</div><label style="display:inline-flex;gap:6px;align-items:center;margin-top:6px;font-size:11.5px;cursor:pointer"><input type="checkbox" style="width:auto" ${a.client?'checked':''} onchange="cur.avances[${i}].client=this.checked;save();renderTab()"> ${a.client?'<span class="tag proc">VISIBLE PARA CLIENTE</span>':'<span class="tag done">SOLO INTERNO</span>'}</label></div></div>`).join('')||'<div class="empty">Sin avances registrados.</div>'}</div></div>`;}
-let noteIsAdv=false;
-function noteModal(adv){noteIsAdv=adv;$('mNoteTitle').textContent=adv?'Registrar avance':'Agregar nota interna';$('noteVisWrap').classList.toggle('hidden',!adv);$('noteVis').checked=adv;$('noteTxt').value='';openM('mNote');}
-function saveNote(){const t=$('noteTxt').value.trim();if(!t){toast('Escriba el contenido');return;}if(noteIsAdv){cur.avances.unshift({date:TODAY,title:t.split('.')[0].slice(0,70),who:'Esteban Mejía',desc:t,client:$('noteVis').checked});log(cur,'Avance registrado.');}else{cur.notas.unshift({date:TODAY,who:'Esteban Mejía',txt:t});log(cur,'Se agregó nota interna.');}save();closeM('mNote');renderExp();toast(noteIsAdv?'Avance registrado':'Nota guardada');}
-function genUpdate(){const e=cur,T=TPL[e.svc],p=progress(e),cp=currentPhase(e),last=e.avances.find(a=>a.client),next=e.tasks.filter(t=>t.st!=='done'&&t.st!=='na')[0];
- $('updPaper').innerHTML=`<img class="lg" src="${document.querySelector('.side img').src}"><h3>ACTUALIZACIÓN DE SU PROCESO</h3><p style="margin-top:10px">Estimado ${e.cliente.nombre}:</p><p style="margin-top:8px">Nos complace informarle que su expediente de ${T.nombre} (${e.id}) ha avanzado satisfactoriamente.</p><div class="kv"><span class="k">Estado actual</span><span class="v">${T.fases[cp][0]}</span><span class="k">Progreso</span><span class="v">${p.pct}%</span><span class="k">Último avance</span><span class="v">${last?last.desc:'—'}</span><span class="k">Próximo paso</span><span class="v">${next?next.name:'Cierre del expediente'}</span><span class="k">Fecha estimada</span><span class="v">${fd(e.fin)}</span></div><p style="margin-top:8px">Quedamos a su disposición para cualquier consulta.</p><p style="margin-top:14px">Atentamente,<br><b style="font-weight:500;color:var(--navy)">Geosolutions Source Dominicana, S.R.L.</b><br><small style="color:var(--gray)">Punta Cana · +1 (829) 493-7254 · mejia2925@gmail.com</small></p>`;openM('mUpd');}
-function clientView(){const e=cur,T=TPL[e.svc],p=progress(e),cp=currentPhase(e),last=e.avances.find(a=>a.client),shared=e.docs.filter(d=>d.share&&d.st==='ok'),next=T.fases.slice(cp,cp+3);
- $('clientView').innerHTML=`<div class="cv"><div class="top"><div><small>PORTAL DEL CLIENTE · VISTA PREVIA</small><b style="font-size:15px;font-weight:500">${T.nombre}</b><div style="font-size:12px;color:#CFE3D8">${e.id}</div></div><img src="${document.querySelector('.side img').src}" style="width:110px;filter:brightness(0) invert(1)"></div>
- <div class="body"><p class="sub">Estimado ${e.cliente.nombre}, este es el estado de su proceso al ${fd(TODAY)}.</p>
- <div style="margin:14px 0"><div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--gray)">Progreso</span><b style="color:var(--navy)">${p.pct}%</b></div><div class="bar" style="height:10px;margin-top:6px"><i style="width:${p.pct}%"></i></div></div>
- <div class="kv" style="grid-template-columns:140px 1fr"><span class="k">Estado actual</span><span class="v">${T.fases[cp][0]}</span><span class="k">Última actualización</span><span class="v">${last?fd(last.date)+' — '+last.desc:'—'}</span><span class="k">Fecha estimada</span><span class="v">${fd(e.fin)}</span></div>
- <h2 style="margin-top:16px;font-size:13px">Próximos pasos</h2>${next.map((f,i)=>`<div class="step"><span class="n">${i+1}</span><div><b style="font-weight:500;color:var(--navy)">${f[0]}</b></div></div>`).join('')}
- <h2 style="margin-top:16px;font-size:13px">Documentos compartidos</h2>${shared.map(d=>`<div class="doc"><div class="ic"><i data-lucide="file-check"></i></div><div><b>${d.name}</b><small>${fd(d.date)}</small></div></div>`).join('')||'<p class="sub">Aún no hay documentos compartidos.</p>'}
- <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--line);font-size:12px;color:var(--gray)">Su contacto en GSD: <b style="color:var(--navy);font-weight:500">${e.resp}</b> · +1 (829) 493-7254 · mejia2925@gmail.com<br><span style="font-style:italic;color:var(--green)">Los límites, claros.</span></div></div></div>`;openM('mClient');}
-function copyUpd(){navigator.clipboard?.writeText($('updPaper').innerText);toast('Texto copiado');}
+function docSt(i,st){
+  const d=cur.docs[i];
+  d.st=st;
+  if(st==='ok'){
+    d.file=d.name.replace(/ /g,'_')+'.pdf';
+    d.size='1.0 MB';
+    d.date=TODAY;
+    d.who='Esteban Mejía';
+    log(cur,`Documento "${d.name}" validado.`);
+  } else {
+    log(cur,`Documento "${d.name}" solicitado al cliente.`);
+  }
+  save();renderTab();toast(st==='ok'?'Documento verificado':'Solicitud registrada');
+}
 
-function bitacora(e,T,b){b.innerHTML=`<div class="card"><h2>Bitácora</h2><div class="log" style="margin-top:10px">${e.log.map(l=>`<div class="it"><span class="d">${l.d.replace(' ',' — ')}</span><span class="w">${l.w}</span><span>${l.t}</span></div>`).join('')}</div></div>`;}
-function evidencias(e,T,b){b.innerHTML=`<div class="card"><div class="ch"><h2>Evidencias de campo</h2><button class="btn p" onclick="$('evFile').value='';$('evDesc').value='';$('evCoord').value='';openM('mEv')"><i data-lucide="camera"></i>Agregar evidencia</button></div><div class="gal">${e.evid.map(v=>`<div class="ev"><div class="ph" ${v.img?`style="background-image:url(${v.img})"`:''}>${v.img?'':'<i data-lucide="image"></i>'}</div><div class="b"><b>${v.t}</b><small>${v.d.replace(' ',' · ')}</small><small>${v.c}</small><small>${v.w}</small></div></div>`).join('')||'<div class="empty" style="grid-column:1/-1">Sin evidencias. Agregue fotografías de campo.</div>'}</div></div>`;}
-function saveEv(){const f=$('evFile').files[0],d=$('evDesc').value.trim();if(!d){toast('Agregue una descripción');return;}const add=img=>{cur.evid.unshift({t:d,d:TODAY+' '+new Date().toTimeString().slice(0,5),c:$('evCoord').value||'—',w:'Esteban Mejía',img});log(cur,`Evidencia "${d}" cargada.`);save();closeM('mEv');renderTab();icons();toast('Evidencia agregada');};if(f){const r=new FileReader();r.onload=()=>add(r.result);r.readAsDataURL(f);}else add('');}
-function finanzas(e,T,b){const pag=e.pagos.filter(p=>p.st==='Pagado'&&p.tipo!=='Gasto').reduce((a,p)=>a+p.m,0),gas=e.pagos.filter(p=>p.st==='Pagado'&&p.tipo==='Gasto').reduce((a,p)=>a+p.m,0),pct=Math.round(pag/e.honorario*100)||0;b.innerHTML=`<div class="kpis" style="grid-template-columns:repeat(4,1fr)"><div class="kpi"><div class="l">Honorario contratado</div><div class="v">${e.mon}${fmt(e.honorario)}</div></div><div class="kpi"><div class="l">Total cobrado</div><div class="v" style="color:var(--green)">${e.mon}${fmt(pag)}</div></div><div class="kpi"><div class="l">Total gastos</div><div class="v" style="color:var(--amber)">${e.mon}${fmt(gas)}</div></div><div class="kpi ${e.honorario-pag>0?'warn':''}"><div class="l">Pendiente de cobro</div><div class="v">${e.mon}${fmt(Math.max(0,e.honorario-pag))}</div><div class="bar" style="margin-top:6px"><i style="width:${pct}%"></i></div></div></div>
- <div class="card"><div class="ch"><h2>Historial de movimientos</h2><button class="btn" onclick="toggleFinForm()"><i data-lucide="plus"></i>Registrar movimiento</button></div>
- <div id="finForm" style="display:none;border-top:1px solid var(--line);padding-top:14px;margin-top:10px"><div class="g2"><div class="f"><label>Concepto</label><input id="finC" placeholder="Ej: Pago inicial, Gasto de campo..."></div><div class="f"><label>Monto</label><input id="finM" type="number" min="0" placeholder="0.00"></div></div><div class="g3"><div class="f"><label>Fecha</label><input id="finD" type="date" value="${TODAY}"></div><div class="f"><label>Tipo</label><select id="finT"><option value="Ingreso">Ingreso (cobro)</option><option value="Gasto">Gasto (egreso)</option></select></div><div class="f"><label>Nota (opcional)</label><input id="finN" placeholder="Referencia, recibo..."></div></div><div style="display:flex;gap:8px;margin-top:8px"><button class="btn p" onclick="saveMovimiento()"><i data-lucide="save"></i>Guardar movimiento</button><button class="btn" onclick="toggleFinForm()">Cancelar</button></div></div>
- <table style="margin-top:10px"><thead><tr><th>Fecha</th><th>Concepto</th><th>Tipo</th><th>Monto</th><th>Estado</th><th></th></tr></thead><tbody>${e.pagos.map((p,i)=>`<tr><td>${fd(p.d)}</td><td>${p.c}${p.nota?`<small style="display:block;color:var(--gray)">${p.nota}</small>`:''}</td><td><span style="font-size:11px;color:${p.tipo==='Gasto'?'var(--amber)':'var(--green)'}">${p.tipo||'Ingreso'}</span></td><td style="${p.tipo==='Gasto'?'color:var(--amber)':'color:var(--navy)'}">${e.mon}${fmt(p.m)}</td><td><span class="tag ${p.st==='Pagado'?'proc':'wait'}">${p.st}</span></td><td>${p.st!=='Pagado'?`<button class="btn sm" onclick="cur.pagos[${i}].st='Pagado';cur.pagos[${i}].d='${TODAY}';log(cur,'Pago registrado: ${p.c}.');save();renderTab();toast('Pago registrado')">Registrar</button>`:''}</td></tr>`).join('')||'<tr><td colspan="6" class="empty" style="text-align:center;padding:16px;color:var(--gray)">Sin movimientos registrados.</td></tr>'}</tbody></table></div>`;}
-function toggleFinForm(){const f=$('finForm');if(f)f.style.display=f.style.display==='none'?'block':'none';icons();}
-function saveMovimiento(){const c=($('finC')||{}).value?.trim(),m=parseFloat(($('finM')||{}).value)||0,d=($('finD')||{}).value||TODAY,t=($('finT')||{}).value||'Ingreso',n=($('finN')||{}).value?.trim()||'';if(!c){toast('El concepto es obligatorio');return;}if(!m){toast('Ingrese un monto válido');return;}cur.pagos.push({d,c,m,st:'Pagado',tipo:t,nota:n});log(cur,`Movimiento registrado: ${c} — ${cur.mon}${fmt(m)} (${t}).`);save();renderTab();toast('Movimiento guardado');}
+// ===== FINANZAS, FACTURACIÓN & RECIBOS MANUALES =====
+function finanzas(e,T,b){
+  const pag=e.pagos.filter(p=>p.st==='Pagado'&&p.tipo!=='Gasto').reduce((a,p)=>a+p.m,0);
+  const gas=e.pagos.filter(p=>p.st==='Pagado'&&p.tipo==='Gasto').reduce((a,p)=>a+p.m,0);
+  const pend=Math.max(0,e.honorario-pag);
+  const pct=Math.round(pag/e.honorario*100)||0;
+  
+  b.innerHTML=`
+  <div class="kpis" style="grid-template-columns:repeat(4,1fr);margin-bottom:14px">
+    <div class="kpi"><div class="l">Honorario contratado</div><div class="v">${e.mon}${fmt(e.honorario)}</div></div>
+    <div class="kpi"><div class="l">Total cobrado</div><div class="v" style="color:var(--green)">${e.mon}${fmt(pag)}</div></div>
+    <div class="kpi"><div class="l">Gastos / Suplidores</div><div class="v" style="color:var(--amber)">${e.mon}${fmt(gas)}</div></div>
+    <div class="kpi ${pend>0?'warn':''}"><div class="l">Saldo pendiente</div><div class="v">${e.mon}${fmt(pend)}</div><div class="bar" style="margin-top:6px"><i style="width:${pct}%"></i></div></div>
+  </div>
+
+  <div class="card">
+    <div class="ch">
+      <h2>Control de Cobros, Facturas y Recibos</h2>
+      <button class="btn p" onclick="toggleFinForm()"><i data-lucide="plus"></i>Registrar factura / cobro</button>
+    </div>
+
+    <div id="finForm" style="display:none;border-top:1px solid var(--line);padding-top:14px;margin-top:10px;background:var(--bg);padding:14px;border-radius:8px">
+      <div class="g2">
+        <div class="f"><label>Concepto / Detalle</label><input id="finC" placeholder="Ej: Separación inicial 30%, Honorarios etapa 1..."></div>
+        <div class="f"><label>Monto</label><input id="finM" type="number" min="0" placeholder="0.00"></div>
+      </div>
+      <div class="g3">
+        <div class="f"><label>Fecha</label><input id="finD" type="date" value="${TODAY}"></div>
+        <div class="f"><label>Tipo de movimiento</label><select id="finT"><option value="Ingreso">Ingreso (Cobro a cliente)</option><option value="Gasto">Gasto (Agrimensor / Trámite / Tasa)</option></select></div>
+        <div class="f"><label>Estado</label><select id="finSt"><option value="Pagado">Pagado (Emitir recibo)</option><option value="Pendiente">Pendiente de cobro</option></select></div>
+      </div>
+      <div class="f"><label>Nota / Comprobante de transferencia</label><input id="finN" placeholder="Ej: Transferencia Banco Popular #48929"></div>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button class="btn p" onclick="saveMovimiento()"><i data-lucide="save"></i>Guardar movimiento</button>
+        <button class="btn" onclick="toggleFinForm()">Cancelar</button>
+      </div>
+    </div>
+
+    <div class="table-responsive" style="margin-top:14px">
+      <table>
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Concepto / Referencia</th>
+            <th>Tipo</th>
+            <th>Monto</th>
+            <th>Estado</th>
+            <th style="text-align:right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${e.pagos.map((p,i)=>`
+            <tr>
+              <td>${fd(p.d||TODAY)}</td>
+              <td>
+                <b>${p.c}</b>
+                ${p.nota?`<small style="display:block;color:var(--gray)">${p.nota}</small>`:''}
+              </td>
+              <td><span style="font-size:11px;font-weight:600;color:${p.tipo==='Gasto'?'var(--amber)':'var(--green)'}">${p.tipo||'Ingreso'}</span></td>
+              <td style="font-weight:600;color:${p.tipo==='Gasto'?'var(--amber)':'var(--navy)'}">${e.mon}${fmt(p.m)}</td>
+              <td><span class="tag ${p.st==='Pagado'?'proc':'wait'}">${p.st}</span></td>
+              <td style="text-align:right">
+                <div style="display:inline-flex;gap:6px">
+                  ${p.st==='Pagado'&&p.tipo!=='Gasto'?`
+                    <button class="btn sm" onclick="verRecibo(${i})"><i data-lucide="receipt"></i>Ver Recibo</button>
+                  `:''}
+                  ${p.st!=='Pagado'?`
+                    <button class="btn sm p" onclick="cur.pagos[${i}].st='Pagado';cur.pagos[${i}].d='${TODAY}';log(cur,'Pago confirmado: ${p.c}.');save();renderTab();toast('Pago confirmado')">Confirmar Pago</button>
+                  `:''}
+                </div>
+              </td>
+            </tr>
+          `).join('')||'<tr><td colspan="6" class="empty" style="text-align:center;padding:18px;color:var(--gray)">Sin movimientos financieros registrados.</td></tr>'}
+        </tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+function toggleFinForm(){
+  const f=$('finForm');
+  if(f) f.style.display=f.style.display==='none'?'block':'none';
+  icons();
+}
+
+function saveMovimiento(){
+  const c=($('finC')||{}).value?.trim();
+  const m=parseFloat(($('finM')||{}).value)||0;
+  const d=($('finD')||{}).value||TODAY;
+  const t=($('finT')||{}).value||'Ingreso';
+  const st=($('finSt')||{}).value||'Pagado';
+  const n=($('finN')||{}).value?.trim()||'';
+  if(!c){ toast('El concepto es obligatorio'); return; }
+  if(!m){ toast('Ingrese un monto válido'); return; }
+  cur.pagos.push({d,c,m,st,tipo:t,nota:n});
+  log(cur,`Registro financiero: ${c} — ${cur.mon}${fmt(m)} (${st}).`);
+  save();
+  renderTab();
+  toast('Movimiento registrado');
+}
+
+function verRecibo(pagoIndex){
+  const p=cur.pagos[pagoIndex];
+  if(!p) return;
+  const T=TPL[cur.svc]||TPL.deslinde;
+  const numRecibo = `REC-${cur.id.replace('EXP-','')}-${pagoIndex+1}`;
+  
+  $('reciboPaper').innerHTML=`
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid var(--navy);padding-bottom:14px;margin-bottom:16px">
+      <div>
+        <h2 style="color:var(--navy);font-size:18px;margin:0">GEOSOLUTIONS SOURCE DOMINICANA</h2>
+        <small style="color:var(--gray)">RNC / Registro Mercantil · Asesoría Jurídica & Agrimensura</small>
+        <div style="font-size:11.5px;color:var(--gray);margin-top:3px">Punta Cana, República Dominicana · +1 (829) 493-7254</div>
+      </div>
+      <div style="text-align:right">
+        <span class="tag proc" style="font-size:12px;padding:4px 10px">RECIBO DE PAGO</span>
+        <div style="font-weight:700;color:var(--navy);font-size:14px;margin-top:4px">${numRecibo}</div>
+        <small style="color:var(--gray)">Fecha: ${fd(p.d||TODAY)}</small>
+      </div>
+    </div>
+
+    <div class="kv" style="grid-template-columns:140px 1fr;margin-bottom:16px">
+      <span class="k">Recibido de:</span><span class="v" style="font-size:14px;font-weight:600">${cur.cliente.nombre}</span>
+      <span class="k">Cédula / RNC:</span><span class="v">${cur.cliente.cedula||'—'}</span>
+      <span class="k">Expediente / Asunto:</span><span class="v">${cur.id} — ${T.nombre}</span>
+      <span class="k">Por concepto de:</span><span class="v">${p.c}</span>
+      <span class="k">Referencia de pago:</span><span class="v">${p.nota||'Pago recibido conforme'}</span>
+    </div>
+
+    <div style="background:var(--bg);padding:14px;border-radius:8px;border:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <span style="font-size:13px;font-weight:600;color:var(--navy)">MONTO RECIBIDO</span>
+      <span style="font-size:22px;font-weight:700;color:var(--green)">${cur.mon}${fmt(p.m)}</span>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:30px;padding-top:14px;border-top:1px dashed var(--line)">
+      <div>
+        <small style="color:var(--gray);display:block">Atendido por:</small>
+        <b style="color:var(--navy)">${cur.resp}</b>
+      </div>
+      <div style="text-align:center;width:200px;border-top:1px solid var(--ink);padding-top:4px">
+        <small style="color:var(--gray);display:block">Firma y Sello Autorizado</small>
+        <span style="font-size:11px;color:var(--navy);font-weight:600">GSD DOMINICANA</span>
+      </div>
+    </div>
+  `;
+  openM('mRecibo');
+}
+
+function copyRecibo(){
+  navigator.clipboard?.writeText($('reciboPaper').innerText);
+  toast('Texto del recibo copiado al portapapeles');
+}
 
 // ===== DROPDOWN: nueva solicitud =====
 function toggleSolicitudDropdown(e) {
