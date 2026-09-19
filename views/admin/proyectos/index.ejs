@@ -1,0 +1,97 @@
+<%- include('../partials/layout-start', { pageTitle: 'Proyectos Inmobiliarios', page: 'proyectos' }) %>
+
+<div class="table-card">
+  <div class="table-card-header">
+    <div>
+      <h3 style="font-size:16px;color:var(--navy);margin:0">Desarrollos & Proyectos (<%= proyectos.length %>)</h3>
+      <p style="font-size:11.5px;color:var(--gray);margin-top:2px">Catálogo editorial de proyectos inmobiliarios en República Dominicana.</p>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <a href="http://localhost:3001/proyectos" target="_blank" class="btn sm" style="text-decoration:none">
+        <i data-lucide="external-link"></i> Ver en la Web
+      </a>
+      <a href="/admin/proyectos/nuevo" class="btn-add">
+        <i data-lucide="plus"></i> Nuevo Proyecto
+      </a>
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:70px">Foto</th>
+          <th>Proyecto</th>
+          <th>Promotor / Desarrollador</th>
+          <th>Ubicación</th>
+          <th>Precio Desde</th>
+          <th>Tipologías</th>
+          <th>Estado / Entrega</th>
+          <th style="text-align:right">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (!proyectos || proyectos.length === 0) { %>
+          <tr>
+            <td colspan="8" style="text-align:center;padding:32px;color:var(--gray)">
+              No hay proyectos registrados aún. Haz clic en "Nuevo Proyecto" para agregar el primero.
+            </td>
+          </tr>
+        <% } else { %>
+          <% proyectos.forEach(p => { %>
+            <tr>
+              <td>
+                <% if (p.cover_image) { %>
+                  <img src="<%= p.cover_image %>" style="width:64px;height:46px;object-fit:cover;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.1);display:block;" alt="<%= p.nombre %>">
+                <% } else { %>
+                  <div style="width:64px;height:46px;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#64748b;">
+                    <i data-lucide="building-2"></i>
+                  </div>
+                <% } %>
+              </td>
+              <td>
+                <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+                  <b style="color:var(--navy);font-size:13px"><%= p.nombre %></b>
+                  <% if (p.featured) { %>
+                    <span class="badge-destacada">★ Destacado</span>
+                  <% } %>
+                </div>
+                <small style="color:var(--gray);font-size:11px">slug: /proyectos/<%= p.slug %></small>
+              </td>
+              <td><span style="font-size:12.5px;font-weight:500"><%= p.promotor || 'GSD Real Estate' %></span></td>
+              <td><span style="color:var(--gray);font-size:12px"><i data-lucide="map-pin" style="width:12px;height:12px;vertical-align:-1px"></i> <%= p.ubicacion %></span></td>
+              <td style="font-weight:700;color:var(--green)">
+                <%= p.moneda === 'USD' ? 'US$' : 'RD$' %><%= Number(p.precio_desde || 0).toLocaleString('en-US') %>
+              </td>
+              <td>
+                <span style="font-size:11.5px;color:var(--ink);background:var(--bg);padding:3px 8px;border-radius:6px;border:1px solid var(--line)"><%= p.tipologias %></span>
+              </td>
+              <td>
+                <span class="tag <%= p.estado === 'Entrega inmediata' ? 'proc' : 'wait' %>" style="font-size:11px">
+                  <%= p.estado %> (<%= p.entrega %>)
+                </span>
+              </td>
+              <td style="text-align:right">
+                <div style="display:inline-flex;gap:6px">
+                  <a href="http://localhost:3001/proyectos/<%= p.slug %>" target="_blank" class="btn-icon" title="Ver en vivo">
+                    <i data-lucide="eye"></i>
+                  </a>
+                  <a href="/admin/proyectos/<%= p.id %>/editar" class="btn-icon edit" title="Editar proyecto">
+                    <i data-lucide="pencil"></i>
+                  </a>
+                  <form method="POST" action="/admin/proyectos/<%= p.id %>/eliminar" style="display:inline" onsubmit="return confirm('¿Seguro que deseas eliminar este proyecto?')">
+                    <button type="submit" class="btn-icon delete" title="Eliminar">
+                      <i data-lucide="trash-2"></i>
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          <% }) %>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%- include('../partials/layout-end') %>

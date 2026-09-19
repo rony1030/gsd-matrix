@@ -568,6 +568,129 @@ blogRouter.post('/:id/eliminar', async (req, res) => {
 
 app.use('/admin/blog', blogRouter);
 
+// ─── PROYECTOS INMOBILIARIOS (CATÁLOGO EDITORIAL) ───────────
+const proyRouter = express.Router();
+proyRouter.use(requireAuth);
+
+proyRouter.get('/', async (req, res) => {
+  await getDb();
+  const proyectos = queryAll('SELECT * FROM proyectos ORDER BY featured DESC, created_at DESC') || [];
+  res.render('admin/proyectos/index', { page: 'proyectos', proyectos });
+});
+
+proyRouter.get('/nuevo', async (req, res) => {
+  res.render('admin/proyectos/form', { page: 'proyectos', proyecto: null, isEdit: false, error: null });
+});
+
+proyRouter.post('/nuevo', async (req, res) => {
+  const { nombre, slug, promotor, ubicacion, tipologias, precio_desde, moneda, estado, entrega, descripcion, cover_image, galeria, amenidades, featured } = req.body;
+  
+  const finalSlug = (slug || nombre || 'proyecto').toLowerCase().trim()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, "-").replace(/[^\w-]+/g, "").replace(/--+/g, "-");
+  
+  const galeriaArr = (galeria || '').split(/[\n,]/).map(s => s.trim()).filter(Boolean);
+  const amenidadesArr = (amenidades || '').split(',').map(s => s.trim()).filter(Boolean);
+
+  await getDb();
+  try {
+    run(
+      `INSERT INTO proyectos (slug, nombre, promotor, ubicacion, tipologias, precio_desde, moneda, estado, entrega, descripcion, cover_image, galeria, amenidades, featured)
+       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+      [
+        finalSlug, nombre, promotor || 'GSD Real Estate', ubicacion, tipologias || 'Apartamentos',
+        parseFloat(precio_desde) || 0, moneda || 'USD', estado || 'En construcción', entrega || '2026',
+        descripcion || '', cover_image || '', JSON.stringify(galeriaArr), JSON.stringify(amenidadesArr), featured ? 1 : 0
+      ]
+    );
+    res.redirect('/admin/proyectos');
+  } catch (err) {
+    res.render('admin/proyectos/form', { page: 'proyectos', proyecto: req.body, isEdit: false, error: 'Error al guardar el proyecto. El slug o nombre ya existe.' });
+  }
+});
+
+proyRouter.get('/:id/editar', async (req, res) => {
+  await getDb();
+  const proyecto = queryOne('SELECT * FROM proyectos WHERE id=?', [req.params.id]);
+  if (!proyecto) return res.redirect('/admin/proyectos');
+  try { proyecto.galeria = JSON.parse(proyecto.galeria || '[]'); } catch(e) { proyecto.galeria = []; }
+  try { proyecto.amenidades = JSON.parse(proyecto.amenidades || '[]'); } catch(e) { proyecto.amenidades = []; }
+  res.render('admin/proyectos/form', { page: 'proyectos', proyecto, isEdit: true, error: null });
+});
+
+proyRouter.post('/:id/editar', async (req, res) => {
+  const { nombre, slug, promotor, ubicacion, tipologias, precio_desde, moneda, estado, entrega, descripcion, cover_image, galeria, amenidades, featured } = req.body;
+  
+  const finalSlug = (slug || nombre || 'proyecto').toLowerCase().trim()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, "-").replace(/[^\w-]+/g, "").replace(/--+/g, "-");
+  
+  const galeriaArr = (galeria || '').split(/[\n,]/).map(s => s.trim()).filter(Boolean);
+  const amenidadesArr = (amenidades || '').split(',').map(s => s.trim()).filter(Boolean);
+
+  await getDb();
+  try {
+    run(
+      `UPDATE proyectos SET 
+        slug=?, nombre=?, promotor=?, ubicacion=?, tipologias=?, precio_desde=?, moneda=?, estado=?, entrega=?, descripcion=?, cover_image=?, galeria=?, amenidades=?, featured=?, updated_at=datetime('now','localtime')
+       WHERE id=?`,
+      [
+        finalSlug, nombre, promotor || 'GSD Real Estate', ubicacion, tipologias || 'Apartamentos',
+        parseFloat(precio_desde) || 0, moneda || 'USD', estado || 'En construcción', entrega || '2026',
+        descripcion || '', cover_image || '', JSON.stringify(galeriaArr), JSON.stringify(amenidadesArr), featured ? 1 : 0,
+        req.params.id
+      ]
+    );
+    res.redirect('/admin/proyectos');
+  } catch (err) {
+    res.render('admin/proyectos/form', { page: 'proyectos', proyecto: { ...req.body, id: req.params.id }, isEdit: true, error: 'Error al actualizar el proyecto: ' + err.message });
+  }
+});
+
+proyRouter.post('/:id/eliminar', async (req, res) => {
+  await getDb();
+  run('DELETE FROM proyectos WHERE id=?', [req.params.id]);
+  res.redirect('/admin/proyectos');
+});
+
+app.use('/admin/proyectos', proyRouter);
+
+// Public API endpoint for Projects (consumible by gsd-bienes-raices)
+app.get('/api/proyectos', async (req, res) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Cache-Control', 'public, max-age=60');
+  try {
+    await getDb();
+    const rows = queryAll('SELECT * FROM proyectos ORDER BY featured DESC, created_at DESC') || [];
+    const formatted = rows.map(r => {
+      let galeria = [];
+      let amenidades = [];
+      try { galeria = JSON.parse(r.galeria || '[]'); } catch(e){}
+      try { amenidades = JSON.parse(r.amenidades || '[]'); } catch(e){}
+      return {
+        slug: r.slug,
+        nombre: r.nombre,
+        promotor: r.promotor,
+        ubicacion: r.ubicacion,
+        tipologias: (r.tipologias || '').split(',').map(t => t.trim()).filter(Boolean),
+        precio_desde: r.precio_desde,
+        moneda: r.moneda,
+        estado: r.estado,
+        entrega: r.entrega,
+        descripcion: r.descripcion,
+        cover_image: r.cover_image,
+        galeria,
+        amenidades,
+        featured: Boolean(r.featured)
+      };
+    });
+    res.json(formatted);
+  } catch(e) {
+    res.status(500).json({ error: 'Error consultando proyectos' });
+  }
+});
+
+
 // ─── LEADS ────────────────────────────────────────────
 const leadsRouter = express.Router();
 leadsRouter.use(requireAuth);

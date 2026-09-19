@@ -129,7 +129,76 @@ async function getDb() {
           updated_at TEXT DEFAULT (datetime('now','localtime'))
         );
 
-        INSERT OR IGNORE INTO settings (key, value) VALUES ('logo_url', '/img/logo-gsd.png');
+        CREATE TABLE IF NOT EXISTS proyectos (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          slug TEXT UNIQUE NOT NULL,
+          nombre TEXT NOT NULL,
+          promotor TEXT DEFAULT 'GSD Real Estate',
+          ubicacion TEXT NOT NULL,
+          tipologias TEXT DEFAULT 'Apartamentos',
+          precio_desde REAL DEFAULT 0,
+          moneda TEXT DEFAULT 'USD',
+          estado TEXT DEFAULT 'En construcción',
+          entrega TEXT DEFAULT '2026',
+          descripcion TEXT,
+          cover_image TEXT,
+          galeria TEXT DEFAULT '[]',
+          amenidades TEXT DEFAULT '[]',
+          featured INTEGER DEFAULT 0,
+          created_at TEXT DEFAULT (datetime('now','localtime')),
+          updated_at TEXT DEFAULT (datetime('now','localtime'))
+        );
+
+        INSERT OR IGNORE INTO proyectos (slug, nombre, promotor, ubicacion, tipologias, precio_desde, moneda, estado, entrega, descripcion, cover_image, galeria, amenidades, featured)
+        VALUES
+        (
+          'stellar-punta-cana',
+          'Stellar Residences',
+          'Blue Coast Realty',
+          'Bávaro, Punta Cana',
+          'Apartamentos 1-3 Hab, Penthouses',
+          180000,
+          'USD',
+          'En construcción',
+          '2027',
+          'Un desarrollo residencial de nueva generación frente al mar. Stellar combina arquitectura contemporánea con amenidades de resort para una vida sin compromisos en el corazón de Bávaro.',
+          'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1200&q=80',
+          '["https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?auto=format&fit=crop&w=900&q=80","https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=900&q=80","https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=900&q=80"]',
+          '["Piscina infinita","Gym & Wellness","Spa","Concierge 24/7","Playa privada","Business center"]',
+          1
+        ),
+        (
+          'cosmo-bavaro',
+          'Cosmo Smart Living',
+          'GSD Real Estate',
+          'Bávaro, La Altagracia',
+          'Estudios, Suites 1-2 Hab',
+          95000,
+          'USD',
+          'En construcción',
+          '2026',
+          'Diseñado para el inversionista inteligente. Cosmo ofrece unidades compactas de alto rendimiento y rentabilidad turística en una ubicación estratégica a minutos de las playas.',
+          'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1200&q=80',
+          '["https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=900&q=80","https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=900&q=80"]',
+          '["Piscina central","Rooftop bar & Lounge","Coworking space","Seguridad 24/7"]',
+          1
+        ),
+        (
+          'galaxy-cap-cana',
+          'Galaxy Villas & Marina',
+          'Cap Cana Developers',
+          'Cap Cana, La Altagracia',
+          'Villas de Lujo, Townhouses',
+          420000,
+          'USD',
+          'Entrega inmediata',
+          '2025',
+          'Galaxy redefine el lujo en Cap Cana. Exclusivas villas y townhouses en el corazón de la marina, con acceso a campos de golf de clase mundial y servicios hoteleros de primer nivel.',
+          'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80',
+          '["https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=900&q=80","https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=900&q=80"]',
+          '["Marina privada","Muelle de atraque","Golf Cart incluido","Club de Playa","Helipuerto","Seguridad perimetral"]',
+          0
+        );
 
         CREATE TABLE IF NOT EXISTS social_feeds (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -336,6 +405,26 @@ function initSchema() {
       updated_at TEXT DEFAULT (datetime('now','localtime'))
     );
 
+    CREATE TABLE IF NOT EXISTS proyectos (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      slug TEXT UNIQUE NOT NULL,
+      nombre TEXT NOT NULL,
+      promotor TEXT DEFAULT 'GSD Real Estate',
+      ubicacion TEXT NOT NULL,
+      tipologias TEXT DEFAULT 'Apartamentos',
+      precio_desde REAL DEFAULT 0,
+      moneda TEXT DEFAULT 'USD',
+      estado TEXT DEFAULT 'En construcción',
+      entrega TEXT DEFAULT '2026',
+      descripcion TEXT,
+      cover_image TEXT,
+      galeria TEXT DEFAULT '[]',
+      amenidades TEXT DEFAULT '[]',
+      featured INTEGER DEFAULT 0,
+      created_at TEXT DEFAULT (datetime('now','localtime')),
+      updated_at TEXT DEFAULT (datetime('now','localtime'))
+    );
+
     CREATE TABLE IF NOT EXISTS settings (
       key TEXT PRIMARY KEY,
       value TEXT,
@@ -343,15 +432,62 @@ function initSchema() {
     );
 
     INSERT OR IGNORE INTO settings (key, value) VALUES ('logo_url', '/img/logo-gsd.png');
-  `);
 
-
-
-  db.run(`
     INSERT OR IGNORE INTO social_feeds (project, project_name, instagram_handle, instagram_url, posts_json)
     VALUES
     ('bienes-raices', 'GSD Bienes Raíces', '@gsd.realestate', 'https://www.instagram.com/', '[]'),
     ('matriz', 'GSD Matriz / Ingeniería & Legal', '@gsdsource', 'https://www.instagram.com/', '[]');
+
+    INSERT OR IGNORE INTO proyectos (slug, nombre, promotor, ubicacion, tipologias, precio_desde, moneda, estado, entrega, descripcion, cover_image, galeria, amenidades, featured)
+    VALUES
+    (
+      'stellar-punta-cana',
+      'Stellar Residences',
+      'Blue Coast Realty',
+      'Bávaro, Punta Cana',
+      'Apartamentos 1-3 Hab, Penthouses',
+      180000,
+      'USD',
+      'En construcción',
+      '2027',
+      'Un desarrollo residencial de nueva generación frente al mar. Stellar combina arquitectura contemporánea con amenidades de resort para una vida sin compromisos en el corazón de Bávaro.',
+      'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1200&q=80',
+      '["https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?auto=format&fit=crop&w=900&q=80","https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=900&q=80","https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=900&q=80"]',
+      '["Piscina infinita","Gym & Wellness","Spa","Concierge 24/7","Playa privada","Business center"]',
+      1
+    ),
+    (
+      'cosmo-bavaro',
+      'Cosmo Smart Living',
+      'GSD Real Estate',
+      'Bávaro, La Altagracia',
+      'Estudios, Suites 1-2 Hab',
+      95000,
+      'USD',
+      'En construcción',
+      '2026',
+      'Diseñado para el inversionista inteligente. Cosmo ofrece unidades compactas de alto rendimiento y rentabilidad turística en una ubicación estratégica a minutos de las playas.',
+      'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1200&q=80',
+      '["https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=900&q=80","https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=900&q=80"]',
+      '["Piscina central","Rooftop bar & Lounge","Coworking space","Seguridad 24/7"]',
+      1
+    ),
+    (
+      'galaxy-cap-cana',
+      'Galaxy Villas & Marina',
+      'Cap Cana Developers',
+      'Cap Cana, La Altagracia',
+      'Villas de Lujo, Townhouses',
+      420000,
+      'USD',
+      'Entrega inmediata',
+      '2025',
+      'Galaxy redefine el lujo en Cap Cana. Exclusivas villas y townhouses en el corazón de la marina, con acceso a campos de golf de clase mundial y servicios hoteleros de primer nivel.',
+      'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80',
+      '["https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=900&q=80","https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=900&q=80"]',
+      '["Marina privada","Muelle de atraque","Golf Cart incluido","Club de Playa","Helipuerto","Seguridad perimetral"]',
+      0
+    );
   `);
 }
 
