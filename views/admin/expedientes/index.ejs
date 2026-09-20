@@ -923,15 +923,91 @@ tr.row:hover td{background:var(--bg);cursor:pointer}
   .exp-mobile-tag {
     display: inline-block!important;
   }
+
+  /* Mobile Table to Card Transformation for Tareas & Alertas */
+  .mytasks-card, #v-mytasks .card {
+    background: transparent!important;
+    border: none!important;
+    box-shadow: none!important;
+    padding: 0!important;
+  }
+  #v-mytasks .table-responsive {
+    overflow: visible!important;
+    background: transparent!important;
+    border: none!important;
+  }
+  #v-mytasks .table-responsive table {
+    display: block!important;
+    width: 100%!important;
+  }
+  #v-mytasks .table-responsive thead {
+    display: none!important;
+  }
+  #v-mytasks .table-responsive tbody {
+    display: flex!important;
+    flex-direction: column!important;
+    gap: 8px!important;
+  }
+  tr.mt-table-row {
+    display: flex!important;
+    flex-direction: column!important;
+    background: #ffffff!important;
+    border: 1px solid var(--line)!important;
+    border-radius: 10px!important;
+    padding: 11px 13px!important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04)!important;
+    gap: 6px!important;
+  }
+  tr.mt-table-row:active {
+    background: #F8FAFC!important;
+  }
+  tr.mt-table-row td {
+    display: block!important;
+    padding: 0!important;
+    border: none!important;
+  }
+  tr.mt-table-row td.mt-desktop-only, .mt-desktop-only {
+    display: none!important;
+  }
+  .mt-mobile-top {
+    display: flex!important;
+    justify-content: space-between!important;
+    align-items: center!important;
+    width: 100%!important;
+  }
+  .mt-mobile-due-box {
+    display: flex!important;
+    justify-content: space-between!important;
+    align-items: center!important;
+    padding-top: 5px!important;
+    border-top: 1px dashed #E2E8F0!important;
+    margin-top: 2px!important;
+  }
+  .mt-exp-badge {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--navy);
+    background: #EEF2F5;
+    padding: 2px 7px;
+    border-radius: 5px;
+  }
 }
 
-.exp-mobile-top {
+.exp-mobile-top, .mt-mobile-top {
   display: flex;
   align-items: center;
   gap: 6px;
 }
 .exp-mobile-tag {
   display: none;
+}
+.mt-exp-badge {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--navy);
+  background: #EEF2F5;
+  padding: 2px 7px;
+  border-radius: 5px;
 }
 
 @media (max-width:480px){
@@ -1072,8 +1148,34 @@ tr.row:hover td{background:var(--bg);cursor:pointer}
   </section>
 
   <section class="view" id="v-mytasks">
-    <h1>Tareas y alertas</h1><p class="sub">Todas las tareas abiertas en todos los expedientes.</p>
-    <div class="card" style="margin-top:16px"><div class="filters" id="mtFilters"><button class="on" data-f="all">Todas</button><button data-f="mine">Mis tareas</button><button data-f="late">Vencidas</button><button data-f="week">Esta semana</button></div><div class="table-responsive"><table><thead><tr><th>Tarea</th><th>Expediente</th><th>Etapa</th><th>Responsable</th><th>Fecha límite</th><th>Estado</th></tr></thead><tbody id="mtRows"></tbody></table></div></div>
+    <div style="margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:8px;">
+        <h1 style="margin:0;font-size:1.35rem;font-weight:700;color:var(--navy);white-space:nowrap;">Tareas y alertas</h1>
+      </div>
+      <div class="filters" id="mtFilters" style="margin-bottom:8px;">
+        <button class="on" data-f="all">Todas</button>
+        <button data-f="mine">Mis tareas</button>
+        <button data-f="late">Vencidas</button>
+        <button data-f="week">Esta semana</button>
+      </div>
+    </div>
+    <div class="card mytasks-card" style="margin-top:8px;padding:0;overflow:hidden;border-radius:10px;">
+      <div class="table-responsive">
+        <table style="margin:0;">
+          <thead>
+            <tr>
+              <th style="padding-left:14px;">Tarea</th>
+              <th>Expediente</th>
+              <th>Etapa</th>
+              <th>Responsable</th>
+              <th>Fecha límite</th>
+              <th style="text-align:right;padding-right:14px;">Estado</th>
+            </tr>
+          </thead>
+          <tbody id="mtRows"></tbody>
+        </table>
+      </div>
+    </div>
   </section>
 
   <section class="view" id="v-cal">
@@ -1879,9 +1981,53 @@ function updateTaskBadge(){
   }
   try { localStorage.setItem('gsd_task_badge_count', myC); } catch(e) {}
 }
-function renderMy(){let ts=allTasks().filter(t=>t.st!=='done'&&t.st!=='na');if(mtF==='mine')ts=ts.filter(t=>t.who==='Esteban Mejía');if(mtF==='late')ts=ts.filter(t=>t.due&&days(t.due)<0);if(mtF==='week')ts=ts.filter(t=>t.due&&days(t.due)>=0&&days(t.due)<=7);ts.sort((a,b)=>(a.due||'9')>(b.due||'9')?1:-1);
- $('mtRows').innerHTML=ts.map(t=>`<tr class="row" onclick="openExp('${t.e.id}','tareas')"><td>${t.name}</td><td>${t.e.id}</td><td>${TPL[t.e.svc]?.fases[t.phase]?.[0]||'General'}</td><td>${t.who}</td><td class="${t.due&&days(t.due)<0?'st-block':''}">${fd(t.due)}</td><td class="${ST[t.st][1]}">${ST[t.st][0]}</td></tr>`).join('')||'<tr><td colspan="6" class="empty" style="text-align:center;padding:28px;color:var(--gray);">No hay tareas pendientes.</td></tr>';
- updateTaskBadge();}
+function renderMy(){
+  let ts=allTasks().filter(t=>t.st!=='done'&&t.st!=='na');
+  if(mtF==='mine') ts=ts.filter(t=>t.who==='Esteban Mejía');
+  if(mtF==='late') ts=ts.filter(t=>t.due&&days(t.due)<0);
+  if(mtF==='week') ts=ts.filter(t=>t.due&&days(t.due)>=0&&days(t.due)<=7);
+  ts.sort((a,b)=>(a.due||'9')>(b.due||'9')?1:-1);
+  const DIV_BG = { Legal: '#EBF8FF', Inmobiliario: '#FEF3C7', Agrimensura: '#E6FFFA' };
+  const DIV_COLOR = { Legal: '#2B6CB0', Inmobiliario: '#D97706', Agrimensura: '#234E52' };
+  $('mtRows').innerHTML=ts.map(t=>{
+    const diff = t.due ? days(t.due) : 999;
+    const isLate = diff < 0;
+    const isToday = diff === 0;
+    const faseName = TPL[t.e.svc]?.fases[t.phase]?.[0] || 'General';
+    const divName = (TPL[t.e.svc] || TPL.deslinde).div || 'Legal';
+    return `
+      <tr class="row mt-table-row" onclick="openExp('${t.e.id}','tareas')" style="cursor:pointer;">
+        <td class="mt-col-task" style="padding-left:14px;">
+          <div class="mt-mobile-top">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span class="mt-exp-badge">${t.e.id}</span>
+              <span style="font-size:10px;padding:1px 6px;border-radius:6px;font-weight:600;background:${DIV_BG[divName]||'#eee'};color:${DIV_COLOR[divName]||'#666'}">${divName}</span>
+            </div>
+            <span class="tag ${ST[t.st][1]}">${ST[t.st][0]}</span>
+          </div>
+          <b style="color:var(--navy);font-size:13px;display:block;margin-top:2px;">${t.name}</b>
+          <div style="font-size:11.5px;color:var(--gray);margin-top:1px;">
+            ${t.e.cliente?.nombre || 'Cliente'} · <span style="color:#64748b;">${faseName}</span>
+          </div>
+        </td>
+        <td class="mt-col-exp mt-desktop-only"><b style="color:var(--navy);font-size:12px;">${t.e.id}</b></td>
+        <td class="mt-col-fase mt-desktop-only"><span style="color:var(--gray);font-size:12px;">${faseName}</span></td>
+        <td class="mt-col-who mt-desktop-only"><span style="color:var(--gray);font-size:12px;">${t.who}</span></td>
+        <td class="mt-col-due">
+          <div class="mt-mobile-due-box">
+            <span style="font-size:11.5px;color:${isLate ? 'var(--red)' : isToday ? 'var(--green)' : 'var(--gray)'};font-weight:${isLate||isToday ? '600' : '400'};">
+              <i data-lucide="calendar" style="width:11px;height:11px;vertical-align:-1px;margin-right:2px;"></i>${fd(t.due)}
+            </span>
+            <span style="font-size:11px;color:var(--gray);">${t.who.split(' ')[0]}</span>
+          </div>
+        </td>
+        <td class="mt-col-st mt-desktop-only" style="text-align:right;padding-right:14px;"><span class="tag ${ST[t.st][1]}">${ST[t.st][0]}</span></td>
+      </tr>
+    `;
+  }).join('')||'<tr><td colspan="6" class="empty" style="text-align:center;padding:28px;color:var(--gray);">No hay tareas pendientes.</td></tr>';
+  if (typeof lucide !== 'undefined') { lucide.createIcons(); }
+  updateTaskBadge();
+}
 let calDate = new Date();
 
 function changeCalMonth(delta) {

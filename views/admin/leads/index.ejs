@@ -38,6 +38,55 @@
     z-index: 1000;
   }
   .modal-lead-tag.open { display: flex; }
+
+  @media (max-width: 768px) {
+    .leads-card {
+      background: transparent!important;
+      border: none!important;
+      box-shadow: none!important;
+      padding: 0!important;
+    }
+    .leads-table-responsive {
+      overflow: visible!important;
+      background: transparent!important;
+    }
+    .leads-table-responsive table {
+      display: block!important;
+      width: 100%!important;
+    }
+    .leads-table-responsive thead {
+      display: none!important;
+    }
+    .leads-table-responsive tbody {
+      display: flex!important;
+      flex-direction: column!important;
+      gap: 10px!important;
+    }
+    .leads-table-responsive tr {
+      display: flex!important;
+      flex-direction: column!important;
+      background: #ffffff!important;
+      border: 1px solid #E5E7EB!important;
+      border-radius: 12px!important;
+      padding: 14px!important;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04)!important;
+      gap: 8px!important;
+    }
+    .leads-table-responsive td {
+      display: block!important;
+      padding: 0!important;
+      border: none!important;
+    }
+    .lead-mobile-hide {
+      display: none!important;
+    }
+    .lead-mobile-row {
+      display: flex!important;
+      justify-content: space-between!important;
+      align-items: center!important;
+      gap: 8px!important;
+    }
+  }
 </style>
 
 <div class="leads-topbar">
@@ -65,8 +114,8 @@
   </div>
 </div>
 
-<div class="card" style="padding:0;overflow:hidden;">
-  <div class="table-responsive">
+<div class="card leads-card" style="padding:0;overflow:hidden;">
+  <div class="table-responsive leads-table-responsive">
     <table>
       <thead>
         <tr>
@@ -84,9 +133,19 @@
       <tbody>
         <% leads.forEach(lead => { %>
         <tr id="lead-row-<%= lead.id %>">
-          <td style="color:#9CA3AF;font-size:0.78rem;">#<%= lead.id %></td>
+          <td class="lead-mobile-hide" style="color:#9CA3AF;font-size:0.78rem;">#<%= lead.id %></td>
           <td>
-            <strong style="color:#1A3A52;font-size:0.88rem;"><%= lead.nombre %></strong>
+            <div class="lead-mobile-row">
+              <strong style="color:#1A3A52;font-size:0.88rem;"><%= lead.nombre %></strong>
+              <div class="lead-mobile-show" style="display:none;">
+                <select style="padding:3px 6px;font-size:0.75rem;width:auto;border-radius:6px;font-weight:600;"
+                        onchange="updateLeadStatus(<%= lead.id %>, this.value)">
+                  <% ['nuevo','contactado','calificado','cerrado','descartado'].forEach(s => { %>
+                  <option value="<%= s %>" <%= lead.estado === s ? 'selected' : '' %>><%= s.toUpperCase() %></option>
+                  <% }) %>
+                </select>
+              </div>
+            </div>
             <div style="font-size:0.78rem;color:#6B7280;margin-top:2px;">
               <% if (lead.email) { %><span><%= lead.email %></span><% } %>
               <% if (lead.email && lead.telefono) { %> · <% } %>
@@ -94,7 +153,7 @@
             </div>
           </td>
           <td>
-            <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-start;">
+            <div style="display:flex;flex-wrap:wrap;gap:4px;align-items:center;">
               <span class="tag-pill tag-custom" style="font-weight:700;">
                 <%= lead.tipo_cliente || 'General' %>
               </span>
@@ -110,12 +169,17 @@
             </div>
           </td>
           <td>
-            <span style="font-weight:500;color:#1A3A52;"><%= lead.servicio || 'General' %></span>
+            <div style="font-size:0.8rem;color:#1A3A52;">
+              <span style="color:#6B7280;font-size:0.75rem;margin-right:3px;">Servicio:</span><strong><%= lead.servicio || 'General' %></strong>
+            </div>
           </td>
-          <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#6B7280;font-size:0.82rem;" title="<%= lead.mensaje %>">
-            <%= lead.mensaje || '—' %>
+          <% if (lead.mensaje) { %>
+          <td style="color:#6B7280;font-size:0.8rem;" title="<%= lead.mensaje %>">
+            <span style="color:#9CA3AF;font-size:0.72rem;display:block;">Mensaje:</span>
+            <%= lead.mensaje %>
           </td>
-          <td>
+          <% } %>
+          <td class="lead-mobile-hide">
             <select style="padding:4px 8px;font-size:0.78rem;width:auto;border-radius:6px;font-weight:600;"
                     onchange="updateLeadStatus(<%= lead.id %>, this.value)">
               <% ['nuevo','contactado','calificado','cerrado','descartado'].forEach(s => { %>
@@ -124,12 +188,24 @@
             </select>
           </td>
           <td>
-            <span class="tag" style="background:#F1F5F9;color:#475569;">
-              <%= lead.origen || 'web' %>
-            </span>
+            <div class="lead-mobile-row">
+              <span class="tag" style="background:#F1F5F9;color:#475569;font-size:0.72rem;">
+                <%= lead.origen || 'web' %> · <%= lead.created_at?.substring(0,10) || '' %>
+              </span>
+              <div style="display:flex;gap:4px;">
+                <button type="button" class="btn sm" onclick='openEditTagModal(<%= lead.id %>, "<%= lead.tipo_cliente || "General" %>", <%= lead.is_real_estate ? 1 : 0 %>, "<%= lead.tags || "" %>")' title="Editar Tipo y Etiquetas">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+                </button>
+                <form method="POST" action="/admin/leads/<%= lead.id %>/eliminar" style="display:inline" onsubmit="return confirm('¿Eliminar este lead?')">
+                  <button class="btn sm" type="submit" style="color:#C0392B;" title="Eliminar">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+                  </button>
+                </form>
+              </div>
+            </div>
           </td>
-          <td style="color:#9CA3AF;font-size:0.75rem;white-space:nowrap;"><%= lead.created_at?.substring(0,16) || '' %></td>
-          <td>
+          <td class="lead-mobile-hide" style="color:#9CA3AF;font-size:0.75rem;white-space:nowrap;"><%= lead.created_at?.substring(0,16) || '' %></td>
+          <td class="lead-mobile-hide">
             <div style="display:flex;gap:4px;">
               <button type="button" class="btn sm" onclick='openEditTagModal(<%= lead.id %>, "<%= lead.tipo_cliente || "General" %>", <%= lead.is_real_estate ? 1 : 0 %>, "<%= lead.tags || "" %>")' title="Editar Tipo y Etiquetas">
                 <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
