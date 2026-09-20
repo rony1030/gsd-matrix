@@ -131,7 +131,9 @@ tr.row:hover td{background:var(--bg);cursor:pointer}
 .phase{margin-bottom:14px}
 .phase .ph{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);font-weight:500;color:var(--navy)}
 .phase .ph small{color:var(--gray);font-weight:400}
-.task{display:grid;grid-template-columns:20px 1fr 130px 120px 110px 60px;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid #F1F3F5}
+.task{display:grid;grid-template-columns:20px 1fr 130px 120px 110px 36px;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid #F1F3F5}
+.task-top-row{display:contents}
+.task-bottom-row{display:contents}
 .task .t{font-weight:500}.task .t.done{text-decoration:line-through;color:var(--gray);font-weight:400}
 .task select{padding:3px 6px;font-size:11.5px;border-radius:12px}
 .task .who,.task .due{font-size:11.5px;color:var(--gray)}
@@ -1112,10 +1114,47 @@ tr.row:hover td{background:var(--bg);cursor:pointer}
     font-size:11.5px!important;
   }
   
-  .task{grid-template-columns:20px 1fr 90px;gap:6px}
+  .task {
+    display: flex!important;
+    flex-direction: column!important;
+    gap: 6px!important;
+    padding: 10px 12px!important;
+    background: #ffffff!important;
+    border: 1px solid #E2E8F0!important;
+    border-radius: 8px!important;
+    margin-bottom: 6px!important;
+  }
+  .task-top-row {
+    display: flex!important;
+    align-items: flex-start!important;
+    gap: 8px!important;
+    width: 100%!important;
+  }
+  .task-bottom-row {
+    display: flex!important;
+    justify-content: space-between!important;
+    align-items: center!important;
+    gap: 6px!important;
+    flex-wrap: wrap!important;
+    padding-top: 5px!important;
+    border-top: 1px dashed #F1F5F9!important;
+    font-size: 11px!important;
+    width: 100%!important;
+  }
   .feed .it{grid-template-columns:1fr;gap:4px}
   .log .it{grid-template-columns:1fr;gap:4px}
-  .modal .box{width:95vw;max-width:95vw;padding:16px 12px}
+  .modal .box{width:95vw;max-width:95vw;padding:16px 12px;scrollbar-width:none!important;-ms-overflow-style:none!important}
+  .modal .box::-webkit-scrollbar,
+  .mobile-inline-drawer::-webkit-scrollbar,
+  textarea::-webkit-scrollbar,
+  .card::-webkit-scrollbar,
+  #mTask .box::-webkit-scrollbar,
+  .f textarea::-webkit-scrollbar {
+    display: none!important;
+  }
+  textarea, #tDesc, #qNote {
+    resize: none!important;
+  }
 
   /* === Directorio de Clientes Mobile Responsive === */
   #v-clients .sub{display:none!important}
@@ -4137,11 +4176,12 @@ function newExpFromTpl(key) {
 }
 
 // ===== EXPEDIENTE: control center =====
-let cur=null,tab='resumen',openPhase=null;
+let cur=null,tab='resumen',openPhase=null,stepperExpanded=false;
 function openExp(id,t){
   cur=DB.find(e=>e.id===id);
   tab=t||'resumen';
   openPhase=null;
+  stepperExpanded=false;
   $('v-exp').innerHTML='<div class="sk" style="width:180px"></div><div class="sk" style="width:320px;height:26px"></div><div class="sk" style="width:240px"></div><div class="card" style="margin-top:18px"><div class="sk"></div><div class="sk" style="width:60%"></div></div><div class="card"><div class="sk"></div><div class="sk"></div><div class="sk" style="width:40%"></div></div>';
   setTimeout(renderExp,220);
   document.querySelectorAll('.view').forEach(x=>x.classList.remove('on'));
@@ -4163,6 +4203,11 @@ const TAB_NAMES={
   evidencias:'Fotos'
 };
 
+function toggleStepperExpand() {
+  stepperExpanded = !stepperExpanded;
+  renderExp();
+}
+
 function renderStepper(e, T) {
   const fases = (T && T.fases) ? T.fases : [];
   if (!fases.length) return '';
@@ -4175,7 +4220,7 @@ function renderStepper(e, T) {
   return `
   <div class="exp-stepper-container">
     <div class="stepper-hero-top">
-      <div style="display:flex;align-items:center;gap:8px;min-width:0;">
+      <div style="display:flex;align-items:center;gap:8px;min-width:0;cursor:pointer;" onclick="toggleStepperExpand()">
         <div class="stepper-icon-badge">
           <i data-lucide="git-merge" style="width:15px;height:15px;"></i>
         </div>
@@ -4187,52 +4232,27 @@ function renderStepper(e, T) {
       <div class="stepper-meta">
         <span class="stepper-pill-count"><b>${doneCount}</b> de ${total} etapas completadas</span>
         <span class="stepper-pill-pct">${pctTotal}%</span>
+        <button type="button" class="btn sm ghost stepper-toggle-btn" onclick="toggleStepperExpand()" style="padding:3px 8px;font-size:11px;font-weight:600;display:inline-flex;align-items:center;gap:4px;color:var(--navy);background:#fff;border:1px solid var(--line);border-radius:6px;" title="${stepperExpanded ? 'Contraer línea de tiempo' : 'Expandir etapas'}">
+          <span>${stepperExpanded ? 'Contraer' : 'Expandir'}</span>
+          <i data-lucide="${stepperExpanded ? 'chevron-up' : 'chevron-down'}" style="width:13px;height:13px;"></i>
+        </button>
       </div>
     </div>
 
-    <!-- Segmented Pipeline Progress Bar -->
-    <div class="stepper-pipeline-bar">
+    <!-- Segmented Pipeline Progress Bar (Siempre visible) -->
+    <div class="stepper-pipeline-bar" style="cursor:pointer;" onclick="if(!stepperExpanded){ stepperExpanded=true; renderExp(); }">
       ${fases.map((f, i) => {
         const s = phaseState(e, i);
         const isOpen = openPhase === i;
         return `
-          <div class="pipeline-segment ${s} ${isOpen ? 'active' : ''}" onclick="togglePhaseDrawer(${i})" title="Etapa ${i+1}: ${f[0]} (${s==='done'?'Completada':s==='cur'?'En curso':'Pendiente'})"></div>
+          <div class="pipeline-segment ${s} ${isOpen ? 'active' : ''}" onclick="event.stopPropagation(); togglePhaseDrawer(${i})" title="Etapa ${i+1}: ${f[0]} (${s==='done'?'Completada':s==='cur'?'En curso':'Pendiente'})"></div>
         `;
       }).join('')}
     </div>
 
-    <!-- Desktop Grid of Interactive Stage Cards -->
-    <div class="stepper-cards-grid">
-      ${fases.map((f, i) => {
-        const s = phaseState(e, i);
-        const isOpen = openPhase === i;
-        const ts = (e.tasks || []).filter(t => t.phase === i && t.st !== 'na');
-        const d = ts.filter(t => t.st === 'done').length;
-        const isCur = s === 'cur';
-        const isDone = s === 'done';
-        return `
-          <div class="stage-card ${s} ${isOpen ? 'selected' : ''}" onclick="togglePhaseDrawer(${i})" title="Haz clic para ver tareas de la Etapa ${i+1}">
-            <div class="stage-card-header">
-              <span class="stage-num-badge ${s}">
-                ${isDone ? '<i data-lucide="check" style="width:11px;height:11px;stroke-width:3"></i>' : (i + 1)}
-              </span>
-              <span class="stage-status-tag ${s}">
-                ${isDone ? 'Listo' : isCur ? 'En curso' : 'Pendiente'}
-              </span>
-            </div>
-            <div class="stage-card-title">${f[0]}</div>
-            <div class="stage-card-footer">
-              <span><i data-lucide="check-circle-2" style="width:11px;height:11px;vertical-align:-1px;margin-right:2px;"></i>${d}/${ts.length} tareas</span>
-              ${ts.length ? `<span class="stage-pct-mini">${Math.round(d/ts.length*100)}%</span>` : ''}
-            </div>
-          </div>
-        `;
-      }).join('')}
-    </div>
-
-    <!-- Mobile View: Clean Vertical Pipeline Checklist -->
-    <div class="stepper-mobile-view">
-      <div class="mobile-timeline-list">
+    ${stepperExpanded ? `
+      <!-- Desktop Grid of Interactive Stage Cards -->
+      <div class="stepper-cards-grid">
         ${fases.map((f, i) => {
           const s = phaseState(e, i);
           const isOpen = openPhase === i;
@@ -4241,75 +4261,115 @@ function renderStepper(e, T) {
           const isCur = s === 'cur';
           const isDone = s === 'done';
           return `
-            <div class="mobile-timeline-item ${s} ${isOpen ? 'open' : ''}">
-              <div class="mobile-timeline-track">
-                <div class="mobile-timeline-node ${s}">
+            <div class="stage-card ${s} ${isOpen ? 'selected' : ''}" onclick="togglePhaseDrawer(${i})" title="Haz clic para ver tareas de la Etapa ${i+1}">
+              <div class="stage-card-header">
+                <span class="stage-num-badge ${s}">
                   ${isDone ? '<i data-lucide="check" style="width:11px;height:11px;stroke-width:3"></i>' : (i + 1)}
-                </div>
-                ${i < total - 1 ? `<div class="mobile-timeline-line ${isDone ? 'done' : ''}"></div>` : ''}
+                </span>
+                <span class="stage-status-tag ${s}">
+                  ${isDone ? 'Listo' : isCur ? 'En curso' : 'Pendiente'}
+                </span>
               </div>
-              <div class="mobile-timeline-content" onclick="togglePhaseDrawer(${i})">
-                <div class="mobile-timeline-header">
-                  <span class="mobile-stage-name">${i+1}. ${f[0]}</span>
-                  <span class="stage-status-tag ${s}">${isDone ? 'Completada' : isCur ? 'En proceso' : 'Pendiente'}</span>
-                </div>
-                <div class="mobile-timeline-sub">
-                  <span>${d} de ${ts.length} tareas (${ts.length ? Math.round(d/ts.length*100) : 0}%)</span>
-                  <span style="display:flex;align-items:center;gap:2px;color:var(--navy);font-weight:600;font-size:11px;">
-                    ${isOpen ? 'Ocultar' : 'Ver detalle'} <i data-lucide="${isOpen ? 'chevron-up' : 'chevron-down'}" style="width:12px;height:12px;"></i>
-                  </span>
-                </div>
+              <div class="stage-card-title">${f[0]}</div>
+              <div class="stage-card-footer">
+                <span><i data-lucide="check-circle-2" style="width:11px;height:11px;vertical-align:-1px;margin-right:2px;"></i>${d}/${ts.length} tareas</span>
+                ${ts.length ? `<span class="stage-pct-mini">${Math.round(d/ts.length*100)}%</span>` : ''}
               </div>
             </div>
-            ${isOpen ? `
-              <div class="mobile-inline-drawer">
-                <div style="font-size:11px;color:var(--gray);margin-bottom:8px;">
-                  <b>Etapa ${i+1}:</b> ${f[0]}
-                </div>
-                ${ts.map(t => taskRow(t)).join('') || '<p class="sub" style="font-size:11.5px;padding:4px 0;">Sin tareas en esta etapa.</p>'}
-              </div>
-            ` : ''}
           `;
         }).join('')}
       </div>
-    </div>
 
-    <!-- Desktop Detail Drawer -->
-    ${openPhase !== null && fases[openPhase] ? (() => {
-      const fi = openPhase;
-      const ts = (e.tasks || []).filter(t => t.phase === fi);
-      const d = ts.filter(t => t.st === 'done').length;
-      const pct = ts.length ? Math.round(d / ts.length * 100) : 0;
-      const who = [...new Set(ts.map(t => t.who))].filter(Boolean).join(', ');
-      const dues = ts.filter(t => t.due).map(t => t.due).sort();
-      return `
-      <div class="stepper-desktop-drawer">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--line);">
-          <div style="display:flex;align-items:center;gap:8px">
-            <span class="tag ${phaseState(e, fi) === 'done' ? 'proc' : phaseState(e, fi) === 'cur' ? 'wait' : 'done'}" style="font-weight:700;">Etapa ${fi+1}</span>
-            <b style="font-size:13.5px;color:var(--navy)">${fases[fi][0]}</b>
-          </div>
-          <div style="display:flex;align-items:center;gap:10px">
-            <span style="font-size:12px;font-weight:600;color:var(--navy);">${pct}% (${d}/${ts.length} tareas)</span>
-            <button class="btn sm ghost" onclick="togglePhaseDrawer(null)" style="padding:2px 6px" title="Cerrar detalle"><i data-lucide="x"></i></button>
-          </div>
-        </div>
-        <div class="kv" style="grid-template-columns:120px 1fr;margin-bottom:10px;font-size:11.5px">
-          <span class="k">Responsables:</span><span class="v">${who || '—'}</span>
-          <span class="k">Plazo estimado:</span><span class="v">${dues.length ? fd(dues[0]) + ' → ' + fd(dues[dues.length-1]) : 'Sin fechas asignadas'}</span>
-        </div>
-        <div style="max-height:220px;overflow-y:auto">
-          ${ts.map(t => taskRow(t)).join('') || '<p class="sub" style="font-size:11.5px;padding:6px 0">Sin tareas en esta etapa.</p>'}
+      <!-- Mobile View: Clean Vertical Pipeline Checklist -->
+      <div class="stepper-mobile-view">
+        <div class="mobile-timeline-list">
+          ${fases.map((f, i) => {
+            const s = phaseState(e, i);
+            const isOpen = openPhase === i;
+            const ts = (e.tasks || []).filter(t => t.phase === i && t.st !== 'na');
+            const d = ts.filter(t => t.st === 'done').length;
+            const isCur = s === 'cur';
+            const isDone = s === 'done';
+            return `
+              <div class="mobile-timeline-item ${s} ${isOpen ? 'open' : ''}">
+                <div class="mobile-timeline-track">
+                  <div class="mobile-timeline-node ${s}">
+                    ${isDone ? '<i data-lucide="check" style="width:11px;height:11px;stroke-width:3"></i>' : (i + 1)}
+                  </div>
+                  ${i < total - 1 ? `<div class="mobile-timeline-line ${isDone ? 'done' : ''}"></div>` : ''}
+                </div>
+                <div class="mobile-timeline-content" onclick="togglePhaseDrawer(${i})">
+                  <div class="mobile-timeline-header">
+                    <span class="mobile-stage-name">${i+1}. ${f[0]}</span>
+                    <span class="stage-status-tag ${s}">${isDone ? 'Completada' : isCur ? 'En proceso' : 'Pendiente'}</span>
+                  </div>
+                  <div class="mobile-timeline-sub">
+                    <span>${d} de ${ts.length} tareas (${ts.length ? Math.round(d/ts.length*100) : 0}%)</span>
+                    <span style="display:flex;align-items:center;gap:2px;color:var(--navy);font-weight:600;font-size:11px;">
+                      ${isOpen ? 'Ocultar' : 'Ver detalle'} <i data-lucide="${isOpen ? 'chevron-up' : 'chevron-down'}" style="width:12px;height:12px;"></i>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              ${isOpen ? `
+                <div class="mobile-inline-drawer">
+                  <div style="font-size:11px;color:var(--gray);margin-bottom:8px;">
+                    <b>Etapa ${i+1}:</b> ${f[0]}
+                  </div>
+                  ${ts.map(t => taskRow(t)).join('') || '<p class="sub" style="font-size:11.5px;padding:4px 0;">Sin tareas en esta etapa.</p>'}
+                </div>
+              ` : ''}
+            `;
+          }).join('')}
         </div>
       </div>
-      `;
-    })() : ''}
+
+      <!-- Desktop Detail Drawer -->
+      ${openPhase !== null && fases[openPhase] ? (() => {
+        const fi = openPhase;
+        const ts = (e.tasks || []).filter(t => t.phase === fi);
+        const d = ts.filter(t => t.st === 'done').length;
+        const pct = ts.length ? Math.round(d / ts.length * 100) : 0;
+        const who = [...new Set(ts.map(t => t.who))].filter(Boolean).join(', ');
+        const dues = ts.filter(t => t.due).map(t => t.due).sort();
+        return `
+        <div class="stepper-desktop-drawer">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--line);">
+            <div style="display:flex;align-items:center;gap:8px">
+              <span class="tag ${phaseState(e, fi) === 'done' ? 'proc' : phaseState(e, fi) === 'cur' ? 'wait' : 'done'}" style="font-weight:700;">Etapa ${fi+1}</span>
+              <b style="font-size:13.5px;color:var(--navy)">${fases[fi][0]}</b>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="font-size:12px;font-weight:600;color:var(--navy);">${pct}% (${d}/${ts.length} tareas)</span>
+              <button class="btn sm ghost" onclick="togglePhaseDrawer(null)" style="padding:2px 6px" title="Cerrar detalle"><i data-lucide="x"></i></button>
+            </div>
+          </div>
+          <div class="kv" style="grid-template-columns:120px 1fr;margin-bottom:10px;font-size:11.5px">
+            <span class="k">Responsables:</span><span class="v">${who || '—'}</span>
+            <span class="k">Plazo estimado:</span><span class="v">${dues.length ? fd(dues[0]) + ' → ' + fd(dues[dues.length-1]) : 'Sin fechas asignadas'}</span>
+          </div>
+          <div style="max-height:220px;overflow-y:auto">
+            ${ts.map(t => taskRow(t)).join('') || '<p class="sub" style="font-size:11.5px;padding:6px 0">Sin tareas en esta etapa.</p>'}
+          </div>
+        </div>
+        `;
+      })() : ''}
+    ` : ''}
   </div>
   `;
 }
 
 function togglePhaseDrawer(i) {
-  openPhase = openPhase === i ? null : i;
+  if (i === null) {
+    openPhase = null;
+  } else {
+    if (openPhase === i) {
+      openPhase = null;
+    } else {
+      openPhase = i;
+      stepperExpanded = true;
+    }
+  }
   renderExp();
 }
 
@@ -4671,13 +4731,22 @@ function checklist(e,T,b){
 
 function taskRow(t){
   const late=t.due&&t.st!=='done'&&t.st!=='na'&&days(t.due)<0;
-  return `<div class="task">
-    <input type="checkbox" style="width:auto" ${t.st==='done'?'checked':''} onchange="setSt(${t.id},this.checked?'done':'pend')">
-    <span class="t ${t.st==='done'?'done':''}" onclick="taskModal(${t.id})" style="cursor:pointer">${t.name}${t.desc?` <small style="color:var(--gray)">· ${t.desc}</small>`:''}</span>
-    <span class="who"><i data-lucide="user"></i> ${t.who}</span>
-    <span class="due ${late?'late':''}">${t.due?'<i data-lucide="calendar"></i> '+fd(t.due):'—'}</span>
-    <select class="${ST[t.st]?ST[t.st][1]:''}" onchange="setSt(${t.id},this.value)">${Object.entries(ST).map(([k,v])=>`<option value="${k}" ${k===t.st?'selected':''}>${v[0]}</option>`).join('')}</select>
-    <button class="btn sm ghost" onclick="taskModal(${t.id})" title="Editar"><i data-lucide="pencil"></i></button>
+  return `
+  <div class="task">
+    <div class="task-top-row">
+      <input type="checkbox" style="width:auto;margin-top:2px;flex-shrink:0" ${t.st==='done'?'checked':''} onchange="setSt(${t.id},this.checked?'done':'pend')">
+      <span class="t ${t.st==='done'?'done':''}" onclick="taskModal(${t.id})" style="cursor:pointer;flex:1;font-weight:500;font-size:12.5px;color:var(--navy);">${t.name}${t.desc?` <small style="color:var(--gray);display:block;font-size:11px;font-weight:400;">${t.desc}</small>`:''}</span>
+      <button class="btn sm ghost task-edit-btn" onclick="taskModal(${t.id})" title="Editar" style="padding:2px 6px;"><i data-lucide="pencil" style="width:13px;height:13px;"></i></button>
+    </div>
+    <div class="task-bottom-row">
+      <div style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--gray);">
+        <span class="who"><i data-lucide="user" style="width:11px;height:11px;vertical-align:-1px;margin-right:2px;"></i>${t.who.split(' ')[0]}</span>
+        <span class="due ${late?'late':''}"><i data-lucide="calendar" style="width:11px;height:11px;vertical-align:-1px;margin-right:2px;"></i>${t.due ? fd(t.due) : 'Sin fecha'}</span>
+      </div>
+      <select class="${ST[t.st]?ST[t.st][1]:''}" onchange="setSt(${t.id},this.value)" style="width:auto;padding:2px 6px;font-size:11px;font-weight:600;border-radius:5px;">
+        ${Object.entries(ST).map(([k,v])=>`<option value="${k}" ${k===t.st?'selected':''}>${v[0]}</option>`).join('')}
+      </select>
+    </div>
   </div>`;
 }
 
