@@ -5201,22 +5201,31 @@ function finanzas(e,T,b){
   </div>
 
   <div class="card">
-    <div class="ch">
-      <h2>Control de Cobros, Facturas y Recibos</h2>
-      <button class="btn p" onclick="toggleFinForm()"><i data-lucide="plus"></i>Registrar factura / cobro</button>
+    <div class="ch" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+      <h2 style="margin:0;">Control de Pagos y Cobros</h2>
+      <button class="btn p" onclick="toggleFinForm()"><i data-lucide="plus"></i>Registrar Pago / Cobro</button>
     </div>
 
     <div id="finForm" style="display:none;border-top:1px solid var(--line);padding-top:14px;margin-top:10px;background:var(--bg);padding:14px;border-radius:8px">
       <div class="g2">
-        <div class="f"><label>Concepto / Detalle</label><input id="finC" placeholder="Ej: Separación inicial 30%, Honorarios etapa 1..."></div>
-        <div class="f"><label>Monto</label><input id="finM" type="number" min="0" placeholder="0.00"></div>
+        <div class="f"><label>Concepto / Detalle *</label><input id="finC" placeholder="Ej: Pago de inicial, Honorarios etapa 1, Tasa catastral..."></div>
+        <div class="f"><label>Monto *</label><input id="finM" type="number" min="0" placeholder="0.00"></div>
       </div>
       <div class="g3">
         <div class="f"><label>Fecha</label><input id="finD" type="date" value="${TODAY}"></div>
-        <div class="f"><label>Tipo de movimiento</label><select id="finT"><option value="Ingreso">Ingreso (Cobro a cliente)</option><option value="Gasto">Gasto (Agrimensor / Trámite / Tasa)</option></select></div>
-        <div class="f"><label>Estado</label><select id="finSt"><option value="Pagado">Pagado (Emitir recibo)</option><option value="Pendiente">Pendiente de cobro</option></select></div>
+        <div class="f"><label>Tipo de movimiento</label><select id="finT"><option value="Ingreso">Cobro a Cliente (Ingreso)</option><option value="Gasto">Gasto / Pago Realizado (Agrimensura / Tasas / Notaría)</option></select></div>
+        <div class="f"><label>Estado</label><select id="finSt"><option value="Pagado">Completado / Pagado</option><option value="Pendiente">Pendiente de confirmación</option></select></div>
       </div>
-      <div class="f"><label>Nota / Comprobante de transferencia</label><input id="finN" placeholder="Ej: Transferencia Banco Popular #48929"></div>
+      <div class="g2">
+        <div class="f"><label>Nota / Referencia bancaria</label><input id="finN" placeholder="Ej: Transferencia Popular #48929"></div>
+        <div class="f">
+          <label>Adjuntar Soporte / Comprobante <small style="color:var(--gray);">(PDF, Imagen, Documento - Máx 200MB)</small></label>
+          <input type="file" id="finFile" accept="*/*" onchange="handleFinFile(this)" style="font-size:12px;padding:5px 8px;background:#fff;border:1px solid var(--line);border-radius:6px;width:100%;">
+          <input type="hidden" id="finFileB64" value="">
+          <input type="hidden" id="finFileName" value="">
+          <div id="finFilePreview" style="display:none;font-size:11.5px;color:var(--green);margin-top:4px;font-weight:600;"></div>
+        </div>
+      </div>
       <div style="display:flex;gap:8px;margin-top:10px">
         <button class="btn p" onclick="saveMovimiento()"><i data-lucide="save"></i>Guardar movimiento</button>
         <button class="btn" onclick="toggleFinForm()">Cancelar</button>
@@ -5232,6 +5241,7 @@ function finanzas(e,T,b){
             <th>Tipo</th>
             <th>Monto</th>
             <th>Estado</th>
+            <th>Soporte</th>
             <th style="text-align:right">Acciones</th>
           </tr>
         </thead>
@@ -5243,21 +5253,28 @@ function finanzas(e,T,b){
                 <b>${p.c}</b>
                 ${p.nota?`<small style="display:block;color:var(--gray)">${p.nota}</small>`:''}
               </td>
-              <td><span style="font-size:11px;font-weight:600;color:${p.tipo==='Gasto'?'var(--amber)':'var(--green)'}">${p.tipo||'Ingreso'}</span></td>
+              <td><span style="font-size:11px;font-weight:600;color:${p.tipo==='Gasto'?'var(--amber)':'var(--green)'}">${p.tipo==='Gasto'?'Pago / Gasto':'Cobro / Ingreso'}</span></td>
               <td style="font-weight:600;color:${p.tipo==='Gasto'?'var(--amber)':'var(--navy)'}">${e.mon}${fmt(p.m)}</td>
               <td><span class="tag ${p.st==='Pagado'?'proc':'wait'}">${p.st}</span></td>
+              <td>
+                ${p.soporte ? `
+                  <a href="${p.soporte}" download="${p.soporteNombre || 'soporte_pago'}" class="btn sm" style="padding:3px 7px;font-size:11px;display:inline-flex;align-items:center;gap:4px;" title="Descargar soporte adjunto">
+                    <i data-lucide="paperclip" style="width:12px;height:12px;"></i><span>${p.soporteNombre ? p.soporteNombre.substring(0,14)+'...' : 'Soporte'}</span>
+                  </a>
+                ` : '<span style="color:var(--gray);font-size:11px;">Sin archivo</span>'}
+              </td>
               <td style="text-align:right">
                 <div style="display:inline-flex;gap:6px">
                   ${p.st==='Pagado'&&p.tipo!=='Gasto'?`
                     <button class="btn sm" onclick="verRecibo(${i})"><i data-lucide="receipt"></i>Ver Recibo</button>
                   `:''}
                   ${p.st!=='Pagado'?`
-                    <button class="btn sm p" onclick="cur.pagos[${i}].st='Pagado';cur.pagos[${i}].d='${TODAY}';log(cur,'Pago confirmado: ${p.c}.');save();renderTab();toast('Pago confirmado')">Confirmar Pago</button>
+                    <button class="btn sm p" onclick="cur.pagos[${i}].st='Pagado';cur.pagos[${i}].d='${TODAY}';log(cur,'Pago confirmado: ${p.c}.');save();renderTab();toast('Pago confirmado')">Confirmar</button>
                   `:''}
                 </div>
               </td>
             </tr>
-          `).join('')||'<tr><td colspan="6" class="empty" style="text-align:center;padding:18px;color:var(--gray)">Sin movimientos financieros registrados.</td></tr>'}
+          `).join('')||'<tr><td colspan="7" class="empty" style="text-align:center;padding:18px;color:var(--gray)">Sin movimientos registrados.</td></tr>'}
         </tbody>
       </table>
     </div>
@@ -5270,6 +5287,28 @@ function toggleFinForm(){
   icons();
 }
 
+function handleFinFile(input){
+  const file = input.files?.[0];
+  if(!file) return;
+  const maxBytes = 200 * 1024 * 1024; // 200 MB limit
+  if(file.size > maxBytes){
+    alert('El archivo excede el límite permitido de 200MB.');
+    input.value = '';
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = function(e){
+    $('finFileB64').value = e.target.result;
+    $('finFileName').value = file.name;
+    const prev = $('finFilePreview');
+    if(prev){
+      prev.style.display = 'block';
+      prev.textContent = `✓ Archivo cargado: ${file.name} (${(file.size/(1024*1024)).toFixed(2)} MB)`;
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
 function saveMovimiento(){
   const c=($('finC')||{}).value?.trim();
   const m=parseFloat(($('finM')||{}).value)||0;
@@ -5277,13 +5316,16 @@ function saveMovimiento(){
   const t=($('finT')||{}).value||'Ingreso';
   const st=($('finSt')||{}).value||'Pagado';
   const n=($('finN')||{}).value?.trim()||'';
+  const soporte = ($('finFileB64')||{}).value || null;
+  const soporteNombre = ($('finFileName')||{}).value || null;
+
   if(!c){ toast('El concepto es obligatorio'); return; }
   if(!m){ toast('Ingrese un monto válido'); return; }
-  cur.pagos.push({d,c,m,st,tipo:t,nota:n});
+  cur.pagos.push({d,c,m,st,tipo:t,nota:n,soporte,soporteNombre});
   log(cur,`Registro financiero: ${c} — ${cur.mon}${fmt(m)} (${st}).`);
   save();
   renderTab();
-  toast('Movimiento registrado');
+  toast('Movimiento registrado con éxito');
 }
 
 function verRecibo(pagoIndex){
