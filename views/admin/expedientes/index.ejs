@@ -1162,6 +1162,40 @@ tr.row:hover td{background:var(--bg);cursor:pointer}
   #v-clients h1{font-size:1.2rem!important}
   .cli-search-box{width:100%!important;max-width:100%!important;margin-top:6px!important}
   
+  .cli-profile-header-card {
+    padding: 14px 12px !important;
+  }
+  .cli-profile-top-wrap {
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+  .cli-profile-contact-btns {
+    width: 100% !important;
+    display: flex !important;
+    gap: 8px !important;
+  }
+  .cli-profile-contact-btns .btn {
+    flex: 1 1 0% !important;
+    justify-content: center !important;
+    padding: 9px 8px !important;
+    font-size: 11.5px !important;
+    text-align: center !important;
+  }
+  .cli-metrics-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+    padding: 10px 12px !important;
+  }
+  .cli-metric-box {
+    background: #ffffff;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid #E2E8F0;
+  }
+  .cli-metric-box b {
+    font-size: 16px !important;
+  }
+  
   /* Mobile Table to Card Transformation for Clients */
   #v-clients .card {
     background: transparent!important;
@@ -2930,55 +2964,55 @@ function renderClientDetail() {
     </div>
 
     <!-- Executive Client Profile Header Card (Fondo Claro) -->
-    <div class="card" style="background:#ffffff;border:1px solid var(--line);border-radius:12px;padding:22px 24px;box-shadow:0 1px 4px rgba(26,58,82,0.05);margin-bottom:16px;">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:20px;flex-wrap:wrap;">
-        <div style="display:flex;align-items:center;gap:16px;">
-          <div style="width:58px;height:58px;border-radius:50%;background:var(--green-l);color:var(--navy);border:2px solid #CBD5E1;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;flex-shrink:0;">
+    <div class="card cli-profile-header-card" style="background:#ffffff;border:1px solid var(--line);border-radius:12px;padding:18px 20px;box-shadow:0 1px 4px rgba(26,58,82,0.05);margin-bottom:16px;">
+      <div class="cli-profile-top-wrap" style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;">
+        <div class="cli-profile-info-left" style="display:flex;align-items:center;gap:14px;min-width:0;flex:1 1 auto;">
+          <div style="width:52px;height:52px;border-radius:50%;background:var(--green-l);color:var(--navy);border:2px solid #CBD5E1;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;flex-shrink:0;">
             ${ini(c.nombre)}
           </div>
-          <div>
-            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-              <h1 style="margin:0;font-size:21px;color:var(--navy);font-weight:700;">${c.nombre}</h1>
-              <div style="display:flex;gap:5px;flex-wrap:wrap;">${badgeTags.join('')}</div>
+          <div style="min-width:0;">
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+              <h1 style="margin:0;font-size:19px;color:var(--navy);font-weight:700;word-break:break-word;">${c.nombre}</h1>
+              <div style="display:flex;gap:4px;flex-wrap:wrap;">${badgeTags.join('')}</div>
             </div>
-            <div style="font-size:12px;color:var(--gray);margin-top:5px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
-              <span><i data-lucide="credit-card" style="width:13px;height:13px;margin-right:4px;color:var(--navy);"></i>${c.cedula ? `Cédula / RNC: <b style="color:var(--ink);">${c.cedula}</b>` : 'Sin Cédula/RNC'}</span>
-              ${c.dir ? `<span><i data-lucide="map-pin" style="width:13px;height:13px;margin-right:4px;color:var(--navy);"></i>${c.dir}</span>` : ''}
-              ${c.email ? `<a href="mailto:${c.email}" style="color:var(--blue);text-decoration:none;"><i data-lucide="mail" style="width:13px;height:13px;margin-right:4px;"></i>${c.email}</a>` : ''}
+            <div style="font-size:12px;color:var(--gray);margin-top:6px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;word-break:break-word;">
+              <span style="display:inline-flex;align-items:center;gap:4px;"><i data-lucide="credit-card" style="width:13px;height:13px;color:var(--navy);flex-shrink:0;"></i><span>${c.cedula ? `Cédula/RNC: <b style="color:var(--ink);">${c.cedula}</b>` : 'Sin Cédula/RNC'}</span></span>
+              ${c.dir ? `<span style="display:inline-flex;align-items:center;gap:4px;"><i data-lucide="map-pin" style="width:13px;height:13px;color:var(--navy);flex-shrink:0;"></i><span>${c.dir}</span></span>` : ''}
+              ${c.email ? `<a href="mailto:${c.email}" style="color:var(--blue);text-decoration:none;display:inline-flex;align-items:center;gap:4px;"><i data-lucide="mail" style="width:13px;height:13px;flex-shrink:0;"></i><span>${c.email}</span></a>` : ''}
             </div>
           </div>
         </div>
-        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <div class="cli-profile-contact-btns" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;width:auto;">
           ${waLink ? `
-            <a href="${waLink}" target="_blank" class="btn sm" style="background:#22C55E;border-color:#22C55E;color:#fff;font-weight:600;padding:6px 12px;font-size:12px;box-shadow:0 2px 6px rgba(34,197,94,0.25);">
-              <i data-lucide="message-circle"></i>WhatsApp Directo
+            <a href="${waLink}" target="_blank" class="btn sm" style="background:#22C55E;border-color:#22C55E;color:#fff;font-weight:600;padding:7px 12px;font-size:12px;box-shadow:0 2px 6px rgba(34,197,94,0.25);display:inline-flex;align-items:center;gap:4px;">
+              <i data-lucide="message-circle"></i><span>WhatsApp Directo</span>
             </a>
           ` : ''}
           ${c.tel ? `
-            <a href="tel:${c.tel}" class="btn sm" style="background:#fff;border:1px solid var(--line);color:var(--navy);padding:6px 12px;font-size:12px;">
-              <i data-lucide="phone"></i>${c.tel}
+            <a href="tel:${c.tel}" class="btn sm" style="background:#fff;border:1px solid var(--line);color:var(--navy);padding:7px 12px;font-size:12px;display:inline-flex;align-items:center;gap:4px;">
+              <i data-lucide="phone"></i><span>${c.tel}</span>
             </a>
           ` : ''}
         </div>
       </div>
 
       <!-- Métricas del cliente (Fondo Claro) -->
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:18px;background:#F8FAFC;padding:14px 18px;border-radius:10px;border:1px solid #E2E8F0;">
-        <div>
-          <span style="color:var(--gray);font-size:11px;font-weight:600;display:block;text-transform:uppercase;letter-spacing:0.5px;">Expedientes Registrados</span>
-          <b style="font-size:20px;color:var(--navy);margin-top:2px;display:block;">${c.expedientes.length}</b>
+      <div class="cli-metrics-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px;background:#F8FAFC;padding:12px 14px;border-radius:10px;border:1px solid #E2E8F0;">
+        <div class="cli-metric-box">
+          <span style="color:var(--gray);font-size:10px;font-weight:600;display:block;text-transform:uppercase;letter-spacing:0.5px;line-height:1.2;">Expedientes</span>
+          <b style="font-size:18px;color:var(--navy);margin-top:2px;display:block;">${c.expedientes.length}</b>
         </div>
-        <div>
-          <span style="color:var(--gray);font-size:11px;font-weight:600;display:block;text-transform:uppercase;letter-spacing:0.5px;">Bienes Raíces / Proyectos</span>
-          <b style="font-size:20px;color:var(--blue);margin-top:2px;display:block;">${c.proyectos.length ? c.proyectos.length : (hasRE ? '1 Activo' : '0')}</b>
+        <div class="cli-metric-box">
+          <span style="color:var(--gray);font-size:10px;font-weight:600;display:block;text-transform:uppercase;letter-spacing:0.5px;line-height:1.2;">Proyectos / RE</span>
+          <b style="font-size:18px;color:var(--blue);margin-top:2px;display:block;">${c.proyectos.length ? c.proyectos.length : (hasRE ? '1' : '0')}</b>
         </div>
-        <div>
-          <span style="color:var(--gray);font-size:11px;font-weight:600;display:block;text-transform:uppercase;letter-spacing:0.5px;">Total Facturado</span>
-          <b style="font-size:20px;color:var(--green);margin-top:2px;display:block;">US$${fmt(c.totalHonorarios)}</b>
+        <div class="cli-metric-box">
+          <span style="color:var(--gray);font-size:10px;font-weight:600;display:block;text-transform:uppercase;letter-spacing:0.5px;line-height:1.2;">Total Facturado</span>
+          <b style="font-size:18px;color:var(--green);margin-top:2px;display:block;">US$${fmt(c.totalHonorarios)}</b>
         </div>
-        <div>
-          <span style="color:var(--gray);font-size:11px;font-weight:600;display:block;text-transform:uppercase;letter-spacing:0.5px;">Saldo Pendiente</span>
-          <b style="font-size:20px;color:${(c.totalHonorarios - c.totalPagado) > 0 ? 'var(--red)' : 'var(--navy)'};margin-top:2px;display:block;">US$${fmt(Math.max(0, c.totalHonorarios - c.totalPagado))}</b>
+        <div class="cli-metric-box">
+          <span style="color:var(--gray);font-size:10px;font-weight:600;display:block;text-transform:uppercase;letter-spacing:0.5px;line-height:1.2;">Saldo Pendiente</span>
+          <b style="font-size:18px;color:${(c.totalHonorarios - c.totalPagado) > 0 ? 'var(--red)' : 'var(--navy)'};margin-top:2px;display:block;">US$${fmt(Math.max(0, c.totalHonorarios - c.totalPagado))}</b>
         </div>
       </div>
     </div>
