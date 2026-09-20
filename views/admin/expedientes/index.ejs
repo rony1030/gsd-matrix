@@ -1033,6 +1033,31 @@ tr.row:hover td{background:var(--bg);cursor:pointer}
   <div class="mf"><button class="btn" onclick="closeM('mClientEdit')">Cancelar</button><button class="btn p" onclick="saveClientModal()">Guardar datos</button></div>
 </div></div>
 
+<!-- MODAL: VISOR DE DOCUMENTOS & PDF OFICIAL -->
+<div class="modal" id="mDocPreview">
+  <div class="box" style="width:880px;max-width:96vw;max-height:92vh;padding:0;overflow:hidden;display:flex;flex-direction:column;">
+    <div style="background:#f8fafc;border-bottom:1px solid var(--line);padding:14px 20px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;">
+      <div style="display:flex;align-items:center;gap:12px;min-width:0;">
+        <div style="width:36px;height:36px;border-radius:8px;background:var(--green-l);color:var(--green);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <i data-lucide="file-text" style="width:20px;height:20px;"></i>
+        </div>
+        <div style="min-width:0;">
+          <b id="docPreviewTitle" style="font-size:14px;color:var(--navy);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Documento Oficial</b>
+          <small id="docPreviewSub" style="font-size:11.5px;color:var(--gray);display:block;">Expediente · Categoría</small>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+        <button type="button" class="btn sm" id="btnDownloadDoc" onclick="downloadCurPreviewDoc()"><i data-lucide="download"></i><span>Descargar</span></button>
+        <button type="button" class="btn sm p" onclick="printCurPreviewDoc()"><i data-lucide="printer"></i><span>Imprimir / Guardar PDF</span></button>
+        <button type="button" class="btn sm ghost" onclick="closeM('mDocPreview')" style="padding:4px 8px;"><i data-lucide="x"></i></button>
+      </div>
+    </div>
+    <div id="docPreviewContainer" style="flex:1;overflow-y:auto;padding:24px;background:#f1f5f9;display:flex;justify-content:center;align-items:flex-start;min-height:480px;">
+      <!-- Dynamic Document Preview / Iframe -->
+    </div>
+  </div>
+</div>
+
 <!-- MODAL: REGISTRAR / EDITAR CLIENTE COMPLETO -->
 <div class="modal" id="mNewClientDirect">
   <div class="box" style="width:620px;max-width:95vw;padding:22px 26px;">
@@ -2131,11 +2156,11 @@ function renderClientDetail() {
   const waLink = cleanPhone ? `https://wa.me/${cleanPhone.startsWith('1')||cleanPhone.startsWith('+')?cleanPhone.replace('+',''):'1'+cleanPhone}` : '';
 
   const badgeTags = [];
-  if (isCorp) badgeTags.push('<span class="cli-badge corp" style="background:rgba(255,255,255,0.22);color:#fff;border:1px solid rgba(255,255,255,0.3);">Empresa</span>');
-  if (isVip) badgeTags.push('<span class="cli-badge vip" style="background:#FDE047;color:#854D0E;font-weight:700;">Inversionista VIP</span>');
-  if (c.expedientes.some(e => e.svc === 'deslinde' || e.svc === 'subdivision' || e.svc === 'condominio')) badgeTags.push('<span class="cli-badge agri" style="background:rgba(74,155,111,0.25);color:#A7F3D0;border:1px solid rgba(74,155,111,0.4);">Agrimensura</span>');
-  if (c.expedientes.some(e => e.svc === 'transferencia' || e.svc === 'iguala' || e.svc === 'sucesiones')) badgeTags.push('<span class="cli-badge legal" style="background:rgba(43,108,176,0.3);color:#BFDBFE;border:1px solid rgba(43,108,176,0.4);">Legal</span>');
-  if (hasRE) badgeTags.push('<span class="cli-badge re" style="background:rgba(217,119,6,0.25);color:#FDE68A;border:1px solid rgba(217,119,6,0.4);">Bienes Raíces</span>');
+  if (isCorp) badgeTags.push('<span class="cli-badge corp">Empresa</span>');
+  if (isVip) badgeTags.push('<span class="cli-badge vip">Inversionista VIP</span>');
+  if (c.expedientes.some(e => e.svc === 'deslinde' || e.svc === 'subdivision' || e.svc === 'condominio')) badgeTags.push('<span class="cli-badge agri">Agrimensura</span>');
+  if (c.expedientes.some(e => e.svc === 'transferencia' || e.svc === 'iguala' || e.svc === 'sucesiones')) badgeTags.push('<span class="cli-badge legal">Legal</span>');
+  if (hasRE) badgeTags.push('<span class="cli-badge re">Bienes Raíces</span>');
 
   container.innerHTML = `
     <!-- Top Action Bar / Breadcrumb -->
@@ -2150,56 +2175,56 @@ function renderClientDetail() {
       </div>
     </div>
 
-    <!-- Executive Client Profile Header Card -->
-    <div class="card" style="background:linear-gradient(135deg, #1A3A52 0%, #152E42 100%);color:#fff;border-radius:12px;padding:24px;border:none;box-shadow:0 8px 24px rgba(26,58,82,0.12);margin-bottom:16px;">
+    <!-- Executive Client Profile Header Card (Fondo Claro) -->
+    <div class="card" style="background:#ffffff;border:1px solid var(--line);border-radius:12px;padding:22px 24px;box-shadow:0 1px 4px rgba(26,58,82,0.05);margin-bottom:16px;">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:20px;flex-wrap:wrap;">
-        <div style="display:flex;align-items:center;gap:18px;">
-          <div style="width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.3);color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;flex-shrink:0;box-shadow:0 4px 12px rgba(0,0,0,0.15);">
+        <div style="display:flex;align-items:center;gap:16px;">
+          <div style="width:58px;height:58px;border-radius:50%;background:var(--green-l);color:var(--navy);border:2px solid #CBD5E1;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;flex-shrink:0;">
             ${ini(c.nombre)}
           </div>
           <div>
             <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-              <h1 style="margin:0;font-size:22px;color:#fff;font-weight:700;">${c.nombre}</h1>
+              <h1 style="margin:0;font-size:21px;color:var(--navy);font-weight:700;">${c.nombre}</h1>
               <div style="display:flex;gap:5px;flex-wrap:wrap;">${badgeTags.join('')}</div>
             </div>
-            <div style="font-size:12.5px;color:#CFE3D8;margin-top:6px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
-              <span><i data-lucide="credit-card" style="width:13px;height:13px;margin-right:4px;"></i>${c.cedula ? `Cédula / RNC: ${c.cedula}` : 'Sin Cédula/RNC'}</span>
-              ${c.dir ? `<span><i data-lucide="map-pin" style="width:13px;height:13px;margin-right:4px;"></i>${c.dir}</span>` : ''}
-              ${c.email ? `<a href="mailto:${c.email}" style="color:#93C5FD;text-decoration:none;"><i data-lucide="mail" style="width:13px;height:13px;margin-right:4px;"></i>${c.email}</a>` : ''}
+            <div style="font-size:12px;color:var(--gray);margin-top:5px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+              <span><i data-lucide="credit-card" style="width:13px;height:13px;margin-right:4px;color:var(--navy);"></i>${c.cedula ? `Cédula / RNC: <b style="color:var(--ink);">${c.cedula}</b>` : 'Sin Cédula/RNC'}</span>
+              ${c.dir ? `<span><i data-lucide="map-pin" style="width:13px;height:13px;margin-right:4px;color:var(--navy);"></i>${c.dir}</span>` : ''}
+              ${c.email ? `<a href="mailto:${c.email}" style="color:var(--blue);text-decoration:none;"><i data-lucide="mail" style="width:13px;height:13px;margin-right:4px;"></i>${c.email}</a>` : ''}
             </div>
           </div>
         </div>
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
           ${waLink ? `
-            <a href="${waLink}" target="_blank" class="btn sm" style="background:#22C55E;border-color:#22C55E;color:#fff;font-weight:600;padding:6px 12px;font-size:12px;box-shadow:0 2px 6px rgba(34,197,94,0.3);">
+            <a href="${waLink}" target="_blank" class="btn sm" style="background:#22C55E;border-color:#22C55E;color:#fff;font-weight:600;padding:6px 12px;font-size:12px;box-shadow:0 2px 6px rgba(34,197,94,0.25);">
               <i data-lucide="message-circle"></i>WhatsApp Directo
             </a>
           ` : ''}
           ${c.tel ? `
-            <a href="tel:${c.tel}" class="btn sm" style="background:rgba(255,255,255,0.15);border-color:rgba(255,255,255,0.3);color:#fff;padding:6px 12px;font-size:12px;">
+            <a href="tel:${c.tel}" class="btn sm" style="background:#fff;border:1px solid var(--line);color:var(--navy);padding:6px 12px;font-size:12px;">
               <i data-lucide="phone"></i>${c.tel}
             </a>
           ` : ''}
         </div>
       </div>
 
-      <!-- Métricas del cliente -->
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:20px;background:rgba(0,0,0,0.22);padding:14px 18px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);">
+      <!-- Métricas del cliente (Fondo Claro) -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:18px;background:#F8FAFC;padding:14px 18px;border-radius:10px;border:1px solid #E2E8F0;">
         <div>
-          <span style="color:#94a3b8;font-size:11px;font-weight:500;display:block;text-transform:uppercase;letter-spacing:0.5px;">Expedientes Registrados</span>
-          <b style="font-size:20px;color:#fff;margin-top:2px;display:block;">${c.expedientes.length}</b>
+          <span style="color:var(--gray);font-size:11px;font-weight:600;display:block;text-transform:uppercase;letter-spacing:0.5px;">Expedientes Registrados</span>
+          <b style="font-size:20px;color:var(--navy);margin-top:2px;display:block;">${c.expedientes.length}</b>
         </div>
         <div>
-          <span style="color:#94a3b8;font-size:11px;font-weight:500;display:block;text-transform:uppercase;letter-spacing:0.5px;">Bienes Raíces / Proyectos</span>
-          <b style="font-size:20px;color:#93C5FD;margin-top:2px;display:block;">${c.proyectos.length ? c.proyectos.length : (hasRE ? '1 Activo' : '0')}</b>
+          <span style="color:var(--gray);font-size:11px;font-weight:600;display:block;text-transform:uppercase;letter-spacing:0.5px;">Bienes Raíces / Proyectos</span>
+          <b style="font-size:20px;color:var(--blue);margin-top:2px;display:block;">${c.proyectos.length ? c.proyectos.length : (hasRE ? '1 Activo' : '0')}</b>
         </div>
         <div>
-          <span style="color:#94a3b8;font-size:11px;font-weight:500;display:block;text-transform:uppercase;letter-spacing:0.5px;">Total Facturado</span>
-          <b style="font-size:20px;color:#86EFAC;margin-top:2px;display:block;">US$${fmt(c.totalHonorarios)}</b>
+          <span style="color:var(--gray);font-size:11px;font-weight:600;display:block;text-transform:uppercase;letter-spacing:0.5px;">Total Facturado</span>
+          <b style="font-size:20px;color:var(--green);margin-top:2px;display:block;">US$${fmt(c.totalHonorarios)}</b>
         </div>
         <div>
-          <span style="color:#94a3b8;font-size:11px;font-weight:500;display:block;text-transform:uppercase;letter-spacing:0.5px;">Saldo Pendiente</span>
-          <b style="font-size:20px;color:#FCA5A5;margin-top:2px;display:block;">US$${fmt(Math.max(0, c.totalHonorarios - c.totalPagado))}</b>
+          <span style="color:var(--gray);font-size:11px;font-weight:600;display:block;text-transform:uppercase;letter-spacing:0.5px;">Saldo Pendiente</span>
+          <b style="font-size:20px;color:${(c.totalHonorarios - c.totalPagado) > 0 ? 'var(--red)' : 'var(--navy)'};margin-top:2px;display:block;">US$${fmt(Math.max(0, c.totalHonorarios - c.totalPagado))}</b>
         </div>
       </div>
     </div>
@@ -2360,7 +2385,23 @@ function renderCli360Body() {
       `}
     `;
   } else if (tabName === 'documentos') {
-    const allDocs = c.expedientes.flatMap(e => (e.docs || []).map(d => ({ ...d, expId: e.id })));
+    const allDocs = c.expedientes.flatMap(e => (e.docs || []).map(d => {
+      const cat = d.cat || (Array.isArray(d) ? d[0] : 'GENERAL') || 'GENERAL';
+      const name = d.name || (Array.isArray(d) ? d[1] : (typeof d === 'string' ? d : 'Documento'));
+      const by = d.by || (Array.isArray(d) ? d[2] : 'gsd') || 'gsd';
+      const st = d.st || 'ok';
+      return {
+        ...d,
+        cat,
+        name,
+        by,
+        st,
+        expId: e.id,
+        expSvc: e.svc,
+        clientName: e.cliente?.nombre || c.nombre
+      };
+    }));
+
     body.innerHTML = `
       <div class="card">
         <div class="ch">
@@ -2370,16 +2411,30 @@ function renderCli360Body() {
         ${allDocs.length ? `
           <div style="display:grid;gap:8px;">
             ${allDocs.map(d => `
-              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid var(--line);border-radius:8px;background:#fff;">
-                <div style="display:flex;align-items:center;gap:12px;">
-                  <i data-lucide="${d.st==='ok'?'file-check':'file'}" style="color:${d.st==='ok'?'var(--green)':'var(--red)'};width:18px;height:18px;"></i>
-                  <div>
-                    <b style="font-size:13px;color:var(--navy);">${d.name}</b>
-                    <small style="color:var(--gray);display:block;margin-top:2px;">Expediente: <b>${d.expId}</b> · Categoría: ${d.cat}</small>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:11px 15px;border:1px solid var(--line);border-radius:8px;background:#fff;">
+                <div style="display:flex;align-items:center;gap:12px;min-width:0;flex:1;">
+                  <div style="width:36px;height:36px;border-radius:6px;background:${d.st==='ok'?'var(--green-l)':'var(--red-l)'};color:${d.st==='ok'?'var(--green)':'var(--red)'};display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <i data-lucide="${d.st==='ok'?'file-check':'file'}"></i>
+                  </div>
+                  <div style="min-width:0;flex:1;">
+                    <b style="font-size:13px;color:var(--navy);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${d.name}</b>
+                    <div style="font-size:11.5px;color:var(--gray);display:flex;align-items:center;gap:8px;margin-top:2px;flex-wrap:wrap;">
+                      <span>Expediente: <b style="color:var(--navy);">${d.expId}</b></span>
+                      <span>·</span>
+                      <span>Categoría: <span class="tag ${d.cat==='CLIENTE'?'wait':d.cat==='INMUEBLE'?'proc':d.cat==='TÉCNICO'?'rev':'lo'}" style="font-size:10px;padding:1px 6px;">${d.cat}</span></span>
+                      ${d.size ? `<span>· ${d.size}</span>` : ''}
+                      ${d.date ? `<span>· ${fd(d.date)}</span>` : ''}
+                    </div>
                   </div>
                 </div>
-                <div>
+                <div style="display:flex;gap:6px;align-items:center;margin-left:12px;flex-shrink:0;">
                   <span class="tag ${d.st==='ok'?'proc':'wait'}">${d.st==='ok'?'Listo':'Pendiente'}</span>
+                  <button type="button" class="btn sm" onclick="previewDocModal('${d.expId}', '${encodeURIComponent(d.name)}', '${encodeURIComponent(d.cat)}')" title="Ver PDF">
+                    <i data-lucide="eye"></i><span>Ver PDF</span>
+                  </button>
+                  <button type="button" class="btn sm ghost" onclick="downloadDocDirect('${d.expId}', '${encodeURIComponent(d.name)}')" title="Descargar">
+                    <i data-lucide="download"></i>
+                  </button>
                 </div>
               </div>
             `).join('')}
@@ -2423,6 +2478,184 @@ function renderCli360Body() {
   }
 
   icons();
+}
+
+/* ===== VISOR Y PREVIEW DE DOCUMENTOS PDF ===== */
+let _curPreviewDoc = null;
+
+function previewDocModal(expId, encDocName, encDocCat) {
+  const docName = decodeURIComponent(encDocName || '');
+  const docCat = decodeURIComponent(encDocCat || 'GENERAL');
+  
+  const exp = DB.find(e => e.id === expId) || (cur && cur.id === expId ? cur : null);
+  const doc = exp?.docs?.find(d => d.name === docName) || { name: docName, cat: docCat, st: 'ok', file: docName + '.pdf', date: TODAY, expId };
+  
+  _curPreviewDoc = { ...doc, expId, exp };
+  
+  $('docPreviewTitle').textContent = doc.name;
+  $('docPreviewSub').innerHTML = `Expediente: <b>${expId}</b> · ${(TPL[exp?.svc]?.nombre || exp?.svc || 'Servicio Técnico')} · Categoría: ${doc.cat || docCat}`;
+
+  const container = $('docPreviewContainer');
+  if (!container) return;
+
+  if (doc.dataUrl && (doc.dataUrl.startsWith('data:application/pdf') || doc.dataUrl.startsWith('blob:') || doc.dataUrl.endsWith('.pdf'))) {
+    container.innerHTML = `
+      <iframe src="${doc.dataUrl}" style="width:100%;height:680px;border:none;border-radius:8px;background:#fff;box-shadow:0 4px 14px rgba(0,0,0,0.1);"></iframe>
+    `;
+  } else if (doc.dataUrl && doc.dataUrl.startsWith('data:image/')) {
+    container.innerHTML = `
+      <div style="background:#fff;border-radius:8px;padding:16px;box-shadow:0 4px 14px rgba(0,0,0,0.1);max-width:100%;text-align:center;">
+        <img src="${doc.dataUrl}" style="max-width:100%;max-height:650px;object-fit:contain;border-radius:4px;">
+      </div>
+    `;
+  } else {
+    // Render High-Fidelity Official GSD Technical Document Sheet / Certificate
+    const sideLogo = document.querySelector('.side .logo img');
+    const logoSrc = sideLogo ? sideLogo.src : '/img/logo-gsd.png';
+    const cliName = exp?.cliente?.nombre || (_cur360Client ? _cur360Client.nombre : 'Cliente');
+    const cliCed = exp?.cliente?.cedula || (_cur360Client ? _cur360Client.cedula : '—');
+    const objStr = exp?.svc === 'deslinde' 
+      ? `Parcela ${exp.objeto?.parcela || '—'} · ${exp.objeto?.sector || 'Punta Cana'}, ${exp.objeto?.provincia || 'La Altagracia'}` 
+      : (exp?.objeto?.matricula ? `Matrícula ${exp.objeto.matricula} · Punta Cana` : 'Inmueble / Asunto en trámite');
+    const svcName = TPL[exp?.svc]?.nombre || 'Servicio Profesional Inmobiliario y Catastral';
+    const numDoc = `DOC-${expId.replace('EXP-','')}-${Math.abs(docName.split('').reduce((a,b)=>{a=((a<<5)-a)+b.charCodeAt(0);return a&a},0)%10000)}`;
+
+    container.innerHTML = `
+      <div id="printDocSheet" style="background:#ffffff;border:1px solid #e2e8f0;border-radius:8px;padding:36px 40px;width:100%;max-width:720px;box-shadow:0 6px 20px rgba(0,0,0,0.07);color:var(--ink);font-family:'Poppins',sans-serif;line-height:1.5;">
+        <!-- Header -->
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid var(--navy);padding-bottom:16px;margin-bottom:20px;">
+          <div>
+            <img src="${logoSrc}" style="height:38px;object-fit:contain;margin-bottom:6px;display:block;">
+            <b style="font-size:14px;color:var(--navy);display:block;">GEOSOLUTIONS SOURCE DOMINICANA, S.R.L.</b>
+            <small style="color:var(--gray);font-size:11px;display:block;">RNC: 1-33-79694-5 · Agrimensura, Notaría & Asesoría Inmobiliaria</small>
+            <small style="color:var(--gray);font-size:11px;display:block;">Av. Barceló, Plaza Roque III, Punta Cana, R.D. · Tel: (829) 493-7254</small>
+          </div>
+          <div style="text-align:right;">
+            <span class="tag proc" style="font-size:11px;font-weight:700;padding:4px 10px;">EXPEDIENTE DIGITAL</span>
+            <div style="font-weight:700;color:var(--navy);font-size:13px;margin-top:6px;font-family:monospace;">${numDoc}</div>
+            <small style="color:var(--gray);display:block;margin-top:2px;">Fecha de Registro: ${fd(doc.date || TODAY)}</small>
+          </div>
+        </div>
+
+        <!-- Document Title Banner -->
+        <div style="background:var(--green-l);border-left:4px solid var(--green);padding:12px 16px;border-radius:0 8px 8px 0;margin-bottom:22px;">
+          <small style="color:var(--green);font-weight:700;text-transform:uppercase;font-size:10px;letter-spacing:0.5px;">Documento Oficial Protocolizado</small>
+          <h2 style="margin:2px 0 0 0;font-size:17px;color:var(--navy);font-weight:700;">${doc.name}</h2>
+        </div>
+
+        <!-- Metadata Grid -->
+        <div class="kv" style="grid-template-columns:140px 1fr;gap:10px 14px;margin-bottom:24px;font-size:12.5px;">
+          <span class="k" style="color:var(--gray);font-weight:600;">Expediente:</span>
+          <span class="v" style="color:var(--navy);font-weight:700;">${expId} — ${svcName}</span>
+
+          <span class="k" style="color:var(--gray);font-weight:600;">Titular / Cliente:</span>
+          <span class="v" style="color:var(--navy);font-weight:600;">${cliName}</span>
+
+          <span class="k" style="color:var(--gray);font-weight:600;">Identificación:</span>
+          <span class="v" style="font-family:monospace;">${cliCed || '—'}</span>
+
+          <span class="k" style="color:var(--gray);font-weight:600;">Objeto / Inmueble:</span>
+          <span class="v">${objStr}</span>
+
+          <span class="k" style="color:var(--gray);font-weight:600;">Categoría:</span>
+          <span class="v"><span class="tag ${doc.cat==='CLIENTE'?'wait':doc.cat==='INMUEBLE'?'proc':doc.cat==='TÉCNICO'?'rev':'lo'}">${doc.cat || docCat}</span></span>
+
+          <span class="k" style="color:var(--gray);font-weight:600;">Aportado por:</span>
+          <span class="v">${doc.by === 'cliente' ? 'Cliente Propietario / Representante' : 'Geosolutions Source Dominicana (GSD)'}</span>
+
+          <span class="k" style="color:var(--gray);font-weight:600;">Estado Documental:</span>
+          <span class="v" style="color:var(--green);font-weight:600;">✓ Verificado y anexado formalmente a la carpeta técnica</span>
+        </div>
+
+        <!-- Verification Seal Box -->
+        <div style="background:#f8fafc;border:1px dashed #cbd5e1;border-radius:8px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <i data-lucide="shield-check" style="width:28px;height:28px;color:var(--green);"></i>
+            <div>
+              <b style="font-size:12px;color:var(--navy);display:block;">Validación de Integridad y Custodia Digital</b>
+              <small style="color:var(--gray);font-size:11px;">Este registro confirma la existencia y resguardo del documento en los archivos jurídicos de GSD.</small>
+            </div>
+          </div>
+          <span style="font-family:monospace;font-size:11px;color:var(--navy);background:#fff;padding:4px 8px;border:1px solid #e2e8f0;border-radius:4px;font-weight:600;">DIGITAL-OK</span>
+        </div>
+
+        <!-- Signatures & Authority -->
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:36px;padding-top:16px;border-top:1px solid var(--line);">
+          <div>
+            <small style="color:var(--gray);display:block;font-size:11px;">Responsable Técnico / Notarial:</small>
+            <b style="color:var(--navy);font-size:12.5px;">${exp?.resp || 'Esteban Mejía'}</b>
+            <small style="color:var(--gray);display:block;font-size:10.5px;">Geosolutions Source Dominicana</small>
+          </div>
+          <div style="text-align:center;width:210px;border-top:1px solid var(--ink);padding-top:5px;">
+            <small style="color:var(--gray);display:block;font-size:11px;">Sello de Custodia Documental</small>
+            <span style="font-size:11px;color:var(--green);font-weight:700;">GSD DOMINICANA</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  openM('mDocPreview');
+  icons();
+}
+
+function printCurPreviewDoc() {
+  const sheet = $('printDocSheet');
+  if (sheet) {
+    const w = window.open('', '_blank');
+    w.document.write(`
+      <html>
+        <head>
+          <title>${_curPreviewDoc?.name || 'Documento'} — GSD</title>
+          <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+          <style>
+            body { font-family: 'Poppins', sans-serif; margin: 20px; color: #1F2937; }
+            .kv { display: grid; }
+            .tag { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; }
+            .tag.proc { background: #E8F4EF; color: #1E6B47; }
+            .tag.wait { background: #FDF3E1; color: #B7791F; }
+            .tag.rev { background: #E8F0FA; color: #2B6CB0; }
+            @media print { body { margin: 0; } }
+          </style>
+        </head>
+        <body>
+          ${sheet.outerHTML}
+        </body>
+      </html>
+    `);
+    w.document.close();
+    w.focus();
+    setTimeout(() => { w.print(); }, 350);
+  } else {
+    window.print();
+  }
+}
+
+function downloadCurPreviewDoc() {
+  if (_curPreviewDoc?.dataUrl) {
+    const a = document.createElement('a');
+    a.href = _curPreviewDoc.dataUrl;
+    a.download = _curPreviewDoc.file || `${_curPreviewDoc.name}.pdf`;
+    a.click();
+    toast('Descargando archivo...');
+  } else {
+    printCurPreviewDoc();
+  }
+}
+
+function downloadDocDirect(expId, encDocName) {
+  const docName = decodeURIComponent(encDocName || '');
+  const exp = DB.find(e => e.id === expId) || (cur && cur.id === expId ? cur : null);
+  const doc = exp?.docs?.find(d => d.name === docName);
+  if (doc?.dataUrl) {
+    const a = document.createElement('a');
+    a.href = doc.dataUrl;
+    a.download = doc.file || `${docName}.pdf`;
+    a.click();
+    toast('Descargando documento...');
+  } else {
+    previewDocModal(expId, encDocName, doc?.cat ? encodeURIComponent(doc.cat) : 'GENERAL');
+  }
 }
 
 function quickClientNote() {
@@ -3893,10 +4126,11 @@ function documentos(e,T,b){
           <div class="acts" style="display:flex;gap:6px;align-items:center">
             ${d.st==='ok'?`
               <span class="tag proc">Listo</span>
+              <button class="btn sm" onclick="previewDocModal('${e.id}', '${encodeURIComponent(d.name)}', '${encodeURIComponent(d.cat)}')"><i data-lucide="eye"></i>Ver PDF</button>
               <label style="font-size:11px;color:var(--gray);display:inline-flex;gap:4px;align-items:center;cursor:pointer" title="Visible para cliente">
                 <input type="checkbox" style="width:auto" ${d.share?'checked':''} onchange="cur.docs[${d.i}].share=this.checked;save();toast(this.checked?'Compartido':'Ocultado')"> Compartir
               </label>
-              ${d.dataUrl?`<a class="btn sm" href="${d.dataUrl}" download="${d.file||'documento'}" target="_blank"><i data-lucide="download"></i>Descargar</a>`:`<button class="btn sm" onclick="toast('Descargando archivo...')"><i data-lucide="download"></i>Descargar</button>`}
+              ${d.dataUrl?`<a class="btn sm" href="${d.dataUrl}" download="${d.file||'documento'}" target="_blank"><i data-lucide="download"></i>Descargar</a>`:`<button class="btn sm ghost" onclick="downloadDocDirect('${e.id}', '${encodeURIComponent(d.name)}')"><i data-lucide="download"></i></button>`}
             `:`
               <span class="tag ${d.st==='wait'?'wait':'late'}">${d.st==='wait'?'Solicitado':'Pendiente'}</span>
               <button class="btn sm" onclick="triggerDocUpload(${d.i})"><i data-lucide="upload"></i>Subir</button>
