@@ -531,11 +531,6 @@
         </div>
       </div>
 
-      <div style="background:#f8fafc;border-radius:8px;padding:0.9rem 1.1rem;font-size:0.84rem;color:#475569;display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;border:1px solid #e2e8f0;">
-        <div>Ruta del archivo: <code style="font-weight:700;color:#1a3a52;"><%= typeof logoUrl !== 'undefined' ? logoUrl : '/img/logo-gsd.png' %></code></div>
-        <span style="font-weight:700;color:#16a34a;background:#dcfce7;padding:3px 8px;border-radius:6px;font-size:0.75rem;"><%= (typeof logoUrl !== 'undefined' && logoUrl.endsWith('.svg')) ? 'SVG VECTORIAL (ÓPTIMO)' : 'IMAGEN RASTER (PNG/JPG)' %></span>
-      </div>
-
       <form action="/admin/ajustes/logo" method="POST" enctype="multipart/form-data" id="logoUploadForm">
         <div class="dropzone" id="dropzone" onclick="document.getElementById('logoFile').click()">
           <svg class="dropzone-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M12 12v9"/><path d="m16 16-4-4-4 4"/></svg>

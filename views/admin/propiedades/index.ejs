@@ -1,11 +1,105 @@
 <%- include('../../admin/partials/layout-start', { pageTitle: 'Propiedades', page: 'propiedades' }) %>
 
+<style>
+@media (max-width: 768px) {
+  .table-card {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+  .table-card-header {
+    padding: 8px 4px 12px !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+  }
+  .table-responsive {
+    overflow: visible !important;
+    background: transparent !important;
+    border: none !important;
+  }
+  .table-responsive table {
+    display: block !important;
+    width: 100% !important;
+  }
+  .table-responsive thead {
+    display: none !important;
+  }
+  .table-responsive tbody {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+  tr.admin-prop-row {
+    display: flex !important;
+    flex-direction: column !important;
+    background: #ffffff !important;
+    border: 1px solid var(--line) !important;
+    border-radius: 12px !important;
+    padding: 12px 14px !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04) !important;
+    gap: 8px !important;
+  }
+  tr.admin-prop-row td {
+    display: block !important;
+    padding: 0 !important;
+    border: none !important;
+  }
+  .prop-col-foto {
+    display: none !important;
+  }
+  .prop-mobile-top {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+  }
+  .prop-mobile-thumb {
+    width: 56px !important;
+    height: 56px !important;
+    border-radius: 8px !important;
+    object-fit: cover !important;
+    flex-shrink: 0 !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+  }
+  .prop-mobile-thumb-empty {
+    width: 56px !important;
+    height: 56px !important;
+    background: #f1f5f9 !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 8px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: #64748b !important;
+    flex-shrink: 0 !important;
+  }
+  .prop-mobile-details {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding-top: 6px !important;
+    border-top: 1px dashed #e2e8f0 !important;
+  }
+  .prop-col-actions {
+    display: flex !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding-top: 6px !important;
+    border-top: 1px solid #f1f5f9 !important;
+  }
+}
+</style>
+
 <div class="table-card">
   <div class="table-card-header">
-    <h3>Propiedades (<%= propiedades.length %>)</h3>
+    <h3 style="font-size:16px;color:var(--navy);margin:0">Propiedades (<%= propiedades.length %>)</h3>
     <a href="/admin/propiedades/nueva" class="btn-add">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      Nueva Propiedad
+      <span>Nueva Propiedad</span>
     </a>
   </div>
   <div class="table-responsive">
@@ -18,14 +112,14 @@
         <th>Precio</th>
         <th>Ubicación</th>
         <th>Estado</th>
-        <th>Acciones</th>
+        <th style="text-align:right">Acciones</th>
       </tr>
     </thead>
     <tbody>
       <% propiedades.forEach(p => { %>
         <% let imgs = []; try { imgs = JSON.parse(p.imagenes || '[]'); } catch(e) {} %>
-      <tr>
-        <td>
+      <tr class="admin-prop-row">
+        <td class="prop-col-foto">
           <% if (imgs.length > 0 && imgs[0]) { %>
             <img src="<%= imgs[0] %>" style="width:56px;height:42px;object-fit:cover;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.12);display:block;" alt="<%= p.titulo %>">
           <% } else { %>
@@ -35,27 +129,43 @@
           <% } %>
         </td>
         <td>
-          <div style="display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap;">
-            <strong><%= p.titulo %></strong>
-            <% if (p.destacada) { %>
-              <span class="badge-destacada">
-                <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="#ca8a04" stroke="#ca8a04" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                Destacada
-              </span>
+          <div class="prop-mobile-top">
+            <% if (imgs.length > 0 && imgs[0]) { %>
+              <img class="prop-mobile-thumb" src="<%= imgs[0] %>" alt="<%= p.titulo %>">
+            <% } else { %>
+              <div class="prop-mobile-thumb-empty">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+              </div>
             <% } %>
+            <div style="flex:1;min-width:0;">
+              <div style="display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap;">
+                <strong style="color:var(--navy);font-size:13.5px;"><%= p.titulo %></strong>
+                <% if (p.destacada) { %>
+                  <span class="badge-destacada">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="#ca8a04" stroke="#ca8a04" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    Destacada
+                  </span>
+                <% } %>
+              </div>
+              <span style="font-size:12px;color:var(--gray);display:block;margin-top:2px;"><%= p.tipo || 'Inmueble' %></span>
+            </div>
           </div>
         </td>
-        <td><%= p.tipo || '—' %></td>
-        <td style="font-weight:600;color:var(--azul);">
-          <%= p.moneda === 'USD' ? '$' : 'RD$' %><%= p.precio ? Number(p.precio).toLocaleString() : '—' %>
+        <td class="prop-col-tipo hide-mobile"><%= p.tipo || '—' %></td>
+        <td class="prop-mobile-details">
+          <div>
+            <span style="color:var(--gris-500);font-size:0.85rem;display:block;"><%= p.ubicacion || '—' %></span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="font-weight:700;color:var(--azul);font-size:13.5px;">
+              <%= p.moneda === 'USD' ? '$' : 'RD$' %><%= p.precio ? Number(p.precio).toLocaleString() : '—' %>
+            </div>
+            <span class="badge <%= p.estado === 'disponible' ? 'badge-green' : p.estado === 'en_negociacion' ? 'badge-orange' : 'badge-gray' %>">
+              <%= p.estado?.replace('_', ' ') %>
+            </span>
+          </div>
         </td>
-        <td style="color:var(--gris-500);font-size:0.85rem;"><%= p.ubicacion || '—' %></td>
-        <td>
-          <span class="badge <%= p.estado === 'disponible' ? 'badge-green' : p.estado === 'en_negociacion' ? 'badge-orange' : 'badge-gray' %>">
-            <%= p.estado?.replace('_', ' ') %>
-          </span>
-        </td>
-        <td>
+        <td class="prop-col-actions" style="text-align:right">
           <div class="action-btns">
             <a href="/admin/propiedades/<%= p.id %>/editar" class="btn-icon edit" title="Editar">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
