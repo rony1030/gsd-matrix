@@ -47,7 +47,7 @@ const uploadsDir = isVercel
   ? path.join(os.tmpdir(), 'gsd-uploads')
   : path.join(__dirname, 'public', 'uploads');
 
-['propiedades', 'blog', 'branding'].forEach((d) => {
+['propiedades', 'blog', 'branding', 'evidencias'].forEach((d) => {
   fs.mkdirSync(path.join(uploadsDir, d), { recursive: true });
 });
 
@@ -59,6 +59,7 @@ const upload = multer({
       let sub = 'blog';
       if (req.baseUrl.includes('propiedades')) sub = 'propiedades';
       else if (req.baseUrl.includes('branding')) sub = 'branding';
+      else if (req.baseUrl.includes('expedientes') || req.path.includes('evidencias')) sub = 'evidencias';
       cb(null, path.join(uploadsDir, sub));
     },
     filename: (req, file, cb) => {
@@ -1047,6 +1048,14 @@ expeRouter.post('/api/guardar', async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+});
+
+expeRouter.post('/api/upload-evidencia', upload.single('archivo'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: 'No se recibió archivo' });
+  }
+  const fileUrl = '/uploads/evidencias/' + req.file.filename;
+  res.json({ ok: true, url: fileUrl });
 });
 
 app.use('/admin/expedientes', expeRouter);

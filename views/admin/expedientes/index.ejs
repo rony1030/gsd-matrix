@@ -5086,35 +5086,72 @@ function evidencias(e,T,b){
 function saveEv(){
   const f=$('evFile').files[0],d=$('evDesc').value.trim();
   if(!d){toast('Agregue una descripción');return;}
-  const add=img=>{
-    cur.evid.unshift({t:d,d:TODAY+' '+new Date().toTimeString().slice(0,5),c:$('evCoord').value||'—',w:'Esteban Mejía',img});
-    log(cur,`Evidencia "${d}" cargada.`);
-    save();closeM('mEv');renderTab();icons();toast('Evidencia agregada');
+  
+  const add=(imgUrl)=>{
+    if (!cur.evid) cur.evid = [];
+    cur.evid.unshift({
+      t: d,
+      d: TODAY + ' ' + new Date().toTimeString().slice(0,5),
+      c: $('evCoord').value || '—',
+      w: 'Esteban Mejía',
+      img: imgUrl
+    });
+    log(cur, `Evidencia "${d}" cargada.`);
+    save();
+    closeM('mEv');
+    renderTab();
+    icons();
+    toast('Evidencia agregada exitosamente');
   };
+
   if(f){
-    const r=new FileReader();
-    r.onload=()=>{
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const maxW = 1280;
-        let w = img.width, h = img.height;
-        if (w > maxW) {
-          h = Math.round((h * maxW) / w);
-          w = maxW;
-        }
-        canvas.width = w;
-        canvas.height = h;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, w, h);
-        const compressed = canvas.toDataURL('image/jpeg', 0.82);
-        add(compressed);
+    // Subir archivo real al servidor (/uploads/evidencias)
+    const formData = new FormData();
+    formData.append('archivo', f);
+    
+    fetch('/admin/expedientes/api/upload-evidencia', {
+      method: 'POST',
+      body: formData
+    })
+    .then(r => r.json())
+    .then(res => {
+      if (res.ok && res.url) {
+        add(res.url);
+      } else {
+        // Fallback local con compresión
+        fallbackLocalCompress();
+      }
+    })
+    .catch(() => {
+      fallbackLocalCompress();
+    });
+
+    function fallbackLocalCompress() {
+      const r = new FileReader();
+      r.onload = () => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const maxW = 1000;
+          let w = img.width, h = img.height;
+          if (w > maxW) {
+            h = Math.round((h * maxW) / w);
+            w = maxW;
+          }
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          add(canvas.toDataURL('image/jpeg', 0.75));
+        };
+        img.onerror = () => add(r.result);
+        img.src = r.result;
       };
-      img.onerror = () => add(r.result);
-      img.src = r.result;
-    };
-    r.readAsDataURL(f);
-  } else add('');
+      r.readAsDataURL(f);
+    }
+  } else {
+    add('');
+  }
 }
 
 // ===== CLIENT PROFILE MODAL =====
