@@ -1195,6 +1195,10 @@ tr.row:hover td{background:var(--bg);cursor:pointer}
   .cli-metric-box b {
     font-size: 16px !important;
   }
+  .cli-re-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
   
   /* Mobile Table to Card Transformation for Clients */
   #v-clients .card {
@@ -3107,33 +3111,33 @@ function renderCli360Body() {
     const isCorp = c.tipo === 'Empresa';
     body.innerHTML = `
       <div class="card" style="margin-bottom:16px;">
-        <div class="ch">
-          <h3>Interés Inmobiliario & Proyectos</h3>
+        <div class="ch" style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;">
+          <h3 style="margin:0;">Interés Inmobiliario & Proyectos</h3>
           <span class="tag ${c.tags.has('Bienes Raíces') ? 'proc' : 'wait'}">${c.tags.has('Bienes Raíces') ? 'CLIENTE ACTIVO BIENES RAÍCES' : 'PROSPECTO INMOBILIARIO'}</span>
         </div>
-        <p class="sub" style="margin-bottom:16px;">Gestiona los proyectos que le interesan o las propiedades que posee/busca este cliente (Stellar, Cosmo, Galaxy, Canar Rock, Far View, etc.).</p>
+        <p class="sub" style="margin:8px 0 14px;line-height:1.4;">Gestiona los proyectos de interés o propiedades en cartera (Stellar, Cosmo, Galaxy, Canar Rock, Far View, etc.).</p>
         
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-          <div style="background:#f8fafc;border:1px solid var(--line);border-radius:10px;padding:16px;">
+        <div class="cli-re-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+          <div style="background:#f8fafc;border:1px solid var(--line);border-radius:10px;padding:14px;box-sizing:border-box;">
             <b style="font-size:13px;color:var(--navy);display:block;margin-bottom:10px;"><i data-lucide="building-2" style="width:14px;height:14px;margin-right:5px;"></i>Proyectos de Interés / Asignados</b>
             ${c.proyectos.length ? `
               <div style="display:flex;gap:8px;flex-wrap:wrap;">
                 ${c.proyectos.map(p => `<span class="cli-project-chip" style="font-size:12.5px;padding:5px 12px;"><i data-lucide="building-2" style="width:12px;height:12px;"></i>${p}</span>`).join('')}
               </div>
-            ` : '<span style="color:var(--gray);font-size:12.5px;">Sin proyectos asignados formalmente aún.</span>'}
+            ` : '<span style="color:var(--gray);font-size:12.5px;display:block;margin-bottom:8px;">Sin proyectos asignados formalmente aún.</span>'}
             
-            <div style="margin-top:14px;display:flex;gap:8px;">
-              <input type="text" id="addProjInput" placeholder="Ej. Stellar Punta Cana, Cosmo Bávaro, Canar Rock..." style="font-size:12px;padding:6px 10px;height:32px;">
-              <button type="button" class="btn sm p" onclick="addClientProject()"><i data-lucide="plus"></i>Agregar</button>
+            <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
+              <input type="text" id="addProjInput" placeholder="Ej. Stellar, Cosmo, Canar Rock..." style="flex:1;min-width:140px;font-size:12px;padding:6px 10px;height:34px;box-sizing:border-box;">
+              <button type="button" class="btn sm p" onclick="addClientProject()" style="white-space:nowrap;height:34px;"><i data-lucide="plus"></i>Agregar</button>
             </div>
           </div>
 
-          <div style="background:#f8fafc;border:1px solid var(--line);border-radius:10px;padding:16px;">
+          <div style="background:#f8fafc;border:1px solid var(--line);border-radius:10px;padding:14px;box-sizing:border-box;">
             <b style="font-size:13px;color:var(--navy);display:block;margin-bottom:10px;"><i data-lucide="compass" style="width:14px;height:14px;margin-right:5px;"></i>Perfil de Inversión & Ubicación</b>
-            <div class="kv" style="grid-template-columns:130px 1fr;font-size:12px;">
-              <span class="k">Rol Inmobiliario:</span><span class="v">${c.tipo === 'Inversionista' ? 'Inversionista Principal' : isCorp ? 'Desarrollador / Empresa' : 'Comprador / Propietario'}</span>
-              <span class="k">Zona Preferida:</span><span class="v">${c.dir || 'Punta Cana / Bávaro / Cap Cana'}</span>
-              <span class="k">Estado Cartera:</span><span class="v"><span class="tag proc">En Cartera Activa</span></span>
+            <div class="kv" style="grid-template-columns:110px 1fr;font-size:12px;gap:8px 12px;">
+              <span class="k" style="color:var(--gray);font-weight:600;">Rol:</span><span class="v" style="word-break:break-word;">${c.tipo === 'Inversionista' ? 'Inversionista Principal' : isCorp ? 'Desarrollador / Empresa' : 'Comprador / Propietario'}</span>
+              <span class="k" style="color:var(--gray);font-weight:600;">Ubicación:</span><span class="v" style="word-break:break-word;">${c.dir || 'Punta Cana / Bávaro / Cap Cana'}</span>
+              <span class="k" style="color:var(--gray);font-weight:600;">Estado:</span><span class="v"><span class="tag proc" style="font-size:11px;">En Cartera Activa</span></span>
             </div>
           </div>
         </div>
