@@ -117,8 +117,9 @@ tr.row:hover td{background:var(--bg);cursor:pointer}
 .doc small{color:var(--gray);font-size:11.5px}
 .doc .acts{margin-left:auto;display:flex;gap:6px;align-items:center}
 .cat{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--gray);margin:16px 0 4px}
-.filters{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
-.filters button{border:1px solid var(--line);background:#fff;padding:5px 11px;border-radius:14px;font-size:11.5px;color:var(--gray)}
+.filters{display:flex;gap:6px;margin-bottom:8px;overflow-x:auto;white-space:nowrap;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.filters::-webkit-scrollbar{display:none;}
+.filters button{border:1px solid var(--line);background:#fff;padding:5px 12px;border-radius:14px;font-size:11.5px;color:var(--gray);flex-shrink:0;cursor:pointer;white-space:nowrap;}
 .filters button.on{background:var(--navy);border-color:var(--navy);color:#fff}
 .phase{margin-bottom:14px}
 .phase .ph{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);font-weight:500;color:var(--navy)}
@@ -910,14 +911,14 @@ tr.row:hover td{background:var(--bg);cursor:pointer}
     padding: 0!important;
     border: none!important;
   }
+  tr.exp-table-row td.exp-desktop-only, .exp-desktop-only {
+    display: none!important;
+  }
   .exp-mobile-top {
     display: flex!important;
     justify-content: space-between!important;
     align-items: center!important;
     width: 100%!important;
-  }
-  .exp-desktop-only {
-    display: none!important;
   }
   .exp-mobile-tag {
     display: inline-block!important;
@@ -1025,14 +1026,14 @@ tr.row:hover td{background:var(--bg);cursor:pointer}
 
   <section class="view" id="v-list">
     <div style="margin-bottom:12px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-        <div style="display:flex;align-items:baseline;gap:8px;">
-          <h1 style="margin:0;font-size:1.35rem;font-weight:700;color:var(--navy);">Expedientes</h1>
-          <span class="sub" id="listCount" style="font-size:0.8rem;color:var(--gray);font-weight:600;"></span>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:8px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <h1 style="margin:0;font-size:1.35rem;font-weight:700;color:var(--navy);white-space:nowrap;">Expedientes</h1>
+          <span class="sub" id="listCount" style="font-size:0.75rem;background:#EEF2F5;color:var(--navy);font-weight:700;padding:2px 8px;border-radius:12px;margin:0;white-space:nowrap;"></span>
         </div>
-        <button class="btn p sm" onclick="openNewExpModal()" type="button">
+        <button class="btn p sm" onclick="openNewExpModal()" type="button" style="white-space:nowrap;flex-shrink:0;">
           <i data-lucide="plus"></i>
-          <span>Nuevo Expediente</span>
+          <span>Nuevo</span>
         </button>
       </div>
       <div class="filters" id="listFilters" style="margin-bottom:6px;">
@@ -1866,7 +1867,7 @@ function renderDash(){const al=alerts(),act=DB.filter(e=>e.estado!=='done');cons
 let listF='all',divF='all';
 $('listFilters').onclick=ev=>{if(ev.target.dataset.f){listF=ev.target.dataset.f;[...$('listFilters').children].forEach(b=>b.classList.toggle('on',b===ev.target));renderList();}};
 $('divFilters').onclick=ev=>{if(ev.target.dataset.d){divF=ev.target.dataset.d;[...$('divFilters').children].forEach(b=>b.classList.toggle('on',b===ev.target));renderList();}};
-function renderList(){const q=$('search').value.toLowerCase();const rows=DB.filter(e=>(listF==='all'||e.estado===listF)&&(divF==='all'||(TPL[e.svc]||TPL.deslinde).div===divF)&&(!q||JSON.stringify(e).toLowerCase().includes(q)));$('listCount').textContent=`${rows.length} expediente${rows.length!==1?'s':''}`;$('listRows').innerHTML=rows.map(e=>rowHTML(e,true)).join('')||'<tr><td colspan="8" class="empty" style="text-align:center;padding:28px;color:var(--gray);">No hay expedientes registrados en esta vista.</td></tr>';}
+function renderList(){const q=$('search').value.toLowerCase();const rows=DB.filter(e=>(listF==='all'||e.estado===listF)&&(divF==='all'||(TPL[e.svc]||TPL.deslinde).div===divF)&&(!q||JSON.stringify(e).toLowerCase().includes(q)));$('listCount').textContent=`${rows.length}`;$('listRows').innerHTML=rows.map(e=>rowHTML(e,true)).join('')||'<tr><td colspan="8" class="empty" style="text-align:center;padding:28px;color:var(--gray);">No hay expedientes registrados en esta vista.</td></tr>';}
 $('search').addEventListener('input',()=>{go('list');});
 let mtF='all';$('mtFilters').onclick=ev=>{if(ev.target.dataset.f){mtF=ev.target.dataset.f;[...$('mtFilters').children].forEach(b=>b.classList.toggle('on',b===ev.target));renderMy();}};
 function allTasks(){return DB.flatMap(e=>(e.tasks||[]).map(t=>({...t,e})));}
