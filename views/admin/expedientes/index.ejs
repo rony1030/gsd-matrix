@@ -718,44 +718,161 @@ tr.row:hover td{background:var(--bg);cursor:pointer}
   .side .me{justify-content:flex-start;padding:12px 16px}
   
   .hdr{
-    height:52px;padding:0 12px;gap:8px;
+    height:50px;padding:0 10px;gap:6px;
     width:100%;max-width:100vw;box-sizing:border-box;
     flex-shrink:0;justify-content:space-between;
   }
   .hdr-search{flex:1;min-width:0;max-width:none;margin:0}
-  .hdr-search input.search{height:33px;font-size:11.5px;padding:0 10px}
+  .hdr-search input.search{height:32px;font-size:12px;padding:0 10px}
   .hdr-actions{gap:6px;margin-left:0}
-  .hdr-actions .btn{height:32px;padding:0 10px;font-size:11.5px}
+  .hdr-actions .btn{height:32px;padding:0 8px;font-size:11.5px}
   .btn-text-full{display:none}
   .btn-text-short{display:inline}
 
   .main{
-    width:100%;max-width:100vw;height:calc(100vh - 52px);
-    padding:12px 10px;box-sizing:border-box;overflow-x:hidden;overflow-y:auto;
+    width:100%;max-width:100vw;height:calc(100vh - 50px);
+    padding:10px 8px;box-sizing:border-box;overflow-x:hidden;overflow-y:auto;
   }
-  .card{padding:14px 12px;border-radius:8px;margin-bottom:12px}
+  .card{padding:12px 10px;border-radius:8px;margin-bottom:10px}
   
-  .kpis{grid-template-columns:repeat(2,1fr);gap:8px;margin:12px 0}
+  /* Horizontal scroll for all filter bars */
+  .filters{
+    display:flex!important;
+    gap:5px!important;
+    overflow-x:auto!important;
+    white-space:nowrap!important;
+    -webkit-overflow-scrolling:touch!important;
+    scrollbar-width:none!important;
+    padding-bottom:2px!important;
+    margin-bottom:8px!important;
+    width:100%!important;
+    max-width:100%!important;
+  }
+  .filters::-webkit-scrollbar{display:none!important}
+  .filters button{
+    flex-shrink:0!important;
+    padding:5px 10px!important;
+    font-size:11.5px!important;
+    border-radius:16px!important;
+  }
+
+  /* Compact 2-col KPI grid on mobile */
+  .kpis, #cliKpisGrid{
+    grid-template-columns:repeat(2,1fr)!important;
+    gap:6px!important;
+    margin:8px 0!important;
+  }
+  .kpi{
+    padding:8px 10px!important;
+    border-radius:8px!important;
+  }
+  .kpi .l{
+    font-size:10.5px!important;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    margin-bottom:2px!important;
+  }
+  .kpi .l i, .kpi .l svg{width:12px;height:12px;margin-right:3px}
+  .kpi .v{
+    font-size:1.15rem!important;
+    font-weight:700!important;
+  }
+
   .alerts{grid-template-columns:1fr;gap:8px}
   .prog{grid-template-columns:1fr 1fr;gap:10px}
-  .g2,.g3{grid-template-columns:1fr;gap:12px}
+  .g2,.g3{grid-template-columns:1fr;gap:10px}
   .gal{grid-template-columns:repeat(2,1fr);gap:8px}
-  .exp-head{flex-direction:column;align-items:stretch;gap:12px}
-  .exp-head .acts{justify-content:flex-start}
-  .exp-kpi-grid{grid-template-columns:1fr 1fr!important;gap:10px!important}
-  .resumen-grid{grid-template-columns:1fr!important;gap:14px!important}
-  .tabs{margin:0 0 12px;padding-bottom:4px;overflow-x:auto;-webkit-overflow-scrolling:touch}
-  .tabs button{padding:8px 11px;font-size:12px}
+  .exp-head{flex-direction:column;align-items:stretch;gap:10px}
+  .exp-head .acts{justify-content:flex-start;flex-wrap:wrap}
+  .exp-kpi-grid{grid-template-columns:1fr 1fr!important;gap:8px!important}
+  .resumen-grid{grid-template-columns:1fr!important;gap:12px!important}
+  
+  .tabs{
+    margin:0 0 10px;
+    padding-bottom:2px;
+    display:flex!important;
+    overflow-x:auto!important;
+    white-space:nowrap!important;
+    -webkit-overflow-scrolling:touch!important;
+    scrollbar-width:none!important;
+  }
+  .tabs::-webkit-scrollbar{display:none!important}
+  .tabs button{
+    flex-shrink:0!important;
+    padding:7px 10px!important;
+    font-size:11.5px!important;
+  }
+  
   .task{grid-template-columns:20px 1fr 90px;gap:6px}
   .feed .it{grid-template-columns:1fr;gap:4px}
   .log .it{grid-template-columns:1fr;gap:4px}
-  .modal .box{width:95vw;max-width:95vw;padding:18px 14px}
+  .modal .box{width:95vw;max-width:95vw;padding:16px 12px}
+
+  /* === Directorio de Clientes Mobile Responsive === */
+  #v-clients .sub{display:none!important}
+  #v-clients h1{font-size:1.2rem!important}
+  .cli-search-box{width:100%!important;max-width:100%!important;margin-top:6px!important}
+  
+  /* Mobile Table to Card Transformation for Clients */
+  #v-clients .card {
+    background: transparent!important;
+    border: none!important;
+    box-shadow: none!important;
+    padding: 0!important;
+  }
+  #v-clients .table-responsive {
+    overflow: visible!important;
+    background: transparent!important;
+    border: none!important;
+  }
+  #v-clients .table-responsive table {
+    display: block!important;
+    width: 100%!important;
+  }
+  #v-clients .table-responsive thead {
+    display: none!important;
+  }
+  #v-clients .table-responsive tbody {
+    display: flex!important;
+    flex-direction: column!important;
+    gap: 8px!important;
+  }
+  #v-clients #cliRows tr.cli-table-row {
+    display: flex!important;
+    flex-direction: column!important;
+    background: #ffffff!important;
+    border: 1px solid var(--line)!important;
+    border-radius: 9px!important;
+    padding: 10px 12px!important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04)!important;
+    gap: 6px!important;
+  }
+  #v-clients #cliRows tr.cli-table-row:active {
+    background: #F8FAFC!important;
+  }
+  #v-clients #cliRows td {
+    display: block!important;
+    padding: 0!important;
+    border: none!important;
+  }
+  #v-clients #cliRows .cli-mobile-actions-top {
+    display: inline-flex!important;
+    gap: 4px;
+  }
+  #v-clients #cliRows .cli-col-actions {
+    display: none!important;
+  }
+  #v-clients #cliRows .cli-col-id {
+    font-size: 11px!important;
+    color: var(--gray);
+  }
 }
 
 @media (max-width:480px){
-  .kpis{grid-template-columns:1fr}
+  .kpis, #cliKpisGrid{grid-template-columns:repeat(2,1fr)!important}
   .prog{grid-template-columns:1fr}
-  .exp-kpi-grid{grid-template-columns:1fr!important}
+  .exp-kpi-grid{grid-template-columns:1fr 1fr!important}
   .gal{grid-template-columns:1fr}
 }
 </style>
@@ -863,11 +980,11 @@ tr.row:hover td{background:var(--bg);cursor:pointer}
     <div id="calBox"></div>
   </section>
   <section class="view" id="v-clients">
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:14px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px;">
       <div>
-        <h1 style="margin:0;font-size:1.45rem;font-weight:700;color:var(--navy);">Directorio de Clientes 360°</h1>
-        <p class="sub" style="margin:4px 0 0;font-size:0.86rem;color:var(--gray);">
-          Gestión integral de clientes: expedientes técnicos y legales, intereses inmobiliarios, cotizaciones y facturación.
+        <h1 style="margin:0;font-size:1.35rem;font-weight:700;color:var(--navy);">Directorio de Clientes 360°</h1>
+        <p class="sub" style="margin:2px 0 0;font-size:0.82rem;color:var(--gray);">
+          Expedientes técnicos y legales, bienes raíces y facturación.
         </p>
       </div>
       <div style="display:flex;gap:8px;">
@@ -879,17 +996,17 @@ tr.row:hover td{background:var(--bg);cursor:pointer}
     </div>
 
     <!-- KPIs de Clientes -->
-    <div class="kpis" id="cliKpisGrid" style="grid-template-columns:repeat(4,1fr);margin:0 0 16px 0;">
+    <div class="kpis" id="cliKpisGrid" style="grid-template-columns:repeat(4,1fr);margin:0 0 14px 0;">
       <div class="kpi">
         <div class="l"><i data-lucide="users"></i>Total Clientes</div>
         <div class="v" id="kpiCliTotal">0</div>
       </div>
       <div class="kpi">
-        <div class="l"><i data-lucide="folder-check"></i>Con Expedientes Activos</div>
+        <div class="l"><i data-lucide="folder-check"></i>Expedientes Activos</div>
         <div class="v" id="kpiCliActivos" style="color:var(--green)">0</div>
       </div>
       <div class="kpi">
-        <div class="l"><i data-lucide="home"></i>Bienes Raíces & Proyectos</div>
+        <div class="l"><i data-lucide="home"></i>Bienes Raíces</div>
         <div class="v" id="kpiCliRealEstate" style="color:var(--blue)">0</div>
       </div>
       <div class="kpi">
@@ -899,16 +1016,16 @@ tr.row:hover td{background:var(--bg);cursor:pointer}
     </div>
 
     <!-- Buscador y Filtros de Segmento -->
-    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap;">
-      <div class="filters" id="cliTypeFilters" style="margin:0;">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
+      <div class="filters" id="cliTypeFilters" style="margin:0;flex:1;min-width:0;">
         <button class="on" data-filt="all" onclick="setCliFilter('all')">Todos</button>
         <button data-filt="active" onclick="setCliFilter('active')">Casos Activos</button>
-        <button data-filt="re" onclick="setCliFilter('re')">Bienes Raíces & Proyectos</button>
+        <button data-filt="re" onclick="setCliFilter('re')">Bienes Raíces</button>
         <button data-filt="legal_tech" onclick="setCliFilter('legal_tech')">Agrimensura & Legal</button>
-        <button data-filt="corp" onclick="setCliFilter('corp')">Corporativos / Empresas</button>
+        <button data-filt="corp" onclick="setCliFilter('corp')">Empresas</button>
       </div>
-      <div style="flex:1;max-width:320px;min-width:200px;">
-        <input type="text" id="cliSearchInput" placeholder="Buscar por nombre, cédula, proyecto..." oninput="filterClientsTable()" style="height:35px;font-size:12.5px;padding:0 12px;border:1px solid var(--line);border-radius:7px;background:#fff;width:100%;">
+      <div class="cli-search-box" style="width:280px;">
+        <input type="text" id="cliSearchInput" placeholder="Buscar por nombre, cédula..." oninput="filterClientsTable()" style="height:34px;font-size:12px;padding:0 10px;border:1px solid var(--line);border-radius:6px;background:#fff;width:100%;">
       </div>
     </div>
 
@@ -2050,24 +2167,34 @@ function renderCli() {
     const waLink = cleanPhone ? `https://wa.me/${cleanPhone.startsWith('1')||cleanPhone.startsWith('+')?cleanPhone.replace('+',''):'1'+cleanPhone}` : '';
 
     return `
-      <tr class="row" onclick="openClient360('${c.key}')" style="cursor:pointer;">
-        <td style="padding-left:16px;">
+      <tr class="row cli-table-row" onclick="openClient360('${c.key}')" style="cursor:pointer;">
+        <td class="cli-col-main" style="padding-left:16px;">
           <div style="display:flex;align-items:center;gap:12px;">
             <div class="cli-avatar ${avatarClass}">${initialText}</div>
-            <div>
-              <b style="font-size:13px;color:var(--navy);display:block;">${c.nombre}</b>
+            <div style="flex:1;min-width:0;">
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;">
+                <b style="font-size:13.5px;color:var(--navy);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${c.nombre}</b>
+                <div class="cli-mobile-actions-top" style="display:none;">
+                  <button type="button" class="btn sm" onclick="event.stopPropagation();openClient360('${c.key}')" style="padding:4px 8px;font-size:11px;" title="Ver Perfil 360°">
+                    <i data-lucide="eye"></i>
+                  </button>
+                  <button type="button" class="btn sm p" onclick="event.stopPropagation();startExpForClient('${c.nombre}')" style="padding:4px 8px;font-size:11px;" title="Crear expediente">
+                    <i data-lucide="plus"></i>
+                  </button>
+                </div>
+              </div>
               <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:3px;">
                 ${badgeTags.join('')}
               </div>
             </div>
           </div>
         </td>
-        <td>
+        <td class="cli-col-id">
           <span style="font-family:monospace;font-size:12px;color:#334155;font-weight:600;">${c.cedula || '—'}</span>
         </td>
-        <td>
+        <td class="cli-col-contact">
           <div>
-            ${c.email ? `<a href="mailto:${c.email}" onclick="event.stopPropagation()" style="color:var(--blue);text-decoration:none;font-size:12px;display:block;"><i data-lucide="mail" style="width:11px;height:11px;margin-right:3px;"></i>${c.email}</a>` : ''}
+            ${c.email ? `<a href="mailto:${c.email}" onclick="event.stopPropagation()" style="color:var(--blue);text-decoration:none;font-size:12px;display:inline-flex;align-items:center;gap:4px;"><i data-lucide="mail" style="width:11px;height:11px;"></i><span>${c.email}</span></a>` : ''}
             ${c.tel ? `
               <div style="display:flex;align-items:center;gap:6px;margin-top:2px;">
                 <span style="font-size:11.5px;color:var(--gray);">${c.tel}</span>
@@ -2076,23 +2203,23 @@ function renderCli() {
             ` : (!c.email ? '<span style="color:#94a3b8;font-size:11.5px;">—</span>' : '')}
           </div>
         </td>
-        <td>
+        <td class="cli-col-exp">
           <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center;">
             ${expChips}
           </div>
         </td>
-        <td>
+        <td class="cli-col-proj">
           <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center;">
             ${projChips}
           </div>
         </td>
-        <td>
+        <td class="cli-col-money">
           <div>
             <b style="font-size:12.5px;color:var(--navy);">${c.totalHonorarios ? `US$${fmt(c.totalHonorarios)}` : '—'}</b>
             ${c.totalPagado ? `<small style="color:var(--green);display:block;font-size:10.5px;">Cobrado: US$${fmt(c.totalPagado)}</small>` : ''}
           </div>
         </td>
-        <td style="text-align:right;padding-right:16px;">
+        <td class="cli-col-actions" style="text-align:right;padding-right:16px;">
           <div style="display:flex;gap:6px;justify-content:flex-end;align-items:center;">
             <button type="button" class="btn sm" onclick="event.stopPropagation();openClient360('${c.key}')" title="Ver Perfil 360°">
               <i data-lucide="eye"></i><span>Perfil 360°</span>
