@@ -2269,7 +2269,24 @@ let quotes = Array.isArray(SERVER_QUOTES) ? SERVER_QUOTES : [];
 function addDays(s,n){const d=new Date(s+'T00:00:00');d.setDate(d.getDate()+n);return d.toISOString().slice(0,10);}
 function mkTasks(t,doneUpTo,proc){let id=1,out=[];t.fases.forEach((f,fi)=>f[1].forEach((n,ti)=>{const k=`${fi}.${ti}`;let st='pend';if(k<doneUpTo||(fi<parseInt(doneUpTo)))st='done';if(k===doneUpTo)st='proc';if(proc&&proc.includes(k))st='proc';out.push({id:id++,phase:fi,name:n,who:fi<=1||fi>=4?'Esteban Mejía':'Carlos Rodríguez',due:'',pri:'Media',st,desc:''});}));return out;}
 const save=()=>{
-  localStorage.setItem(SEED_KEY,JSON.stringify(DB));
+  try {
+    localStorage.setItem(SEED_KEY,JSON.stringify(DB));
+  } catch(e) {
+    console.warn('localStorage full, stripping heavy base64 data for local caching:', e);
+    try {
+      // Create a light copy without heavy base64 strings to preserve local storage state
+      const lightDB = JSON.parse(JSON.stringify(DB, (key, value) => {
+        if (typeof value === 'string' && value.startsWith('data:') && value.length > 50000) {
+          return '[Archivo adjunto almacenado en servidor]';
+        }
+        return value;
+      }));
+      localStorage.setItem(SEED_KEY, JSON.stringify(lightDB));
+    } catch(err) {
+      console.warn('Could not save to localStorage:', err);
+    }
+  }
+
   if (cur) {
     fetch('/admin/expedientes/api/guardar', {
       method: 'POST',
