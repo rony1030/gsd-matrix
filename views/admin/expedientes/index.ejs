@@ -830,7 +830,7 @@ tr.row:hover td{background:var(--bg);cursor:pointer}
   <section class="view" id="v-exp"></section>
 </main>
 
-<div class="modal" id="mNew"><div class="box">
+<div class="modal" id="mNew"><div class="box" style="width:560px;max-width:95vw;">
   <h2>Nuevo expediente</h2>
   <div class="f"><label>Origen</label><div class="radio"><label class="on"><input type="radio" name="orig" value="q" checked>Cotización aprobada</label><label><input type="radio" name="orig" value="m">Creación manual</label></div></div>
   <div id="newQ">
@@ -838,11 +838,12 @@ tr.row:hover td{background:var(--bg);cursor:pointer}
     <div class="quote-src" id="nQuoteInfo"></div>
   </div>
   <div id="newM" class="hidden">
-    <div class="f"><label>Tipo de servicio</label><select id="nSvc"></select></div>
-    <div class="g2"><div class="f"><label>Cliente</label><input id="nCli"></div><div class="f"><label>Honorario</label><input id="nHon" placeholder="US$0"></div></div>
-    <div class="f"><label>Objeto / inmueble</label><input id="nObj" placeholder="Parcela, matrícula, asunto"></div>
+    <div class="f"><label>Tipo de servicio / Plantilla base</label><select id="nSvc" onchange="updateNewExpTplInfo()"></select></div>
+    <div id="nSvcTplInfo" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px 12px;margin-bottom:14px;font-size:11.5px;"></div>
+    <div class="g2"><div class="f"><label>Cliente</label><input id="nCli" placeholder="Nombre completo o empresa"></div><div class="f"><label>Honorario pactado</label><input id="nHon" placeholder="US$ 1,800"></div></div>
+    <div class="f"><label>Objeto / inmueble</label><input id="nObj" placeholder="Parcela, matrícula, inmueble o asunto"></div>
   </div>
-  <div class="g2"><div class="f"><label>Responsable</label><select id="nResp"></select></div><div class="f"><label>Prioridad</label><select id="nPri"><option>Alta</option><option selected>Media</option><option>Baja</option></select></div></div>
+  <div class="g2"><div class="f"><label>Responsable principal</label><select id="nResp"></select></div><div class="f"><label>Prioridad</label><select id="nPri"><option>Alta</option><option selected>Media</option><option>Baja</option></select></div></div>
   <div class="mf"><button class="btn" onclick="closeM('mNew')">Cancelar</button><button class="btn p" onclick="createExp()">Crear expediente</button></div>
 </div></div>
 
@@ -850,9 +851,15 @@ tr.row:hover td{background:var(--bg);cursor:pointer}
   <h2 id="mTaskTitle">Nueva tarea</h2>
   <div class="f"><label>Nombre</label><input id="tName"></div>
   <div class="f"><label>Descripción</label><textarea id="tDesc"></textarea></div>
-  <div class="g2"><div class="f"><label>Responsable</label><select id="tWho"></select></div><div class="f"><label>Etapa</label><select id="tPhase"></select></div></div>
+  <div class="g2"><div class="f"><label>Responsable</label><select id="tWho"></select></div><div class="f"><label>Etapa / Fase</label><select id="tPhase"></select></div></div>
   <div class="g3"><div class="f"><label>Prioridad</label><select id="tPri"><option>Alta</option><option selected>Media</option><option>Baja</option></select></div><div class="f"><label>Fecha límite</label><input type="date" id="tDue"></div><div class="f"><label>Estado</label><select id="tSt"><option value="pend">Pendiente</option><option value="proc">En proceso</option><option value="done">Completado</option><option value="block">Bloqueado</option><option value="na">No aplica</option></select></div></div>
-  <div class="mf"><button class="btn" onclick="closeM('mTask')">Cancelar</button><button class="btn p" onclick="saveTask()">Guardar</button></div>
+  <div class="mf" style="display:flex;justify-content:space-between;align-items:center;">
+    <button class="btn sm" id="btnDeleteTask" onclick="deleteTask()" style="color:var(--red);border-color:#FCA5A5;background:#FEF2F2;display:none;"><i data-lucide="trash-2" style="width:13px;height:13px"></i>Eliminar</button>
+    <div style="display:flex;gap:8px;margin-left:auto;">
+      <button class="btn" onclick="closeM('mTask')">Cancelar</button>
+      <button class="btn p" onclick="saveTask()">Guardar</button>
+    </div>
+  </div>
 </div></div>
 
 <div class="modal" id="mNote"><div class="box">
@@ -2607,9 +2614,15 @@ function checklist(e,T,b){
     ${T.fases.map((f,fi)=>{
       const ts=e.tasks.filter(t=>t.phase===fi);
       const d=ts.filter(t=>t.st==='done').length;
-      return `<div class="phase">
-        <div class="ph"><span>Fase ${fi+1} — ${f[0]}</span><small>${d}/${ts.length}</small></div>
-        ${ts.map(t=>taskRow(t)).join('')}
+      return `<div class="phase" style="margin-bottom:14px;">
+        <div class="ph" style="display:flex;justify-content:space-between;align-items:center;">
+          <span>Fase ${fi+1} — ${f[0]}</span>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <small style="color:var(--gray);font-weight:600;">${d}/${ts.length}</small>
+            <button class="btn sm" onclick="taskModal(null, ${fi})" style="padding:2px 7px;font-size:11px;" title="Agregar tarea a esta etapa"><i data-lucide="plus" style="width:12px;height:12px"></i>Tarea</button>
+          </div>
+        </div>
+        ${ts.length ? ts.map(t=>taskRow(t)).join('') : '<div style="padding:8px 12px;color:var(--gray);font-size:11.5px;font-style:italic;">Sin tareas en esta etapa. Haga clic en "+ Tarea" para agregar una.</div>'}
       </div>`;
     }).join('')}
   </div>`;
@@ -2644,19 +2657,34 @@ function setSt(id,st){
 }
 
 let editTask=null;
-function taskModal(id){
+function taskModal(id, phaseIndex){
   editTask=id?cur.tasks.find(t=>t.id===id):null;
   $('mTaskTitle').textContent=editTask?'Editar tarea':'Nueva tarea';
   $('tWho').innerHTML=TEAM.map(n=>`<option>${n}</option>`).join('');
-  $('tPhase').innerHTML=(TPL[cur.svc]||TPL.deslinde).fases.map((f,i)=>`<option value="${i}">${f[0]}</option>`).join('');
+  $('tPhase').innerHTML=(TPL[cur.svc]||TPL.deslinde).fases.map((f,i)=>`<option value="${i}">Fase ${i+1} — ${f[0]}</option>`).join('');
   $('tName').value=editTask?.name||'';
   $('tDesc').value=editTask?.desc||'';
   $('tWho').value=editTask?.who||cur.resp;
-  $('tPhase').value=editTask?editTask.phase:currentPhase(cur);
+  $('tPhase').value=editTask?editTask.phase:(phaseIndex!==undefined?phaseIndex:currentPhase(cur));
   $('tPri').value=editTask?.pri||'Media';
   $('tDue').value=editTask?.due||'';
   $('tSt').value=editTask?.st||'pend';
+  
+  const delBtn = $('btnDeleteTask');
+  if (delBtn) delBtn.style.display = editTask ? 'inline-flex' : 'none';
+  
   openM('mTask');
+}
+
+function deleteTask(){
+  if (!editTask || !cur) return;
+  if (!confirm(`¿Eliminar la tarea "${editTask.name}" de este expediente?`)) return;
+  cur.tasks = cur.tasks.filter(t => t.id !== editTask.id);
+  log(cur, `Tarea "${editTask.name}" eliminada.`);
+  save();
+  closeM('mTask');
+  renderExp();
+  toast('Tarea eliminada');
 }
 
 function saveTask(){
@@ -3177,9 +3205,37 @@ function openNewExpModal(){
     if (rQ) { rQ.checked = true; rQ.dispatchEvent(new Event('change')); }
   }
   quoteInfo();
+  updateNewExpTplInfo();
   openM('mNew');
 }
 if ($('btnNewExp')) $('btnNewExp').onclick = openNewExpModal;
+
+function updateNewExpTplInfo() {
+  const svc = $('nSvc')?.value || 'deslinde';
+  const t = TPL[svc] || TPL.deslinde;
+  const infoEl = $('nSvcTplInfo');
+  if (!infoEl || !t) return;
+  const divColor = DIV_COLOR[t.div] || 'var(--navy)';
+  const divBg = DIV_BG[t.div] || '#EEF2F5';
+  const totalTasks = (t.fases || []).reduce((acc, f) => acc + (f[1] || []).length, 0);
+  const totalDocs = (t.docs || []).length;
+  
+  infoEl.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+      <span style="font-weight:700;color:var(--navy);font-size:12px;">Configuración de la Plantilla:</span>
+      <span style="background:${divBg};color:${divColor};padding:2px 8px;border-radius:10px;font-size:10.5px;font-weight:700;">${t.div}</span>
+    </div>
+    <div style="color:#475569;line-height:1.4;">
+      <div>• <b>Flujo inicial:</b> ${t.fases.length} etapas con ${totalTasks} tareas predeterminadas.</div>
+      <div>• <b>Requisitos:</b> ${totalDocs} documentos cargados automáticamente al checklist.</div>
+      <div>• <b>Plazo y honorario:</b> ${t.plazo} días hábiles · ${t.moneda === 'DOP' ? 'RD$' : 'US$'}${Number(t.honorario||0).toLocaleString('en-US', {minimumFractionDigits:2})}.</div>
+    </div>
+  `;
+  
+  if ($('nHon') && t.honorario && (!$('nHon').value || $('nHon').value === 'US$0' || $('nHon').value.startsWith('US$') || $('nHon').value.startsWith('RD$'))) {
+    $('nHon').value = `${t.moneda === 'DOP' ? 'RD$' : 'US$'}${Number(t.honorario).toLocaleString('en-US', {minimumFractionDigits:2})}`;
+  }
+}
 
 // Auto-abrir si la URL tiene ?action=new
 if (new URLSearchParams(window.location.search).get('action') === 'new') {
