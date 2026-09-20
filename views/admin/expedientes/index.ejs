@@ -648,32 +648,78 @@ tr.row:hover td{background:var(--bg);cursor:pointer}
 .exp-stepper{
   background:#F8FAFC;
   border-top:1px solid var(--line);
-  padding:10px 14px;
+  padding:12px 14px;
   margin-top:10px;
   border-radius:0 0 10px 10px;
   overflow-x:auto;
   -webkit-overflow-scrolling:touch;
-  scrollbar-width:none;
 }
-.exp-stepper::-webkit-scrollbar{display:none}
-.stepper-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.exp-stepper::-webkit-scrollbar{height:4px}
+.exp-stepper::-webkit-scrollbar-thumb{background:#CBD5E1;border-radius:4px}
+.stepper-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:8px;flex-wrap:wrap;}
 .stepper-header h3{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--navy);margin:0;display:flex;align-items:center;gap:6px}
-.stepper-track{display:flex;align-items:flex-start;justify-content:space-between;position:relative;min-width:580px;padding:0 6px}
-.stepper-line{position:absolute;top:12px;left:24px;right:24px;height:2px;background:#CBD5E1;z-index:1}
+.stepper-track{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  position:relative;
+  min-width:640px;
+  padding:0 12px;
+  gap:8px;
+}
+.stepper-line{position:absolute;top:12px;left:32px;right:32px;height:2px;background:#CBD5E1;z-index:1}
 .stepper-line-fill{position:absolute;top:0;left:0;height:100%;background:var(--green);transition:width 0.4s ease}
-.step-node{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;text-align:center;cursor:pointer;flex:1;max-width:110px;padding:0 2px;background:none;border:none;font-family:inherit;transition:transform 0.15s ease}
+.step-node{
+  position:relative;
+  z-index:2;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
+  cursor:pointer;
+  flex:1 1 0;
+  min-width:110px;
+  max-width:145px;
+  padding:0 4px;
+  background:none;
+  border:none;
+  font-family:inherit;
+  transition:transform 0.15s ease;
+  box-sizing:border-box;
+}
 .step-node:hover{transform:translateY(-1px)}
-.step-circle{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;transition:all 0.2s ease;margin-bottom:4px;background:#fff;border:1.5px solid #CBD5E1;color:#64748B;box-shadow:0 0 0 2px #F8FAFC}
+.step-circle{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;transition:all 0.2s ease;margin-bottom:6px;background:#fff;border:1.5px solid #CBD5E1;color:#64748B;box-shadow:0 0 0 2px #F8FAFC}
 .step-node.done .step-circle{background:var(--green);border-color:var(--green);color:#fff;box-shadow:0 0 0 2px #F8FAFC,0 1px 3px rgba(74,155,111,0.25)}
 .step-node.cur .step-circle{background:#fff;border:2px solid var(--amber);color:var(--amber);box-shadow:0 0 0 2px #F8FAFC,0 0 6px rgba(217,119,6,0.3)}
 .step-node.open .step-circle{border-color:var(--navy);box-shadow:0 0 0 3px rgba(30,57,98,0.15)}
-.step-label{font-size:10.5px;font-weight:600;color:var(--navy);line-height:1.2;margin-bottom:1px;white-space:nowrap}
+.step-label{
+  font-size:10px;
+  font-weight:600;
+  color:var(--navy);
+  line-height:1.25;
+  margin-bottom:4px;
+  white-space:normal;
+  word-wrap:break-word;
+  overflow-wrap:break-word;
+  text-align:center;
+  display:block;
+  width:100%;
+}
 .step-node.pend .step-label{color:#64748B;font-weight:500}
-.step-status{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.3px}
-.step-node.done .step-status{color:var(--green)}
-.step-node.cur .step-status{color:var(--amber)}
-.step-node.pend .step-status{color:#94A3B8}
-.step-drawer{margin-top:8px;padding:10px 12px;background:#fff;border:1px solid var(--line);border-radius:6px;animation:pop 0.18s ease}
+.step-status{
+  font-size:8.5px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:0.4px;
+  white-space:nowrap;
+  display:inline-block;
+  padding:1px 5px;
+  border-radius:4px;
+}
+.step-node.done .step-status{color:#2F6B4A;background:#E8F4EF}
+.step-node.cur .step-status{color:#B7791F;background:#FDF3E1}
+.step-node.pend .step-status{color:#94A3B8;background:#F1F5F9}
+.step-drawer{margin-top:10px;padding:12px 14px;background:#fff;border:1px solid var(--line);border-radius:8px;animation:pop 0.18s ease}
 
 /* Mobile Drawer Controls */
 .btn-sidebar-toggle{display:none;background:none;border:none;color:var(--navy);padding:6px;border-radius:6px;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
