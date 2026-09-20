@@ -703,12 +703,13 @@ tr.row:hover td{background:var(--bg);cursor:pointer}
 }
 .stepper-pill-count {
   font-size: 11px;
-  color: var(--gray);
+  color: var(--navy);
   background: #ffffff;
   border: 1px solid var(--line);
-  padding: 2px 8px;
+  padding: 3px 9px;
   border-radius: 12px;
-  font-weight: 500;
+  font-weight: 600;
+  white-space: nowrap;
 }
 .stepper-pill-pct {
   font-size: 11px;
@@ -4230,7 +4231,7 @@ function renderStepper(e, T) {
         </div>
       </div>
       <div class="stepper-meta">
-        <span class="stepper-pill-count"><b>${doneCount}</b> de ${total} etapas completadas</span>
+        <span class="stepper-pill-count"><b>${doneCount} de ${total}</b></span>
         <span class="stepper-pill-pct">${pctTotal}%</span>
         <button type="button" class="btn sm ghost stepper-toggle-btn" onclick="toggleStepperExpand()" style="padding:3px 8px;font-size:11px;font-weight:600;display:inline-flex;align-items:center;gap:4px;color:var(--navy);background:#fff;border:1px solid var(--line);border-radius:6px;" title="${stepperExpanded ? 'Contraer línea de tiempo' : 'Expandir etapas'}">
           <span>${stepperExpanded ? 'Contraer' : 'Expandir'}</span>
