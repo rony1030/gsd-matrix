@@ -5031,7 +5031,26 @@ function saveEv(){
   };
   if(f){
     const r=new FileReader();
-    r.onload=()=>add(r.result);
+    r.onload=()=>{
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const maxW = 1280;
+        let w = img.width, h = img.height;
+        if (w > maxW) {
+          h = Math.round((h * maxW) / w);
+          w = maxW;
+        }
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        const compressed = canvas.toDataURL('image/jpeg', 0.82);
+        add(compressed);
+      };
+      img.onerror = () => add(r.result);
+      img.src = r.result;
+    };
     r.readAsDataURL(f);
   } else add('');
 }
