@@ -776,6 +776,78 @@ app.get('/api/blogs', async (req, res) => {
   }
 });
 
+// ─── API PÚBLICA / WEBHOOK PARA RECEPCIÓN DE LEADS & ENVÍO DE EMAIL AL AGENTE ───
+const { sendLeadAlert } = require('./services/mailer');
+
+app.post('/api/leads', async (req, res) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  const { name, nombre, email, phone, telefono, message, mensaje, service, servicio, formSource, origen, clientType, tipo_cliente } = req.body;
+  const leadName = (name || nombre || '').trim();
+  const leadPhone = (phone || telefono || '').trim();
+  const leadEmail = (email || '').trim();
+  const leadMsg = (message || mensaje || '').trim();
+  const leadServ = (service || servicio || '').trim();
+  const leadSource = formSource || origen || 'Web General';
+
+  if (!leadName) {
+    return res.status(400).json({ error: 'Nombre es requerido' });
+  }
+
+  // Determinar tipo de cliente: si vino por legal -> Legal; si vino por bienes raíces -> Bienes Raíces
+  let finalTipoCliente = clientType || tipo_cliente || 'General';
+  if (!clientType && !tipo_cliente) {
+    if (leadSource.toLowerCase().includes('legal') || leadServ.toLowerCase().includes('legal') || leadServ.toLowerCase().includes('deslinde') || leadServ.toLowerCase().includes('titulo')) {
+      finalTipoCliente = 'Legal';
+    } else if (leadSource.toLowerCase().includes('bienes') || leadSource.toLowerCase().includes('inmobiliaria') || leadServ.toLowerCase().includes('proyecto') || leadServ.toLowerCase().includes('propiedad')) {
+      finalTipoCliente = 'Bienes Raíces';
+    }
+  }
+
+  const isRealEstate = finalTipoCliente === 'Bienes Raíces' ? 1 : 0;
+
+  try {
+    await getDb();
+    const result = run(
+      `INSERT INTO leads (nombre, email, telefono, servicio, mensaje, estado, origen, tipo_cliente, is_real_estate, tags) 
+       VALUES (?,?,?,?,?,?,?,?,?,?)`,
+      [
+        leadName, 
+        leadEmail, 
+        leadPhone, 
+        leadServ || 'Consulta / Registro Web', 
+        leadMsg, 
+        'nuevo', 
+        leadSource, 
+        finalTipoCliente, 
+        isRealEstate, 
+        finalTipoCliente
+      ]
+    );
+
+    // Enviar correo transaccional automático al agente con Hostinger SMTP
+    sendLeadAlert({
+      clientName: leadName,
+      clientPhone: leadPhone,
+      clientEmail: leadEmail,
+      clientType: finalTipoCliente,
+      formSource: leadSource,
+      service: leadServ,
+      message: leadMsg
+    }).catch(err => console.error('Error background mailer:', err));
+
+    return res.status(201).json({ 
+      ok: true, 
+      leadId: result?.lastInsertRowid || null, 
+      tipo_cliente: finalTipoCliente 
+    });
+  } catch (err) {
+    console.error('Error guardando lead en CRM:', err);
+    return res.status(500).json({ error: 'Error procesando solicitud' });
+  }
+});
+
 const leadsRouter = express.Router();
 leadsRouter.use(requireAuth);
 
