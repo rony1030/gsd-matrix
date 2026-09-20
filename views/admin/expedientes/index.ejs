@@ -1103,6 +1103,11 @@ tr.row:hover td{background:var(--bg);cursor:pointer}
   .prog{grid-template-columns:1fr 1fr;gap:10px}
   .g2,.g3{grid-template-columns:1fr;gap:10px}
   .gal{grid-template-columns:repeat(2,1fr);gap:8px}
+  .kv{grid-template-columns:100px 1fr !important;gap:6px 8px !important;font-size:12px !important;}
+  .kv .k{font-size:11.5px !important;white-space:nowrap;}
+  .kv .v{word-break:break-word !important;font-size:12px !important;}
+  .doc{flex-direction:column !important;align-items:stretch !important;gap:8px !important;padding:10px 12px !important;}
+  .doc .acts{justify-content:flex-end !important;border-top:1px dashed var(--line) !important;padding-top:6px !important;width:100% !important;}
   .exp-head{flex-direction:column;align-items:stretch;gap:10px}
   .exp-head .acts{justify-content:flex-start;flex-wrap:wrap}
   .exp-kpi-grid{grid-template-columns:1fr 1fr!important;gap:8px!important}
@@ -4937,7 +4942,7 @@ function avances(e,T,b){
       </div>
     </div>
     <p class="sub" style="margin-bottom:10px">Historial cronológico de avances e hitos alcanzados en este expediente.</p>
-    <div class="feed">${e.avances.map((a,i)=>`<div class="it"><div class="d">${fd(a.date).toUpperCase()}</div><div><b>${a.title}</b><p>${a.desc}</p><div class="who">Responsable: ${a.who}</div><label style="display:inline-flex;gap:6px;align-items:center;margin-top:6px;font-size:11.5px;cursor:pointer"><input type="checkbox" style="width:auto" ${a.client?'checked':''} onchange="cur.avances[${i}].client=this.checked;save();renderTab()"> ${a.client?'<span class="tag proc">VISIBLE PARA CLIENTE</span>':'<span class="tag done">SOLO INTERNO</span>'}</label></div></div>`).join('')||'<div class="empty">Sin avances registrados.</div>'}</div>
+    <div class="feed">${e.avances.map((a,i)=>`<div class="it"><div class="d">${fd(a.date).toUpperCase()}</div><div><b>${a.title}</b><p>${a.desc}</p><div class="who" style="margin-top:4px;">Responsable: ${a.who}</div></div></div>`).join('')||'<div class="empty">Sin avances registrados.</div>'}</div>
   </div>`;
 }
 
@@ -5072,9 +5077,6 @@ function documentos(e,T,b){
             ${d.st==='ok'?`
               <span class="tag proc">Listo</span>
               <button class="btn sm" onclick="previewDocModal('${e.id}', '${encodeURIComponent(d.name)}', '${encodeURIComponent(d.cat)}')"><i data-lucide="eye"></i>Ver PDF</button>
-              <label style="font-size:11px;color:var(--gray);display:inline-flex;gap:4px;align-items:center;cursor:pointer" title="Visible para cliente">
-                <input type="checkbox" style="width:auto" ${d.share?'checked':''} onchange="cur.docs[${d.i}].share=this.checked;save();toast(this.checked?'Compartido':'Ocultado')"> Compartir
-              </label>
               ${d.dataUrl?`<a class="btn sm" href="${d.dataUrl}" download="${d.file||'documento'}" target="_blank"><i data-lucide="download"></i>Descargar</a>`:`<button class="btn sm ghost" onclick="downloadDocDirect('${e.id}', '${encodeURIComponent(d.name)}')"><i data-lucide="download"></i></button>`}
             `:`
               <span class="tag ${d.st==='wait'?'wait':'late'}">${d.st==='wait'?'Solicitado':'Pendiente'}</span>
