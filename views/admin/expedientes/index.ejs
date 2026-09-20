@@ -4447,7 +4447,6 @@ function renderExp(){
         </select>
         <div style="height:18px;width:1px;background:var(--line);margin:0 2px"></div>
         <button class="btn sm" onclick="openClientModal()" style="height:28px;padding:0 9px;font-size:11.5px"><i data-lucide="user-check" style="width:13px;height:13px"></i>Perfil</button>
-        <button class="btn sm" onclick="clientView()" style="height:28px;padding:0 9px;font-size:11.5px"><i data-lucide="eye" style="width:13px;height:13px"></i>Portal</button>
         <button class="btn sm p" onclick="genUpdate()" style="height:28px;padding:0 10px;font-size:11.5px"><i data-lucide="send" style="width:13px;height:13px"></i>Reporte</button>
       </div>
     </div>
@@ -4933,7 +4932,7 @@ function avances(e,T,b){
         <button class="btn p" onclick="genUpdate()"><i data-lucide="send"></i>Generar actualización</button>
       </div>
     </div>
-    <p class="sub" style="margin-bottom:10px">Los avances marcados como visibles alimentan la actualización al cliente y el portal de seguimiento.</p>
+    <p class="sub" style="margin-bottom:10px">Historial cronológico de avances e hitos alcanzados en este expediente.</p>
     <div class="feed">${e.avances.map((a,i)=>`<div class="it"><div class="d">${fd(a.date).toUpperCase()}</div><div><b>${a.title}</b><p>${a.desc}</p><div class="who">Responsable: ${a.who}</div><label style="display:inline-flex;gap:6px;align-items:center;margin-top:6px;font-size:11.5px;cursor:pointer"><input type="checkbox" style="width:auto" ${a.client?'checked':''} onchange="cur.avances[${i}].client=this.checked;save();renderTab()"> ${a.client?'<span class="tag proc">VISIBLE PARA CLIENTE</span>':'<span class="tag done">SOLO INTERNO</span>'}</label></div></div>`).join('')||'<div class="empty">Sin avances registrados.</div>'}</div>
   </div>`;
 }
