@@ -867,6 +867,70 @@ tr.row:hover td{background:var(--bg);cursor:pointer}
     font-size: 11px!important;
     color: var(--gray);
   }
+
+  /* Mobile Table to Card Transformation for Expedientes List & Dashboard */
+  .exp-list-card, #v-list .card {
+    background: transparent!important;
+    border: none!important;
+    box-shadow: none!important;
+    padding: 0!important;
+  }
+  #v-list .table-responsive, #v-dash .table-responsive {
+    overflow: visible!important;
+    background: transparent!important;
+    border: none!important;
+  }
+  #v-list .table-responsive table, #v-dash .table-responsive table {
+    display: block!important;
+    width: 100%!important;
+  }
+  #v-list .table-responsive thead, #v-dash .table-responsive thead {
+    display: none!important;
+  }
+  #v-list .table-responsive tbody, #v-dash .table-responsive tbody {
+    display: flex!important;
+    flex-direction: column!important;
+    gap: 8px!important;
+  }
+  tr.exp-table-row {
+    display: flex!important;
+    flex-direction: column!important;
+    background: #ffffff!important;
+    border: 1px solid var(--line)!important;
+    border-radius: 9px!important;
+    padding: 10px 12px!important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04)!important;
+    gap: 5px!important;
+  }
+  tr.exp-table-row:active {
+    background: #F8FAFC!important;
+  }
+  tr.exp-table-row td {
+    display: block!important;
+    padding: 0!important;
+    border: none!important;
+  }
+  .exp-mobile-top {
+    display: flex!important;
+    justify-content: space-between!important;
+    align-items: center!important;
+    width: 100%!important;
+  }
+  .exp-desktop-only {
+    display: none!important;
+  }
+  .exp-mobile-tag {
+    display: inline-block!important;
+  }
+}
+
+.exp-mobile-top {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.exp-mobile-tag {
+  display: none;
 }
 
 @media (max-width:480px){
@@ -920,7 +984,7 @@ tr.row:hover td{background:var(--bg);cursor:pointer}
   </button>
 
   <div class="hdr-search">
-    <input class="search" id="search" placeholder="Buscar expediente, cliente...">
+    <input class="search" id="search" placeholder="Buscar...">
   </div>
   <div class="hdr-actions">
     <div class="dropdown-solicitud" style="position:relative;">
@@ -960,9 +1024,50 @@ tr.row:hover td{background:var(--bg);cursor:pointer}
   </section>
 
   <section class="view" id="v-list">
-    <div style="display:flex;justify-content:space-between;align-items:center"><div><h1>Expedientes</h1><p class="sub" id="listCount"></p></div><div class="filters" id="listFilters"><button class="on" data-f="all">Todos</button><button data-f="proc">En proceso</button><button data-f="rev">En revisión</button><button data-f="wait">Esperando cliente</button><button data-f="done">Cerrados</button></div></div>
-    <div class="filters" id="divFilters" style="margin-top:8px"><button class="on" data-d="all">Todas las divisiones</button><button data-d="Legal">Legal</button><button data-d="Inmobiliario">Inmobiliario</button><button data-d="Agrimensura">Agrimensura</button></div>
-    <div class="card" style="margin-top:16px"><div class="table-responsive"><table><thead><tr><th>Expediente</th><th>División</th><th>Cliente</th><th>Servicio</th><th>Responsable</th><th>Inicio</th><th>Progreso</th><th>Estado</th></tr></thead><tbody id="listRows"></tbody></table></div></div>
+    <div style="margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <div style="display:flex;align-items:baseline;gap:8px;">
+          <h1 style="margin:0;font-size:1.35rem;font-weight:700;color:var(--navy);">Expedientes</h1>
+          <span class="sub" id="listCount" style="font-size:0.8rem;color:var(--gray);font-weight:600;"></span>
+        </div>
+        <button class="btn p sm" onclick="openNewExpModal()" type="button">
+          <i data-lucide="plus"></i>
+          <span>Nuevo Expediente</span>
+        </button>
+      </div>
+      <div class="filters" id="listFilters" style="margin-bottom:6px;">
+        <button class="on" data-f="all">Todos</button>
+        <button data-f="proc">En proceso</button>
+        <button data-f="rev">En revisión</button>
+        <button data-f="wait">Esperando cliente</button>
+        <button data-f="done">Cerrados</button>
+      </div>
+      <div class="filters" id="divFilters" style="margin:0;">
+        <button class="on" data-d="all">Todas las divisiones</button>
+        <button data-d="Legal">Legal</button>
+        <button data-d="Inmobiliario">Inmobiliario</button>
+        <button data-d="Agrimensura">Agrimensura</button>
+      </div>
+    </div>
+    <div class="card exp-list-card" style="margin-top:8px;padding:0;overflow:hidden;border-radius:10px;">
+      <div class="table-responsive">
+        <table style="margin:0;">
+          <thead>
+            <tr>
+              <th style="padding-left:14px;">Expediente</th>
+              <th>División</th>
+              <th>Cliente</th>
+              <th>Servicio</th>
+              <th>Responsable</th>
+              <th>Inicio</th>
+              <th>Progreso</th>
+              <th style="text-align:right;padding-right:14px;">Estado</th>
+            </tr>
+          </thead>
+          <tbody id="listRows"></tbody>
+        </table>
+      </div>
+    </div>
   </section>
 
   <section class="view" id="v-mytasks">
@@ -1725,7 +1830,35 @@ document.querySelectorAll('.side a[data-view]').forEach(a => {
 const DIV_COLOR={Legal:'#2B6CB0',Inmobiliario:'#1A3A52',Agrimensura:'#4A9B6F'};
 const DIV_BG={Legal:'#E8F0FA',Inmobiliario:'#EEF2F5',Agrimensura:'#E8F4EF'};
 function divBadge(svc){const d=(TPL[svc]||TPL.deslinde).div||'—';return `<span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:10.5px;font-weight:600;background:${DIV_BG[d]||'#eee'};color:${DIV_COLOR[d]||'#666'}">${d}</span>`;}
-function rowHTML(e,withDate){const p=progress(e),es=ESTADO[e.estado];return `<tr class="row" onclick="openExp('${e.id}')"><td><b style="color:var(--navy);font-weight:500">${e.id}</b></td><td>${divBadge(e.svc)}</td><td>${e.cliente.nombre}</td><td>${(TPL[e.svc]||TPL.deslinde).nombre}</td><td>${e.tec&&e.tec!==e.resp?e.resp.split(' ')[0]+' / '+e.tec.split(' ')[0]:e.resp}</td>${withDate?`<td>${fd(e.inicio)}</td>`:''}<td><div style="display:flex;align-items:center;gap:8px"><div class="bar" style="flex:1"><i style="width:${p.pct}%"></i></div><span style="font-size:11.5px;color:var(--gray);min-width:32px">${p.pct}%</span></div></td><td><span class="tag ${es[1]}">${es[0]}</span></td></tr>`;}
+function rowHTML(e, withDate) {
+  const p = progress(e), es = ESTADO[e.estado] || ['En Proceso', 'proc'];
+  const tpl = TPL[e.svc] || TPL.deslinde;
+  return `
+    <tr class="row exp-table-row" onclick="openExp('${e.id}')" style="cursor:pointer;">
+      <td class="exp-col-id" style="padding-left:14px;">
+        <div class="exp-mobile-top">
+          <div style="display:flex;align-items:center;gap:6px;">
+            <b style="color:var(--navy);font-weight:700;font-size:13px;">${e.id}</b>
+            ${divBadge(e.svc)}
+          </div>
+          <span class="tag ${es[1]} exp-mobile-tag">${es[0]}</span>
+        </div>
+      </td>
+      <td class="exp-col-div exp-desktop-only">${divBadge(e.svc)}</td>
+      <td class="exp-col-client"><b style="color:#1e293b;font-size:13px;">${e.cliente?.nombre || 'Cliente'}</b></td>
+      <td class="exp-col-svc"><span style="color:var(--gray);font-size:12.5px;">${tpl.nombre}</span></td>
+      <td class="exp-col-resp exp-desktop-only"><span style="color:var(--gray);font-size:12px;">${e.tec && e.tec !== e.resp ? e.resp.split(' ')[0] + ' / ' + e.tec.split(' ')[0] : e.resp}</span></td>
+      ${withDate ? `<td class="exp-col-date exp-desktop-only"><span style="color:var(--gray);font-size:11.5px;">${fd(e.inicio)}</span></td>` : ''}
+      <td class="exp-col-prog">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="bar" style="flex:1;height:6px;"><i style="width:${p.pct}%"></i></div>
+          <span style="font-size:11px;color:var(--gray);min-width:30px;font-weight:600;">${p.pct}%</span>
+        </div>
+      </td>
+      <td class="exp-col-st exp-desktop-only" style="text-align:right;padding-right:14px;"><span class="tag ${es[1]}">${es[0]}</span></td>
+    </tr>
+  `;
+}
 function renderDash(){const al=alerts(),act=DB.filter(e=>e.estado!=='done');const late=al.filter(a=>a.c==='r').length,soon=DB.flatMap(e=>e.tasks||[]).filter(t=>t.due&&t.st!=='done'&&days(t.due)>=0&&days(t.due)<=14).length;
  $('kpis').innerHTML=[['folder-open','Expedientes activos',act.length],['alert-circle','Requieren atención',al.length,al.length?'warn':''],['clock','Tareas vencidas',late,late?'warn':''],['calendar','Próximos vencimientos',soon],['check-circle','Completados este mes',DB.filter(e=>e.estado==='done').length]].map(k=>`<div class="kpi ${k[3]||''}"><div class="l"><i data-lucide="${k[0]}"></i>${k[1]}</div><div class="v">${k[2]}</div></div>`).join('');
  $('dashAlerts').innerHTML=al.slice(0,3).map(a=>`<div class="alert" onclick="openExp('${a.e}')"><span class="dot ${a.c}"></span><div><b>${a.n}</b><small>${a.e} · ${a.s}</small><small>Responsable: ${a.w.split(' ')[0]}</small></div></div>`).join('')||'<div class="empty" style="text-align:center;padding:18px;color:var(--gray);">Sin alertas pendientes. Todo al día.</div>';
