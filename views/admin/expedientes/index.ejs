@@ -1113,6 +1113,9 @@ tr.row:hover td{background:var(--bg);cursor:pointer}
   .exp-kpi-grid{grid-template-columns:1fr 1fr!important;gap:8px!important}
   .resumen-grid{grid-template-columns:1fr!important;gap:12px!important}
   
+  .exp-tab-select-container {
+    display: none;
+  }
   .tabs{
     margin:0 0 10px;
     padding-bottom:2px;
@@ -1127,6 +1130,40 @@ tr.row:hover td{background:var(--bg);cursor:pointer}
     flex-shrink:0!important;
     padding:7px 10px!important;
     font-size:11.5px!important;
+  }
+  
+  @media (max-width:768px){
+    .desktop-tabs-bar {
+      display: none !important;
+    }
+    .exp-tab-select-container {
+      display: block !important;
+      margin-bottom: 12px;
+    }
+    .mobile-tab-select {
+      width: 100% !important;
+      height: 42px !important;
+      font-size: 13.5px !important;
+      font-weight: 600 !important;
+      color: var(--navy) !important;
+      background-color: #ffffff !important;
+      border: 1.5px solid var(--line) !important;
+      border-radius: 8px !important;
+      padding: 0 14px !important;
+      outline: none !important;
+      cursor: pointer !important;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
+      background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%231A3A52%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E") !important;
+      background-repeat: no-repeat !important;
+      background-position: right 14px top 50% !important;
+      background-size: 10px auto !important;
+      appearance: none !important;
+      -webkit-appearance: none !important;
+    }
+    .mobile-tab-select:focus {
+      border-color: var(--green) !important;
+      box-shadow: 0 0 0 3px rgba(74,155,111,0.2) !important;
+    }
   }
   
   .task {
@@ -3064,13 +3101,23 @@ function renderClientDetail() {
       </div>
     </div>
 
-    <!-- Pestañas de la Vista 360 -->
-    <div class="tabs" id="cli360Tabs" style="margin:0 0 16px 0;background:#fff;border-bottom:1px solid var(--line);border-radius:8px 8px 0 0;padding:0 16px;">
+    <!-- Pestañas de la Vista 360 (Desktop Tabs + Mobile Select) -->
+    <div class="tabs desktop-tabs-bar" id="cli360Tabs" style="margin:0 0 16px 0;background:#fff;border-bottom:1px solid var(--line);border-radius:8px 8px 0 0;padding:0 16px;">
       <button class="${_cur360Tab==='expedientes'?'on':''}" data-tab="expedientes" onclick="switchCli360Tab('expedientes')">1. Expedientes & Casos (${c.expedientes.length})</button>
       <button class="${_cur360Tab==='bienes_raices'?'on':''}" data-tab="bienes_raices" onclick="switchCli360Tab('bienes_raices')">2. Bienes Raíces & Proyectos (${c.proyectos.length})</button>
       <button class="${_cur360Tab==='cotizaciones'?'on':''}" data-tab="cotizaciones" onclick="switchCli360Tab('cotizaciones')">3. Cotizaciones & Quoter (${c.cotizaciones.length})</button>
       <button class="${_cur360Tab==='documentos'?'on':''}" data-tab="documentos" onclick="switchCli360Tab('documentos')">4. Documentos del Cliente</button>
       <button class="${_cur360Tab==='bitacora'?'on':''}" data-tab="bitacora" onclick="switchCli360Tab('bitacora')">5. Bitácora & Historial de Notas</button>
+    </div>
+
+    <div class="exp-tab-select-container">
+      <select id="cli360MobileSelect" class="mobile-tab-select" onchange="switchCli360Tab(this.value)">
+        <option value="expedientes" ${_cur360Tab==='expedientes'?'selected':''}>📁 1. Expedientes & Casos (${c.expedientes.length})</option>
+        <option value="bienes_raices" ${_cur360Tab==='bienes_raices'?'selected':''}>🏢 2. Bienes Raíces & Proyectos (${c.proyectos.length})</option>
+        <option value="cotizaciones" ${_cur360Tab==='cotizaciones'?'selected':''}>💼 3. Cotizaciones & Quoter (${c.cotizaciones.length})</option>
+        <option value="documentos" ${_cur360Tab==='documentos'?'selected':''}>📄 4. Documentos del Cliente</option>
+        <option value="bitacora" ${_cur360Tab==='bitacora'?'selected':''}>📝 5. Bitácora & Historial de Notas</option>
+      </select>
     </div>
 
     <!-- Contenido de la pestaña activa -->
@@ -3085,6 +3132,10 @@ function switchCli360Tab(tabName) {
   _cur360Tab = tabName;
   const tabBtns = document.querySelectorAll('#cli360Tabs button');
   tabBtns.forEach(b => b.classList.toggle('on', b.dataset.tab === tabName));
+  const mobSelect = $('cli360MobileSelect');
+  if (mobSelect && mobSelect.value !== tabName) {
+    mobSelect.value = tabName;
+  }
   renderCli360Body();
 }
 
@@ -4496,7 +4547,14 @@ function renderExp(){
     ${renderStepper(e, T)}
   </div>
 
-  <div class="tabs" style="margin:0 0 10px">${tabs.map(t=>`<button class="${t===tab?'on':''}" data-tab="${t}" onclick="setTab('${t}')">${TAB_NAMES[t]||t}</button>`).join('')}</div>
+  <div class="tabs desktop-tabs-bar" style="margin:0 0 10px">${tabs.map(t=>`<button class="${t===tab?'on':''}" data-tab="${t}" onclick="setTab('${t}')">${TAB_NAMES[t]||t}</button>`).join('')}</div>
+  
+  <div class="exp-tab-select-container">
+    <select id="expMobileTabSelect" class="mobile-tab-select" onchange="setTab(this.value)">
+      ${tabs.map(t=>`<option value="${t}" ${t===tab?'selected':''}>${TAB_NAMES[t]||t}</option>`).join('')}
+    </select>
+  </div>
+
   <div id="tabBox"></div>`;
   renderTab();
   icons();
@@ -4505,6 +4563,10 @@ function renderExp(){
 function setTab(t){
   tab=t;
   document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));
+  const mobSelect = $('expMobileTabSelect');
+  if (mobSelect && mobSelect.value !== t) {
+    mobSelect.value = t;
+  }
   renderTab();
   icons();
 }
