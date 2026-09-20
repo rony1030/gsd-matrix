@@ -3,7 +3,7 @@
 <style>
   .quoter-layout {
     display: grid;
-    grid-template-columns: 220px minmax(0, 1fr) 330px;
+    grid-template-columns: 240px minmax(0, 1fr) 340px;
     gap: 16px;
     align-items: start;
     width: 100%;
@@ -16,65 +16,86 @@
     gap: 12px;
     margin-bottom: 14px;
   }
-  @media (max-width: 1380px) {
+  .mobile-svc-picker {
+    display: none;
+    margin-bottom: 12px;
+  }
+  .mobile-svc-select {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid #CBD5E1;
+    border-radius: 8px;
+    background: #ffffff;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #1A3A52;
+    outline: none;
+  }
+  .mobile-svc-select:focus {
+    border-color: #4A9B6F;
+    box-shadow: 0 0 0 3px rgba(74, 155, 111, 0.15);
+  }
+
+  @media (max-width: 1200px) {
     .quoter-layout {
-      grid-template-columns: 210px minmax(0, 1fr);
+      grid-template-columns: 220px minmax(0, 1fr);
     }
     .quoter-preview-col {
       grid-column: 1 / -1;
-      margin-top: 14px;
+      margin-top: 8px;
     }
   }
-  @media (max-width: 900px) {
+
+  @media (max-width: 800px) {
     .quoter-layout {
-      grid-template-columns: 1fr !important;
-      gap: 12px;
-    }
-    .quoter-services-card {
-      padding: 10px 12px !important;
-    }
-    #serviceList {
       display: flex !important;
-      flex-direction: row !important;
-      gap: 6px !important;
-      overflow-x: auto !important;
-      white-space: nowrap !important;
-      padding-bottom: 4px !important;
-      -webkit-overflow-scrolling: touch !important;
-      scrollbar-width: none !important;
+      flex-direction: column !important;
+      gap: 14px !important;
       width: 100% !important;
     }
-    #serviceList::-webkit-scrollbar {
+    .quoter-services-card {
       display: none !important;
     }
-    .svc-menu-btn {
-      flex: 0 0 auto !important;
-      width: auto !important;
-      margin-bottom: 0 !important;
-      padding: 6px 12px !important;
-      font-size: 0.78rem !important;
-      border-radius: 20px !important;
-      white-space: nowrap !important;
-    }
-    .svc-menu-btn svg {
-      display: none !important;
-    }
-  }
-  @media (max-width: 640px) {
-    .form-row-2col {
-      grid-template-columns: 1fr !important;
-      gap: 8px;
-      margin-bottom: 10px;
+    .mobile-svc-picker {
+      display: block !important;
     }
     .quoter-form-card {
-      padding: 14px 12px !important;
+      padding: 16px 14px !important;
+      border-radius: 12px !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
     }
-  }
-  @media (max-width: 480px) {
-    .quoter-form-card .btn {
-      flex: 1 1 100%;
-      justify-content: center;
-      padding: 9px 12px;
+    .quoter-preview-col {
+      width: 100% !important;
+      box-sizing: border-box !important;
+      margin-top: 0 !important;
+    }
+    .form-row-2col {
+      grid-template-columns: 1fr !important;
+      gap: 10px !important;
+      margin-bottom: 10px !important;
+    }
+    .quoter-form-card input,
+    .quoter-form-card select,
+    .quoter-form-card textarea {
+      width: 100% !important;
+      box-sizing: border-box !important;
+      font-size: 14px !important;
+    }
+    .form-actions-bar {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 8px !important;
+      width: 100% !important;
+    }
+    .form-actions-bar .btn {
+      width: 100% !important;
+      justify-content: center !important;
+      padding: 12px 16px !important;
+      font-size: 0.88rem !important;
+    }
+    .paper-preview-box {
+      padding: 14px !important;
     }
   }
 
@@ -83,7 +104,7 @@
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    padding: 10px 14px;
+    padding: 10px 12px;
     border-radius: 8px;
     border: 1px solid #E5E7EB;
     background: #ffffff;
@@ -111,11 +132,14 @@
     background: #ffffff;
     border: 1px solid #E5E7EB;
     border-radius: 12px;
-    padding: 20px;
+    padding: 18px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.04);
     font-size: 0.78rem;
     line-height: 1.5;
     color: #1F2937;
+    width: 100%;
+    box-sizing: border-box;
+    word-break: break-word;
   }
   .preview-header {
     display: flex;
@@ -146,66 +170,84 @@
 
 <div class="quoter-layout">
   
-  <!-- COLUMNA 1: CATÁLOGO DE SERVICIOS -->
-  <div>
-    <div class="card quoter-services-card" style="padding:14px;">
-      <h3 style="font-size:0.75rem;letter-spacing:1px;text-transform:uppercase;color:#6B7280;margin-bottom:12px;">Servicios GSD</h3>
-      
-      <div id="serviceList">
-        <button type="button" class="svc-menu-btn active" onclick="selectService('iguala', 'Iguala Legal (Cartera & Contratos)', 35000, 'DOP')">
-          <span>Iguala Legal</span>
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-        </button>
-        <button type="button" class="svc-menu-btn" onclick="selectService('deslinde', 'Deslinde Catastral con Título', 2000, 'USD')">
-          <span>Deslinde Catastral</span>
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-        </button>
-        <button type="button" class="svc-menu-btn" onclick="selectService('transferencia', 'Transferencia Inmobiliaria CONFOTUR', 1500, 'USD')">
-          <span>Transferencia Inmobiliaria</span>
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-        </button>
-        <button type="button" class="svc-menu-btn" onclick="selectService('investigacion', 'Investigación Parcelaria & Títulos', 800, 'USD')">
-          <span>Investigación Parcelaria</span>
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-        </button>
-        <button type="button" class="svc-menu-btn" onclick="selectService('topografia', 'Levantamiento Topográfico GNSS', 65000, 'DOP')">
-          <span>Levantamiento Topográfico</span>
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-        </button>
-        <button type="button" class="svc-menu-btn" onclick="selectService('condominio', 'Constitución de Régimen de Condominio', 2500, 'USD')">
-          <span>Condominio (Constitución)</span>
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-        </button>
-        <button type="button" class="svc-menu-btn" onclick="selectService('regularizacion', 'Regularización Parcelaria', 1200, 'USD')">
-          <span>Regularización Parcelaria</span>
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-        </button>
-        <button type="button" class="svc-menu-btn" onclick="selectService('asesoria', 'Asesoría Inmobiliaria Estratégica', 500, 'USD')">
-          <span>Asesoría Inmobiliaria</span>
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-        </button>
-      </div>
+  <!-- SELECTOR MÓVIL DIRECTO -->
+  <div class="mobile-svc-picker">
+    <label style="display:block;font-size:0.75rem;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#4A9B6F;margin-bottom:6px;">
+      Seleccionar Servicio a Cotizar:
+    </label>
+    <select id="mobileServiceSelect" class="mobile-svc-select" onchange="onMobileServiceChange(this.value)">
+      <option value="iguala" data-title="Iguala Legal (Cartera & Contratos)" data-price="35000" data-curr="DOP" selected>⚖️ Iguala Legal (RD$ 35,000)</option>
+      <option value="deslinde" data-title="Deslinde Catastral con Título" data-price="2000" data-curr="USD">📐 Deslinde Catastral (US$ 2,000)</option>
+      <option value="transferencia" data-title="Transferencia Inmobiliaria CONFOTUR" data-price="1500" data-curr="USD">🏢 Transferencia Inmobiliaria (US$ 1,500)</option>
+      <option value="investigacion" data-title="Investigación Parcelaria & Títulos" data-price="800" data-curr="USD">🔍 Investigación Parcelaria (US$ 800)</option>
+      <option value="topografia" data-title="Levantamiento Topográfico GNSS" data-price="65000" data-curr="DOP">📍 Levantamiento Topográfico (RD$ 65,000)</option>
+      <option value="condominio" data-title="Constitución de Régimen de Condominio" data-price="2500" data-curr="USD">📑 Constitución Condominio (US$ 2,500)</option>
+      <option value="regularizacion" data-title="Regularización Parcelaria" data-price="1200" data-curr="USD">📝 Regularización Parcelaria (US$ 1,200)</option>
+      <option value="asesoria" data-title="Asesoría Inmobiliaria Estratégica" data-price="500" data-curr="USD">💡 Asesoría Inmobiliaria (US$ 500)</option>
+    </select>
+  </div>
 
-      <button type="button" onclick="resetForm()" class="btn p" style="width:100%;margin-top:14px;justify-content:center;">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Nueva Cotización
+  <!-- COLUMNA 1: CATÁLOGO DE SERVICIOS (ESCRITORIO / TABLET) -->
+  <div class="quoter-services-card card" style="padding:14px;">
+    <h3 style="font-size:0.75rem;letter-spacing:1px;text-transform:uppercase;color:#6B7280;margin-bottom:12px;">Servicios GSD</h3>
+    
+    <div id="serviceList">
+      <button type="button" class="svc-menu-btn active" onclick="selectService('iguala', 'Iguala Legal (Cartera & Contratos)', 35000, 'DOP', this)">
+        <span>Iguala Legal</span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+      <button type="button" class="svc-menu-btn" onclick="selectService('deslinde', 'Deslinde Catastral con Título', 2000, 'USD', this)">
+        <span>Deslinde Catastral</span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+      <button type="button" class="svc-menu-btn" onclick="selectService('transferencia', 'Transferencia Inmobiliaria CONFOTUR', 1500, 'USD', this)">
+        <span>Transferencia Inmobiliaria</span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+      <button type="button" class="svc-menu-btn" onclick="selectService('investigacion', 'Investigación Parcelaria & Títulos', 800, 'USD', this)">
+        <span>Investigación Parcelaria</span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+      <button type="button" class="svc-menu-btn" onclick="selectService('topografia', 'Levantamiento Topográfico GNSS', 65000, 'DOP', this)">
+        <span>Levantamiento Topográfico</span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+      <button type="button" class="svc-menu-btn" onclick="selectService('condominio', 'Constitución de Régimen de Condominio', 2500, 'USD', this)">
+        <span>Condominio (Constitución)</span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+      <button type="button" class="svc-menu-btn" onclick="selectService('regularizacion', 'Regularización Parcelaria', 1200, 'USD', this)">
+        <span>Regularización Parcelaria</span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+      <button type="button" class="svc-menu-btn" onclick="selectService('asesoria', 'Asesoría Inmobiliaria Estratégica', 500, 'USD', this)">
+        <span>Asesoría Inmobiliaria</span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
       </button>
     </div>
+
+    <button type="button" onclick="resetForm()" class="btn p" style="width:100%;margin-top:14px;justify-content:center;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Nueva Cotización
+    </button>
   </div>
 
   <!-- COLUMNA 2: FORMULARIO DINÁMICO -->
-  <div>
-    <div class="card quoter-form-card">
-      <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #E5E7EB;padding-bottom:12px;margin-bottom:16px;">
-        <div>
-          <h2 id="formServiceTitle" style="font-size:1.25rem;color:#1A3A52;margin:0;">Iguala Legal</h2>
-          <p style="font-size:0.75rem;color:#6B7280;margin:2px 0 0;">Asesoría y representación jurídica continua en materia inmobiliaria y civil.</p>
+  <div style="width: 100%; max-width: 100%; min-width: 0;">
+    <div class="card quoter-form-card" style="width: 100%; box-sizing: border-box;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid #E5E7EB;padding-bottom:12px;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+        <div style="min-width:0;flex:1 1 auto;">
+          <h2 id="formServiceTitle" style="font-size:1.15rem;color:#1A3A52;margin:0;word-break:break-word;">Iguala Legal (Cartera & Contratos)</h2>
+          <p style="font-size:0.75rem;color:#6B7280;margin:4px 0 0;line-height:1.4;">Asesoría y representación jurídica continua en materia inmobiliaria y civil.</p>
         </div>
+        <button type="button" onclick="resetForm()" class="btn sm" style="display:inline-flex;padding:5px 10px;font-size:0.75rem;">
+          Limpiar
+        </button>
       </div>
 
       <form id="quoterForm" onsubmit="event.preventDefault(); saveAndDownloadPDF();">
         <input type="hidden" id="service_type" value="iguala">
-        <input type="hidden" id="service_title" value="Iguala de Servicios Legales">
+        <input type="hidden" id="service_title" value="Iguala Legal (Cartera & Contratos)">
 
         <!-- 1. Datos del Cliente -->
         <h4 style="font-size:0.8rem;text-transform:uppercase;color:#4A9B6F;margin-bottom:10px;">1. Datos del Cliente</h4>
@@ -367,15 +409,47 @@
 </div>
 
 <script>
-function selectService(type, title, basePrice, currency) {
+function selectService(type, title, basePrice, currency, btnEl) {
   document.querySelectorAll('.svc-menu-btn').forEach(b => b.classList.remove('active'));
-  event.currentTarget.classList.add('active');
+  if (btnEl) {
+    btnEl.classList.add('active');
+  }
+
+  const mobileSel = document.getElementById('mobileServiceSelect');
+  if (mobileSel) {
+    mobileSel.value = type;
+  }
 
   document.getElementById('service_type').value = type;
   document.getElementById('service_title').value = title;
   document.getElementById('formServiceTitle').textContent = title;
   document.getElementById('monto_base').value = basePrice;
   document.getElementById('doc_currency').value = currency;
+  renderPreview();
+}
+
+function onMobileServiceChange(val) {
+  const sel = document.getElementById('mobileServiceSelect');
+  const opt = sel.options[sel.selectedIndex];
+  if (!opt) return;
+
+  const title = opt.getAttribute('data-title');
+  const price = parseFloat(opt.getAttribute('data-price')) || 0;
+  const curr = opt.getAttribute('data-curr') || 'USD';
+
+  // Highlight corresponding desktop button if any
+  document.querySelectorAll('.svc-menu-btn').forEach(b => {
+    b.classList.remove('active');
+    if (b.getAttribute('onclick') && b.getAttribute('onclick').includes(`'${val}'`)) {
+      b.classList.add('active');
+    }
+  });
+
+  document.getElementById('service_type').value = val;
+  document.getElementById('service_title').value = title;
+  document.getElementById('formServiceTitle').textContent = title;
+  document.getElementById('monto_base').value = price;
+  document.getElementById('doc_currency').value = curr;
   renderPreview();
 }
 
