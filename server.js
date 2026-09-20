@@ -270,11 +270,17 @@ app.get('/admin', requireAuth, async (req, res) => {
     const rawExp = queryAll('SELECT * FROM expedientes ORDER BY created_at DESC') || [];
     const expedientes = rawExp.map(formatExpedienteRow).filter(Boolean);
     const cotizaciones = queryAll('SELECT referencia as ref, cliente_nombre as cli, servicio_tipo as svc, total as hon, moneda as mon, observaciones as obj FROM cotizaciones ORDER BY created_at DESC') || [];
+    const leads = queryAll('SELECT * FROM leads ORDER BY created_at DESC') || [];
+    const propiedades = queryAll('SELECT id, titulo, tipo, precio, moneda, ubicacion, estado FROM propiedades ORDER BY created_at DESC') || [];
+    const proyectos = queryAll('SELECT id, nombre, promotor, ubicacion, precio_desde, moneda, estado FROM proyectos ORDER BY created_at DESC') || [];
     res.render('admin/expedientes/index', {
       page: 'dashboard',
       initialView: 'dash',
       expedientes,
-      cotizaciones
+      cotizaciones,
+      leads,
+      propiedades,
+      proyectos
     });
   } catch (err) {
     console.error('Error cargando dashboard CRM:', err);
@@ -282,7 +288,10 @@ app.get('/admin', requireAuth, async (req, res) => {
       page: 'dashboard',
       initialView: 'dash',
       expedientes: [],
-      cotizaciones: []
+      cotizaciones: [],
+      leads: [],
+      propiedades: [],
+      proyectos: []
     });
   }
 });
@@ -304,11 +313,42 @@ crmSubmodules.forEach(({ path: subPath, view, page }) => {
       const rawExp = queryAll('SELECT * FROM expedientes ORDER BY created_at DESC') || [];
       const expedientes = rawExp.map(formatExpedienteRow).filter(Boolean);
       const cotizaciones = queryAll('SELECT referencia as ref, cliente_nombre as cli, servicio_tipo as svc, total as hon, moneda as mon, observaciones as obj FROM cotizaciones ORDER BY created_at DESC') || [];
-      res.render('admin/expedientes/index', { page, initialView: view, expedientes, cotizaciones });
+      const leads = queryAll('SELECT * FROM leads ORDER BY created_at DESC') || [];
+      const propiedades = queryAll('SELECT id, titulo, tipo, precio, moneda, ubicacion, estado FROM propiedades ORDER BY created_at DESC') || [];
+      const proyectos = queryAll('SELECT id, nombre, promotor, ubicacion, precio_desde, moneda, estado FROM proyectos ORDER BY created_at DESC') || [];
+      res.render('admin/expedientes/index', { page, initialView: view, expedientes, cotizaciones, leads, propiedades, proyectos });
     } catch (err) {
-      res.render('admin/expedientes/index', { page, initialView: view, expedientes: [], cotizaciones: [] });
+      res.render('admin/expedientes/index', { page, initialView: view, expedientes: [], cotizaciones: [], leads: [], propiedades: [], proyectos: [] });
     }
   });
+});
+
+// API para registrar o actualizar clientes desde el CRM 360
+app.post('/admin/clientes/api/guardar', requireAuth, async (req, res) => {
+  try {
+    const { nombre, email, telefono, cedula, tipo_cliente, notas, origen, is_real_estate, tags, proyectos_interes } = req.body;
+    if (!nombre) return res.status(400).json({ error: 'Nombre es requerido' });
+    await getDb();
+    
+    // Check if lead already exists with same name or email
+    const existing = queryOne('SELECT id FROM leads WHERE nombre = ? OR (email != "" AND email = ?)', [nombre, email || '__dummy__']);
+    if (existing) {
+      run(
+        'UPDATE leads SET email=?, telefono=?, tipo_cliente=?, mensaje=?, tags=?, is_real_estate=? WHERE id=?',
+        [email || '', telefono || '', tipo_cliente || 'General', notas || '', (tags ? (Array.isArray(tags) ? tags.join(',') : tags) : '') + (proyectos_interes ? ` · ${proyectos_interes}` : ''), is_real_estate ? 1 : 0, existing.id]
+      );
+      return res.json({ success: true, id: existing.id, action: 'updated' });
+    } else {
+      const result = run(
+        'INSERT INTO leads (nombre, email, telefono, servicio, mensaje, estado, origen, tipo_cliente, is_real_estate, tags) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        [nombre, email || '', telefono || '', is_real_estate ? 'Bienes Raíces' : 'Agrimensura / Legal', notas || '', 'activo', origen || 'crm', tipo_cliente || 'General', is_real_estate ? 1 : 0, (tags ? (Array.isArray(tags) ? tags.join(',') : tags) : '') + (proyectos_interes ? ` · ${proyectos_interes}` : '')]
+      );
+      return res.json({ success: true, id: result.lastInsertRowid, action: 'created' });
+    }
+  } catch (err) {
+    console.error('Error guardando cliente CRM:', err);
+    res.status(500).json({ error: 'Error en base de datos' });
+  }
 });
 
 // API para estadísticas de tareas y sincronización del badge global en el menú lateral

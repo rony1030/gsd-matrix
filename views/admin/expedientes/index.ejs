@@ -262,6 +262,74 @@ tr.row:hover td{background:var(--bg);cursor:pointer}
   margin-top: auto;
 }
 
+/* ===== CLIENTES 360° MODULE STYLES ===== */
+.cli-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--navy);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+  flex-shrink: 0;
+  box-shadow: 0 1px 3px rgba(26,58,82,0.15);
+}
+.cli-avatar.corp { background: #1E3962; }
+.cli-avatar.vip { background: linear-gradient(135deg, #B7791F 0%, #D97706 100%); }
+.cli-avatar.re { background: linear-gradient(135deg, #1E6B47 0%, #2563EB 100%); }
+
+.cli-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 10.5px;
+  font-weight: 600;
+}
+.cli-badge.agri { background: var(--green-l); color: #1E6B47; }
+.cli-badge.legal { background: var(--blue-l); color: var(--blue); }
+.cli-badge.re { background: #FEF3C7; color: #92400E; }
+.cli-badge.corp { background: #EEF2F5; color: var(--navy); }
+.cli-badge.vip { background: #FDF4FF; color: #86198F; border: 1px solid #F0ABFC; }
+
+.cli-row-exp-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #F1F5F9;
+  border: 1px solid #E2E8F0;
+  color: var(--navy);
+  padding: 2px 7px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all .15s ease;
+  cursor: pointer;
+}
+.cli-row-exp-tag:hover {
+  background: var(--navy);
+  color: #fff;
+  border-color: var(--navy);
+}
+
+.cli-project-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  color: #1D4ED8;
+  padding: 2px 7px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
 /* Modal PDF Preview & Paper */
 .tpl-pdf-paper {
   background: #ffffff;
@@ -793,7 +861,76 @@ tr.row:hover td{background:var(--bg);cursor:pointer}
     </div>
     <div id="calBox"></div>
   </section>
-  <section class="view" id="v-clients"><h1>Clientes</h1><p class="sub">Clientes con expedientes en el sistema.</p><div class="card" style="margin-top:16px"><div class="table-responsive"><table><thead><tr><th>Cliente</th><th>Cédula / RNC</th><th>Contacto</th><th>Expedientes</th></tr></thead><tbody id="cliRows"></tbody></table></div></div></section>
+  <section class="view" id="v-clients">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:14px;">
+      <div>
+        <h1 style="margin:0;font-size:1.45rem;font-weight:700;color:var(--navy);">Directorio de Clientes 360°</h1>
+        <p class="sub" style="margin:4px 0 0;font-size:0.86rem;color:var(--gray);">
+          Gestión integral de clientes: expedientes técnicos y legales, intereses inmobiliarios, cotizaciones y facturación.
+        </p>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn p" onclick="openNewClientDirectModal()">
+          <i data-lucide="user-plus"></i>
+          <span>Nuevo Cliente</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- KPIs de Clientes -->
+    <div class="kpis" id="cliKpisGrid" style="grid-template-columns:repeat(4,1fr);margin:0 0 16px 0;">
+      <div class="kpi">
+        <div class="l"><i data-lucide="users"></i>Total Clientes</div>
+        <div class="v" id="kpiCliTotal">0</div>
+      </div>
+      <div class="kpi">
+        <div class="l"><i data-lucide="folder-check"></i>Con Expedientes Activos</div>
+        <div class="v" id="kpiCliActivos" style="color:var(--green)">0</div>
+      </div>
+      <div class="kpi">
+        <div class="l"><i data-lucide="home"></i>Bienes Raíces & Proyectos</div>
+        <div class="v" id="kpiCliRealEstate" style="color:var(--blue)">0</div>
+      </div>
+      <div class="kpi">
+        <div class="l"><i data-lucide="dollar-sign"></i>Total Facturado</div>
+        <div class="v" id="kpiCliFacturado" style="color:var(--navy)">US$0</div>
+      </div>
+    </div>
+
+    <!-- Buscador y Filtros de Segmento -->
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap;">
+      <div class="filters" id="cliTypeFilters" style="margin:0;">
+        <button class="on" data-filt="all" onclick="setCliFilter('all')">Todos</button>
+        <button data-filt="active" onclick="setCliFilter('active')">Casos Activos</button>
+        <button data-filt="re" onclick="setCliFilter('re')">Bienes Raíces & Proyectos</button>
+        <button data-filt="legal_tech" onclick="setCliFilter('legal_tech')">Agrimensura & Legal</button>
+        <button data-filt="corp" onclick="setCliFilter('corp')">Corporativos / Empresas</button>
+      </div>
+      <div style="flex:1;max-width:320px;min-width:200px;">
+        <input type="text" id="cliSearchInput" placeholder="Buscar por nombre, cédula, proyecto..." oninput="filterClientsTable()" style="height:35px;font-size:12.5px;padding:0 12px;border:1px solid var(--line);border-radius:7px;background:#fff;width:100%;">
+      </div>
+    </div>
+
+    <!-- Tabla de Clientes -->
+    <div class="card" style="padding:0;overflow:hidden;border-radius:10px;">
+      <div class="table-responsive">
+        <table style="margin:0;">
+          <thead>
+            <tr>
+              <th style="padding-left:16px;">Cliente / Razón Social</th>
+              <th>Identificación</th>
+              <th>Contacto Directo</th>
+              <th>Expedientes & Casos</th>
+              <th>Bienes Raíces / Proyectos</th>
+              <th>Facturación</th>
+              <th style="text-align:right;padding-right:16px;">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="cliRows"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
   <section class="view" id="v-docs"><h1>Documentos</h1><p class="sub">Documentos pendientes en todos los expedientes.</p><div class="card" style="margin-top:16px" id="docsAll"></div></section>
   <section class="view" id="v-tpl">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:14px;">
@@ -894,6 +1031,80 @@ tr.row:hover td{background:var(--bg);cursor:pointer}
   <div class="f"><label>Dirección física / fiscal</label><input id="cliDir"></div>
   <div class="mf"><button class="btn" onclick="closeM('mClientEdit')">Cancelar</button><button class="btn p" onclick="saveClientModal()">Guardar datos</button></div>
 </div></div>
+
+<!-- MODAL: PERFIL 360° DEL CLIENTE -->
+<div class="modal" id="mClient360">
+  <div class="box" style="width:920px;max-width:96vw;max-height:92vh;padding:0;overflow:hidden;display:flex;flex-direction:column;">
+    <!-- Header del Perfil 360 -->
+    <div id="cli360Header" style="background:var(--navy);color:#fff;padding:20px 24px;position:relative;flex-shrink:0;">
+      <!-- Generado dinámicamente -->
+    </div>
+    
+    <!-- Pestañas del Perfil 360 -->
+    <div class="tabs" id="cli360Tabs" style="margin:0;padding:0 24px;background:#fff;border-bottom:1px solid var(--line);flex-shrink:0;overflow-x:auto;">
+      <button class="on" data-tab="expedientes" onclick="switchCli360Tab('expedientes')">1. Expedientes & Casos</button>
+      <button data-tab="bienes_raices" onclick="switchCli360Tab('bienes_raices')">2. Bienes Raíces & Proyectos</button>
+      <button data-tab="cotizaciones" onclick="switchCli360Tab('cotizaciones')">3. Cotizaciones & Quoter</button>
+      <button data-tab="documentos" onclick="switchCli360Tab('documentos')">4. Documentos del Cliente</button>
+      <button data-tab="bitacora" onclick="switchCli360Tab('bitacora')">5. Bitácora & Notas</button>
+    </div>
+
+    <!-- Contenido dinámico de las pestañas -->
+    <div id="cli360Body" style="flex:1;overflow-y:auto;padding:20px 24px;background:#f8fafc;">
+      <!-- Rellenado por switchCli360Tab -->
+    </div>
+
+    <!-- Footer de Acciones Rápidas -->
+    <div class="mf" style="padding:12px 24px;background:#fff;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;flex-shrink:0;">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button type="button" class="btn sm p" id="btnCli360NewExp" onclick="cli360NewExp()"><i data-lucide="folder-plus"></i>+ Nuevo Expediente</button>
+        <button type="button" class="btn sm" onclick="window.location.href='/admin/cotizaciones'"><i data-lucide="calculator"></i>+ Cotización</button>
+        <button type="button" class="btn sm" id="btnCli360Edit" onclick="editCurCliFrom360()"><i data-lucide="edit-3"></i>Editar Datos</button>
+      </div>
+      <button type="button" class="btn sm ghost" onclick="closeM('mClient360')">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: REGISTRAR / EDITAR CLIENTE COMPLETO -->
+<div class="modal" id="mNewClientDirect">
+  <div class="box" style="width:620px;max-width:95vw;padding:22px 26px;">
+    <h2 id="mNewClientTitle" style="margin:0 0 14px 0;font-size:1.2rem;color:var(--navy);font-weight:700;">Nuevo Cliente</h2>
+    <input type="hidden" id="cliFormKey">
+    <div class="g2">
+      <div class="f"><label>Nombre completo / Razón social *</label><input id="cliFormNombre" placeholder="Ej. Juan Pérez / Constructora Cap Cana SRL"></div>
+      <div class="f"><label>Tipo de Cliente</label><select id="cliFormTipo"><option value="Persona Física">Persona Física</option><option value="Empresa">Empresa / Jurídica</option><option value="Inversionista">Inversionista VIP</option><option value="Desarrollador">Desarrollador</option></select></div>
+    </div>
+    <div class="g2">
+      <div class="f"><label>Cédula / RNC / Pasaporte</label><input id="cliFormCedula" placeholder="001-0000000-0"></div>
+      <div class="f"><label>Teléfono / WhatsApp</label><input id="cliFormTel" placeholder="(829) 000-0000"></div>
+    </div>
+    <div class="g2">
+      <div class="f"><label>Correo electrónico</label><input id="cliFormEmail" type="email" placeholder="cliente@correo.com"></div>
+      <div class="f"><label>Dirección / Ubicación</label><input id="cliFormDir" placeholder="Punta Cana, La Altagracia"></div>
+    </div>
+    <div class="f">
+      <label>Servicios de Interés / Segmento</label>
+      <div style="display:flex;gap:14px;margin-top:4px;flex-wrap:wrap;">
+        <label style="display:inline-flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;"><input type="checkbox" id="cliFormIntAgri" style="width:auto" checked> Agrimensura & Deslindes</label>
+        <label style="display:inline-flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;"><input type="checkbox" id="cliFormIntLegal" style="width:auto" checked> Legal & Transferencias</label>
+        <label style="display:inline-flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;"><input type="checkbox" id="cliFormIntRE" style="width:auto"> Bienes Raíces (Comprar / Invertir)</label>
+      </div>
+    </div>
+    <div class="f">
+      <label>Proyectos o Propiedades de Interés (opcional)</label>
+      <input id="cliFormProyectos" placeholder="Ej. Stellar Punta Cana, Cosmo Bávaro, Canar Rock...">
+    </div>
+    <div class="f">
+      <label>Notas internas / Perfil inicial</label>
+      <textarea id="cliFormNotas" placeholder="Notas sobre requerimientos, presupuesto, procedencia o acuerdos previos..."></textarea>
+    </div>
+    <div class="mf">
+      <button type="button" class="btn" onclick="closeM('mNewClientDirect')">Cancelar</button>
+      <button type="button" class="btn p" onclick="saveNewClientDirect()">Guardar Cliente</button>
+    </div>
+  </div>
+</div>
 
 <div class="modal" id="mRecibo"><div class="box" style="width:580px">
   <h2>Recibo de pago / Comprobante</h2>
@@ -1312,6 +1523,9 @@ try {
 
 const SERVER_EXPEDIENTES = <%- JSON.stringify(typeof expedientes !== 'undefined' ? expedientes : []) %>;
 const SERVER_QUOTES = <%- JSON.stringify(typeof cotizaciones !== 'undefined' ? cotizaciones : []) %>;
+const SERVER_LEADS = <%- JSON.stringify(typeof leads !== 'undefined' ? leads : []) %>;
+const SERVER_PROPIEDADES = <%- JSON.stringify(typeof propiedades !== 'undefined' ? propiedades : []) %>;
+const SERVER_PROYECTOS = <%- JSON.stringify(typeof proyectos !== 'undefined' ? proyectos : []) %>;
 
 let localStored = null;
 try {
@@ -1585,7 +1799,774 @@ function renderCal() {
   `;
   icons();
 }
-function renderCli(){const g={};DB.forEach(e=>{if(e.cliente?.nombre){(g[e.cliente.nombre]=g[e.cliente.nombre]||{c:e.cliente,ex:[]}).ex.push(e.id);}});$('cliRows').innerHTML=Object.values(g).map(x=>`<tr><td><b style="font-weight:500;color:var(--navy)">${x.c.nombre}</b></td><td>${x.c.cedula||'—'}</td><td>${x.c.email||'—'}<br><small style="color:var(--gray)">${x.c.tel||'—'}</small></td><td>${x.ex.map(i=>`<span class="link" onclick="openExp('${i}')">${i}</span>`).join(', ')}</td></tr>`).join('')||'<tr><td colspan="4" class="empty" style="text-align:center;padding:28px;color:var(--gray);">No hay clientes registrados aún.</td></tr>';}
+let _cliFilter = 'all';
+let _cur360Client = null;
+let _cur360Tab = 'expedientes';
+let CLIENTS_MAP = {};
+
+function buildClientsDatabase() {
+  const map = {};
+
+  // 1. Clientes desde Expedientes
+  DB.forEach(e => {
+    const name = e.cliente?.nombre?.trim();
+    if (!name) return;
+    const key = name.toLowerCase();
+    if (!map[key]) {
+      const isCorp = name.toLowerCase().includes('srl') || name.toLowerCase().includes('s.a.') || name.toLowerCase().includes('corp') || name.toLowerCase().includes('grupo') || name.toLowerCase().includes('desarrollos') || name.toLowerCase().includes('constructora');
+      map[key] = {
+        key: key,
+        id: 'cli-' + key.replace(/[^a-z0-9]/g, '-'),
+        nombre: name,
+        cedula: e.cliente.cedula || '',
+        tel: e.cliente.tel || '',
+        email: e.cliente.email || '',
+        dir: e.cliente.dir || '',
+        tipo: isCorp ? 'Empresa' : 'Persona Física',
+        expedientes: [],
+        cotizaciones: [],
+        proyectos: [],
+        propiedades: [],
+        leads: [],
+        notas: (e.notas || []).map(n => ({ date: n.date, who: n.who, txt: n.txt })),
+        totalHonorarios: 0,
+        totalPagado: 0,
+        tags: new Set()
+      };
+    }
+
+    if (!map[key].cedula && e.cliente.cedula) map[key].cedula = e.cliente.cedula;
+    if (!map[key].tel && e.cliente.tel) map[key].tel = e.cliente.tel;
+    if (!map[key].email && e.cliente.email) map[key].email = e.cliente.email;
+    if (!map[key].dir && e.cliente.dir) map[key].dir = e.cliente.dir;
+
+    map[key].expedientes.push(e);
+    const divName = TPL[e.svc]?.div || 'Agrimensura';
+    map[key].tags.add(divName);
+    map[key].totalHonorarios += (parseFloat(e.honorario) || 0);
+    const pag = (e.pagos || []).filter(p => p.st === 'Pagado').reduce((a, b) => a + (parseFloat(b.m) || 0), 0);
+    map[key].totalPagado += pag;
+  });
+
+  // 2. Clientes desde Cotizaciones
+  quotes.forEach(q => {
+    const name = q.cli?.trim();
+    if (!name) return;
+    const key = name.toLowerCase();
+    if (!map[key]) {
+      const isCorp = name.toLowerCase().includes('srl') || name.toLowerCase().includes('s.a.') || name.toLowerCase().includes('corp');
+      map[key] = {
+        key: key,
+        id: 'cli-' + key.replace(/[^a-z0-9]/g, '-'),
+        nombre: name,
+        cedula: '',
+        tel: '',
+        email: '',
+        dir: '',
+        tipo: isCorp ? 'Empresa' : 'Persona Física',
+        expedientes: [],
+        cotizaciones: [],
+        proyectos: [],
+        propiedades: [],
+        leads: [],
+        notas: [],
+        totalHonorarios: 0,
+        totalPagado: 0,
+        tags: new Set(['Cotizaciones'])
+      };
+    }
+    map[key].cotizaciones.push(q);
+    map[key].tags.add('Cotizaciones');
+    if (!map[key].expedientes.length) {
+      map[key].totalHonorarios += (parseFloat(q.hon) || 0);
+    }
+  });
+
+  // 3. Clientes desde Leads / Bienes Raíces
+  if (Array.isArray(SERVER_LEADS)) {
+    SERVER_LEADS.forEach(l => {
+      const name = l.nombre?.trim();
+      if (!name) return;
+      const key = name.toLowerCase();
+      if (!map[key]) {
+        map[key] = {
+          key: key,
+          id: 'cli-' + key.replace(/[^a-z0-9]/g, '-'),
+          nombre: name,
+          cedula: '',
+          tel: l.telefono || '',
+          email: l.email || '',
+          dir: '',
+          tipo: l.tipo_cliente || (l.is_real_estate ? 'Inversionista' : 'Persona Física'),
+          expedientes: [],
+          cotizaciones: [],
+          proyectos: [],
+          propiedades: [],
+          leads: [],
+          notas: l.mensaje ? [{ date: (l.created_at || TODAY).slice(0, 10), who: 'Lead CRM', txt: l.mensaje }] : [],
+          totalHonorarios: 0,
+          totalPagado: 0,
+          tags: new Set()
+        };
+      }
+      if (!map[key].tel && l.telefono) map[key].tel = l.telefono;
+      if (!map[key].email && l.email) map[key].email = l.email;
+      if (l.is_real_estate) map[key].tags.add('Bienes Raíces');
+      if (l.tags) {
+        l.tags.split(',').forEach(tg => {
+          const tTrim = tg.trim();
+          if (tTrim) {
+            map[key].tags.add(tTrim);
+            if (tTrim.toLowerCase().includes('stellar') || tTrim.toLowerCase().includes('cosmo') || tTrim.toLowerCase().includes('galaxy') || tTrim.toLowerCase().includes('canar') || tTrim.toLowerCase().includes('proyecto')) {
+              map[key].proyectos.push(tTrim);
+            }
+          }
+        });
+      }
+      map[key].leads.push(l);
+    });
+  }
+
+  // 4. Clientes guardados personalizados en localStorage
+  try {
+    const savedCustomCli = JSON.parse(localStorage.getItem('gsd_custom_clients_v1') || '{}');
+    Object.values(savedCustomCli).forEach(c => {
+      const key = c.nombre?.toLowerCase().trim();
+      if (!key) return;
+      if (!map[key]) {
+        map[key] = {
+          key: key,
+          id: c.id || ('cli-' + key.replace(/[^a-z0-9]/g, '-')),
+          nombre: c.nombre,
+          cedula: c.cedula || '',
+          tel: c.tel || '',
+          email: c.email || '',
+          dir: c.dir || '',
+          tipo: c.tipo || 'Persona Física',
+          expedientes: [],
+          cotizaciones: [],
+          proyectos: c.proyectos || [],
+          propiedades: c.propiedades || [],
+          leads: [],
+          notas: c.notas || [],
+          totalHonorarios: c.totalHonorarios || 0,
+          totalPagado: c.totalPagado || 0,
+          tags: new Set(c.tags || ['Bienes Raíces'])
+        };
+      } else {
+        if (c.cedula) map[key].cedula = c.cedula;
+        if (c.tel) map[key].tel = c.tel;
+        if (c.email) map[key].email = c.email;
+        if (c.dir) map[key].dir = c.dir;
+        if (c.tipo) map[key].tipo = c.tipo;
+        if (c.proyectos && c.proyectos.length) map[key].proyectos = [...new Set([...map[key].proyectos, ...c.proyectos])];
+        if (c.tags) c.tags.forEach(t => map[key].tags.add(t));
+        if (c.notas && c.notas.length) {
+          map[key].notas = [...map[key].notas, ...c.notas];
+        }
+      }
+    });
+  } catch(e) {}
+
+  CLIENTS_MAP = map;
+  return Object.values(map);
+}
+
+function renderCli() {
+  const clients = buildClientsDatabase();
+  const searchQ = ($('cliSearchInput')?.value || '').toLowerCase().trim();
+
+  // Actualizar KPIs de Clientes
+  const totalCli = clients.length;
+  const activosCli = clients.filter(c => c.expedientes.some(e => e.estado !== 'done')).length;
+  const reCli = clients.filter(c => c.tags.has('Bienes Raíces') || c.proyectos.length > 0 || c.tipo === 'Inversionista').length;
+  const totalFac = clients.reduce((acc, c) => acc + (c.totalHonorarios || 0), 0);
+
+  if ($('kpiCliTotal')) $('kpiCliTotal').textContent = totalCli;
+  if ($('kpiCliActivos')) $('kpiCliActivos').textContent = activosCli;
+  if ($('kpiCliRealEstate')) $('kpiCliRealEstate').textContent = reCli;
+  if ($('kpiCliFacturado')) $('kpiCliFacturado').textContent = `US$${fmt(totalFac)}`;
+
+  // Filtrado
+  const filtered = clients.filter(c => {
+    // Filtro de segmento
+    if (_cliFilter === 'active' && !c.expedientes.some(e => e.estado !== 'done')) return false;
+    if (_cliFilter === 're' && !(c.tags.has('Bienes Raíces') || c.proyectos.length > 0 || c.tipo === 'Inversionista')) return false;
+    if (_cliFilter === 'legal_tech' && !c.expedientes.length) return false;
+    if (_cliFilter === 'corp' && c.tipo !== 'Empresa') return false;
+
+    // Filtro de búsqueda
+    if (searchQ) {
+      const matchName = (c.nombre || '').toLowerCase().includes(searchQ);
+      const matchCed = (c.cedula || '').toLowerCase().includes(searchQ);
+      const matchTel = (c.tel || '').toLowerCase().includes(searchQ);
+      const matchEmail = (c.email || '').toLowerCase().includes(searchQ);
+      const matchExp = c.expedientes.some(e => (e.id || '').toLowerCase().includes(searchQ) || (e.svc || '').toLowerCase().includes(searchQ));
+      const matchProj = c.proyectos.some(p => p.toLowerCase().includes(searchQ));
+      if (!matchName && !matchCed && !matchTel && !matchEmail && !matchExp && !matchProj) return false;
+    }
+    return true;
+  });
+
+  const tbody = $('cliRows');
+  if (!tbody) return;
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="7" style="text-align:center;padding:36px;color:var(--gray);">
+          <i data-lucide="users" style="width:32px;height:32px;margin:0 auto 8px;display:block;opacity:0.4;"></i>
+          No se encontraron clientes que coincidan con la búsqueda.
+        </td>
+      </tr>
+    `;
+    icons();
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(c => {
+    const isCorp = c.tipo === 'Empresa';
+    const isVip = c.tipo === 'Inversionista';
+    const hasRE = c.tags.has('Bienes Raíces') || c.proyectos.length > 0;
+    const avatarClass = isVip ? 'vip' : isCorp ? 'corp' : hasRE ? 're' : '';
+    const initialText = ini(c.nombre);
+
+    // Badges
+    const badgeTags = [];
+    if (isCorp) badgeTags.push('<span class="cli-badge corp">Empresa</span>');
+    if (isVip) badgeTags.push('<span class="cli-badge vip">Inversionista</span>');
+    if (c.expedientes.some(e => e.svc === 'deslinde' || e.svc === 'subdivision' || e.svc === 'condominio')) badgeTags.push('<span class="cli-badge agri">Agrimensura</span>');
+    if (c.expedientes.some(e => e.svc === 'transferencia' || e.svc === 'iguala' || e.svc === 'sucesiones')) badgeTags.push('<span class="cli-badge legal">Legal</span>');
+    if (hasRE) badgeTags.push('<span class="cli-badge re">Bienes Raíces</span>');
+
+    // Expedientes chips
+    const expChips = c.expedientes.length > 0 ? c.expedientes.map(e => `
+      <span class="cli-row-exp-tag" onclick="event.stopPropagation();openExp('${e.id}')" title="${(TPL[e.svc]||{}).nombre||e.svc}">
+        <i data-lucide="folder" style="width:11px;height:11px;"></i>${e.id}
+      </span>
+    `).join(' ') : '<span style="color:#94a3b8;font-size:11.5px;">Sin expedientes</span>';
+
+    // Proyectos chips
+    const projChips = c.proyectos.length > 0 ? c.proyectos.map(p => `
+      <span class="cli-project-chip">
+        <i data-lucide="building-2" style="width:11px;height:11px;"></i>${p}
+      </span>
+    `).join(' ') : (hasRE ? '<span class="cli-badge re">Interés Inmobiliario</span>' : '<span style="color:#94a3b8;font-size:11.5px;">—</span>');
+
+    // Tel & WhatsApp link
+    const cleanPhone = (c.tel || '').replace(/[^\d+]/g, '');
+    const waLink = cleanPhone ? `https://wa.me/${cleanPhone.startsWith('1')||cleanPhone.startsWith('+')?cleanPhone.replace('+',''):'1'+cleanPhone}` : '';
+
+    return `
+      <tr class="row" onclick="openClient360('${c.key}')" style="cursor:pointer;">
+        <td style="padding-left:16px;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div class="cli-avatar ${avatarClass}">${initialText}</div>
+            <div>
+              <b style="font-size:13px;color:var(--navy);display:block;">${c.nombre}</b>
+              <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:3px;">
+                ${badgeTags.join('')}
+              </div>
+            </div>
+          </div>
+        </td>
+        <td>
+          <span style="font-family:monospace;font-size:12px;color:#334155;font-weight:600;">${c.cedula || '—'}</span>
+        </td>
+        <td>
+          <div>
+            ${c.email ? `<a href="mailto:${c.email}" onclick="event.stopPropagation()" style="color:var(--blue);text-decoration:none;font-size:12px;display:block;"><i data-lucide="mail" style="width:11px;height:11px;margin-right:3px;"></i>${c.email}</a>` : ''}
+            ${c.tel ? `
+              <div style="display:flex;align-items:center;gap:6px;margin-top:2px;">
+                <span style="font-size:11.5px;color:var(--gray);">${c.tel}</span>
+                ${waLink ? `<a href="${waLink}" target="_blank" onclick="event.stopPropagation()" title="Contactar por WhatsApp" style="color:#16A34A;display:inline-flex;align-items:center;"><i data-lucide="message-circle" style="width:13px;height:13px;"></i></a>` : ''}
+              </div>
+            ` : (!c.email ? '<span style="color:#94a3b8;font-size:11.5px;">—</span>' : '')}
+          </div>
+        </td>
+        <td>
+          <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center;">
+            ${expChips}
+          </div>
+        </td>
+        <td>
+          <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center;">
+            ${projChips}
+          </div>
+        </td>
+        <td>
+          <div>
+            <b style="font-size:12.5px;color:var(--navy);">${c.totalHonorarios ? `US$${fmt(c.totalHonorarios)}` : '—'}</b>
+            ${c.totalPagado ? `<small style="color:var(--green);display:block;font-size:10.5px;">Cobrado: US$${fmt(c.totalPagado)}</small>` : ''}
+          </div>
+        </td>
+        <td style="text-align:right;padding-right:16px;">
+          <div style="display:flex;gap:6px;justify-content:flex-end;align-items:center;">
+            <button type="button" class="btn sm" onclick="event.stopPropagation();openClient360('${c.key}')" title="Ver Perfil 360°">
+              <i data-lucide="eye"></i><span>Perfil 360°</span>
+            </button>
+            <button type="button" class="btn sm p" onclick="event.stopPropagation();startExpForClient('${c.nombre}')" title="Crear expediente para este cliente">
+              <i data-lucide="plus"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+
+  icons();
+}
+
+function setCliFilter(filt) {
+  _cliFilter = filt;
+  const wrap = $('cliTypeFilters');
+  if (wrap) {
+    [...wrap.children].forEach(b => b.classList.toggle('on', b.dataset.filt === filt));
+  }
+  renderCli();
+}
+
+function filterClientsTable() {
+  renderCli();
+}
+
+/* ===== MODAL: PERFIL 360° DEL CLIENTE ===== */
+function openClient360(clientKey) {
+  buildClientsDatabase();
+  const c = CLIENTS_MAP[clientKey.toLowerCase()];
+  if (!c) {
+    toast('Cliente no encontrado');
+    return;
+  }
+  _cur360Client = c;
+
+  const header = $('cli360Header');
+  if (header) {
+    const isCorp = c.tipo === 'Empresa';
+    const isVip = c.tipo === 'Inversionista';
+    const hasRE = c.tags.has('Bienes Raíces') || c.proyectos.length > 0;
+    const cleanPhone = (c.tel || '').replace(/[^\d+]/g, '');
+    const waLink = cleanPhone ? `https://wa.me/${cleanPhone.startsWith('1')||cleanPhone.startsWith('+')?cleanPhone.replace('+',''):'1'+cleanPhone}` : '';
+
+    const badgeTags = [];
+    if (isCorp) badgeTags.push('<span style="background:rgba(255,255,255,0.2);color:#fff;padding:2px 8px;border-radius:10px;font-size:10.5px;font-weight:600;">Empresa</span>');
+    if (isVip) badgeTags.push('<span style="background:#FDE047;color:#854D0E;padding:2px 8px;border-radius:10px;font-size:10.5px;font-weight:700;">Inversionista VIP</span>');
+    if (hasRE) badgeTags.push('<span style="background:#4A9B6F;color:#fff;padding:2px 8px;border-radius:10px;font-size:10.5px;font-weight:600;">Bienes Raíces</span>');
+
+    header.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:16px;">
+          <div style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.3);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;flex-shrink:0;">
+            ${ini(c.nombre)}
+          </div>
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+              <h2 style="margin:0;font-size:19px;color:#fff;font-weight:800;">${c.nombre}</h2>
+              ${badgeTags.join('')}
+            </div>
+            <div style="font-size:12px;color:#CFE3D8;margin-top:3px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+              <span><i data-lucide="credit-card" style="width:12px;height:12px;margin-right:3px;"></i>${c.cedula ? `Cédula / RNC: ${c.cedula}` : 'Sin Cédula/RNC'}</span>
+              ${c.dir ? `<span><i data-lucide="map-pin" style="width:12px;height:12px;margin-right:3px;"></i>${c.dir}</span>` : ''}
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          ${waLink ? `
+            <a href="${waLink}" target="_blank" class="btn sm" style="background:#22C55E;border-color:#22C55E;color:#fff;font-weight:600;">
+              <i data-lucide="message-circle"></i>WhatsApp
+            </a>
+          ` : ''}
+          ${c.tel ? `
+            <a href="tel:${c.tel}" class="btn sm" style="background:rgba(255,255,255,0.15);border-color:rgba(255,255,255,0.3);color:#fff;">
+              <i data-lucide="phone"></i>Llamar
+            </a>
+          ` : ''}
+          ${c.email ? `
+            <a href="mailto:${c.email}" class="btn sm" style="background:rgba(255,255,255,0.15);border-color:rgba(255,255,255,0.3);color:#fff;">
+              <i data-lucide="mail"></i>Email
+            </a>
+          ` : ''}
+          <button type="button" class="btn sm ghost" onclick="closeM('mClient360')" style="color:rgba(255,255,255,0.8);padding:4px 8px;">
+            <i data-lucide="x"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Métricas rápidas del cliente -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px;background:rgba(0,0,0,0.2);padding:10px 14px;border-radius:8px;font-size:12px;">
+        <div>
+          <span style="color:#94a3b8;font-size:10.5px;display:block;">Expedientes Registrados</span>
+          <b style="font-size:15px;color:#fff;">${c.expedientes.length}</b>
+        </div>
+        <div>
+          <span style="color:#94a3b8;font-size:10.5px;display:block;">Bienes Raíces / Proyectos</span>
+          <b style="font-size:15px;color:#93C5FD;">${c.proyectos.length ? c.proyectos.length : (hasRE ? '1 Activo' : '0')}</b>
+        </div>
+        <div>
+          <span style="color:#94a3b8;font-size:10.5px;display:block;">Total Facturado</span>
+          <b style="font-size:15px;color:#86EFAC;">US$${fmt(c.totalHonorarios)}</b>
+        </div>
+        <div>
+          <span style="color:#94a3b8;font-size:10.5px;display:block;">Saldo Pendiente</span>
+          <b style="font-size:15px;color:#FCA5A5;">US$${fmt(Math.max(0, c.totalHonorarios - c.totalPagado))}</b>
+        </div>
+      </div>
+    `;
+  }
+
+  switchCli360Tab('expedientes');
+  openM('mClient360');
+  icons();
+}
+
+function switchCli360Tab(tabName) {
+  _cur360Tab = tabName;
+  const c = _cur360Client;
+  if (!c) return;
+
+  const tabBtns = document.querySelectorAll('#cli360Tabs button');
+  tabBtns.forEach(b => b.classList.toggle('on', b.dataset.tab === tabName));
+
+  const body = $('cli360Body');
+  if (!body) return;
+
+  if (tabName === 'expedientes') {
+    if (c.expedientes.length === 0) {
+      body.innerHTML = `
+        <div class="card" style="text-align:center;padding:36px;">
+          <i data-lucide="folder-plus" style="width:36px;height:36px;color:var(--gray);margin:0 auto 8px;display:block;opacity:0.5;"></i>
+          <h3 style="margin:0 0 6px 0;color:var(--navy);">Sin expedientes activos</h3>
+          <p class="sub" style="margin-bottom:14px;">Este cliente aún no tiene expedientes técnicos o legales registrados.</p>
+          <button type="button" class="btn p" onclick="cli360NewExp()"><i data-lucide="plus"></i>Iniciar Primer Expediente</button>
+        </div>
+      `;
+    } else {
+      body.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <h3 style="margin:0;font-size:14px;color:var(--navy);">Expedientes y Casos en Curso (${c.expedientes.length})</h3>
+          <button type="button" class="btn sm p" onclick="cli360NewExp()"><i data-lucide="plus"></i>Nuevo Expediente</button>
+        </div>
+        <div style="display:grid;gap:10px;">
+          ${c.expedientes.map(e => {
+            const p = progress(e);
+            const es = ESTADO[e.estado] || ['En Proceso', 'proc'];
+            const tpl = TPL[e.svc] || TPL.deslinde;
+            return `
+              <div class="card" style="padding:14px 16px;margin:0;border-left:4px solid ${DIV_COLOR[tpl.div]||'var(--navy)'};">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;">
+                  <div>
+                    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                      <b style="font-size:13px;color:var(--navy);">${e.id}</b>
+                      ${divBadge(e.svc)}
+                      <span class="tag ${es[1]}">${es[0]}</span>
+                    </div>
+                    <h4 style="margin:4px 0 2px 0;font-size:14px;color:#1e293b;">${tpl.nombre}</h4>
+                    <div style="font-size:11.5px;color:var(--gray);">
+                      <span>Inicio: ${fd(e.inicio)} · Fin estimado: ${fd(e.fin)} · Resp: ${e.resp}</span>
+                    </div>
+                  </div>
+                  <div style="text-align:right;">
+                    <b style="font-size:13.5px;color:var(--navy);">${e.mon || 'US$'}${fmt(e.honorario || 0)}</b>
+                    <div style="margin-top:6px;">
+                      <button type="button" class="btn sm" onclick="closeM('mClient360');openExp('${e.id}')">
+                        <i data-lucide="arrow-up-right"></i>Abrir Expediente
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div style="margin-top:10px;display:flex;align-items:center;gap:10px;">
+                  <span style="font-size:11px;color:var(--gray);">Progreso:</span>
+                  <div class="bar" style="flex:1;height:6px;"><i style="width:${p.pct}%;"></i></div>
+                  <span style="font-size:11px;font-weight:700;color:var(--navy);">${p.pct}% (${p.done}/${p.total} tareas)</span>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+    }
+  } else if (tabName === 'bienes_raices') {
+    body.innerHTML = `
+      <div class="card" style="margin-bottom:14px;">
+        <div class="ch">
+          <h3>Interés Inmobiliario & Proyectos</h3>
+          <span class="tag ${c.tags.has('Bienes Raíces') ? 'proc' : 'wait'}">${c.tags.has('Bienes Raíces') ? 'CLIENTE ACTIVO BIENES RAÍCES' : 'PROSPECTO INMOBILIARIO'}</span>
+        </div>
+        <p class="sub" style="margin-bottom:14px;">Gestiona los proyectos que le interesan o las propiedades que posee/busca este cliente.</p>
+        
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+          <div style="background:#f8fafc;border:1px solid var(--line);border-radius:8px;padding:12px 14px;">
+            <b style="font-size:12px;color:var(--navy);display:block;margin-bottom:8px;"><i data-lucide="building-2" style="width:13px;height:13px;margin-right:4px;"></i>Proyectos de Interés / Asignados</b>
+            ${c.proyectos.length ? `
+              <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                ${c.proyectos.map(p => `<span class="cli-project-chip" style="font-size:12px;padding:4px 9px;">${p}</span>`).join('')}
+              </div>
+            ` : '<span style="color:var(--gray);font-size:12px;">Sin proyectos asignados formalmente.</span>'}
+            
+            <div style="margin-top:12px;display:flex;gap:6px;">
+              <input type="text" id="addProjInput" placeholder="Ej. Stellar Punta Cana, Cosmo..." style="font-size:11.5px;padding:5px 8px;height:30px;">
+              <button type="button" class="btn sm p" onclick="addClientProject()"><i data-lucide="plus"></i>Agregar</button>
+            </div>
+          </div>
+
+          <div style="background:#f8fafc;border:1px solid var(--line);border-radius:8px;padding:12px 14px;">
+            <b style="font-size:12px;color:var(--navy);display:block;margin-bottom:8px;"><i data-lucide="compass" style="width:13px;height:13px;margin-right:4px;"></i>Perfil de Inversión</b>
+            <div class="kv" style="grid-template-columns:120px 1fr;font-size:11.5px;">
+              <span class="k">Rol Inmobiliario</span><span class="v">${c.tipo === 'Inversionista' ? 'Inversionista Principal' : isCorp ? 'Desarrollador / Empresa' : 'Comprador / Propietario'}</span>
+              <span class="k">Zona Preferida</span><span class="v">${c.dir || 'Punta Cana / Bávaro / Cap Cana'}</span>
+              <span class="k">Estado</span><span class="v"><span class="tag proc">En Cartera Activa</span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  } else if (tabName === 'cotizaciones') {
+    body.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <h3 style="margin:0;font-size:14px;color:var(--navy);">Cotizaciones Emitidas en GSD Quoter (${c.cotizaciones.length})</h3>
+        <button type="button" class="btn sm p" onclick="window.location.href='/admin/cotizaciones'"><i data-lucide="plus"></i>Nueva Cotización</button>
+      </div>
+      ${c.cotizaciones.length ? `
+        <div style="display:grid;gap:10px;">
+          ${c.cotizaciones.map(q => `
+            <div class="card" style="padding:12px 16px;margin:0;">
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div>
+                  <b style="font-size:13px;color:var(--navy);">${q.ref}</b>
+                  <div style="font-size:12px;color:#334155;margin-top:2px;">${TPL[q.svc]?.nombre || q.svc || 'Servicio Profesional'}</div>
+                  ${q.obj ? `<small style="color:var(--gray);">${q.obj}</small>` : ''}
+                </div>
+                <div style="text-align:right;">
+                  <b style="font-size:14px;color:var(--green);">${q.mon || 'USD'}${fmt(q.hon || 0)}</b>
+                  <div style="margin-top:4px;">
+                    <span class="tag proc">Aprobada / Registrada</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      ` : `
+        <div class="card" style="text-align:center;padding:32px;">
+          <p class="sub">No hay cotizaciones previas emitidas para este cliente.</p>
+          <button type="button" class="btn" onclick="window.location.href='/admin/cotizaciones'"><i data-lucide="calculator"></i>Crear Cotización en Quoter</button>
+        </div>
+      `}
+    `;
+  } else if (tabName === 'documentos') {
+    const allDocs = c.expedientes.flatMap(e => (e.docs || []).map(d => ({ ...d, expId: e.id })));
+    body.innerHTML = `
+      <div class="card">
+        <div class="ch">
+          <h3>Documentos Consolidados del Cliente</h3>
+          <span style="font-size:12px;color:var(--gray);">${allDocs.filter(d => d.st === 'ok').length} de ${allDocs.length} listos</span>
+        </div>
+        ${allDocs.length ? `
+          <div style="display:grid;gap:6px;">
+            ${allDocs.map(d => `
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border:1px solid var(--line);border-radius:6px;background:#fff;">
+                <div style="display:flex;align-items:center;gap:10px;">
+                  <i data-lucide="${d.st==='ok'?'file-check':'file'}" style="color:${d.st==='ok'?'var(--green)':'var(--red)'};width:16px;height:16px;"></i>
+                  <div>
+                    <b style="font-size:12px;color:var(--navy);">${d.name}</b>
+                    <small style="color:var(--gray);display:block;">Expediente: ${d.expId} · Categoría: ${d.cat}</small>
+                  </div>
+                </div>
+                <div>
+                  <span class="tag ${d.st==='ok'?'proc':'wait'}">${d.st==='ok'?'Listo':'Pendiente'}</span>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        ` : `
+          <p class="sub" style="text-align:center;padding:20px;">Sin documentos específicos adjuntos en los expedientes.</p>
+        `}
+      </div>
+    `;
+  } else if (tabName === 'bitacora') {
+    body.innerHTML = `
+      <div class="card" style="margin-bottom:12px;">
+        <h3 style="margin-bottom:8px;">Agregar Nota de Seguimiento / Acuerdo</h3>
+        <div style="display:flex;gap:8px;">
+          <textarea id="cliQuickNoteTxt" placeholder="Escribe un resumen de llamada, reunión o interés del cliente..." style="min-height:55px;"></textarea>
+        </div>
+        <div style="display:flex;justify-content:flex-end;margin-top:6px;">
+          <button type="button" class="btn sm p" onclick="quickClientNote()"><i data-lucide="plus"></i>Guardar Nota</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 style="margin-bottom:12px;">Historial de Notas & Actividad</h3>
+        ${(c.notas && c.notas.length) ? `
+          <div style="display:grid;gap:8px;">
+            ${c.notas.map(n => `
+              <div style="padding:10px 12px;border:1px solid var(--line);border-radius:6px;background:#fff;">
+                <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--gray);margin-bottom:4px;">
+                  <span><i data-lucide="user" style="width:11px;height:11px;margin-right:3px;"></i>${n.who || 'Esteban Mejía'}</span>
+                  <span>${fd(n.date)}</span>
+                </div>
+                <p style="margin:0;font-size:12.5px;color:#334155;line-height:1.4;">${n.txt}</p>
+              </div>
+            `).join('')}
+          </div>
+        ` : `
+          <p class="sub" style="text-align:center;padding:16px;">Sin notas registradas aún para este cliente.</p>
+        `}
+      </div>
+    `;
+  }
+
+  icons();
+}
+
+function quickClientNote() {
+  if (!_cur360Client) return;
+  const txt = $('cliQuickNoteTxt')?.value.trim();
+  if (!txt) {
+    toast('Escribe una nota primero');
+    return;
+  }
+  const note = { date: TODAY, who: 'Esteban Mejía', txt };
+  if (!_cur360Client.notas) _cur360Client.notas = [];
+  _cur360Client.notas.unshift(note);
+
+  // Guardar en localStorage
+  try {
+    const saved = JSON.parse(localStorage.getItem('gsd_custom_clients_v1') || '{}');
+    saved[_cur360Client.key] = _cur360Client;
+    localStorage.setItem('gsd_custom_clients_v1', JSON.stringify(saved));
+  } catch(e) {}
+
+  switchCli360Tab('bitacora');
+  toast('Nota guardada');
+}
+
+function addClientProject() {
+  if (!_cur360Client) return;
+  const inp = $('addProjInput');
+  const val = inp?.value.trim();
+  if (!val) return;
+  if (!_cur360Client.proyectos) _cur360Client.proyectos = [];
+  _cur360Client.proyectos.push(val);
+  _cur360Client.tags.add('Bienes Raíces');
+
+  try {
+    const saved = JSON.parse(localStorage.getItem('gsd_custom_clients_v1') || '{}');
+    saved[_cur360Client.key] = _cur360Client;
+    localStorage.setItem('gsd_custom_clients_v1', JSON.stringify(saved));
+  } catch(e) {}
+
+  switchCli360Tab('bienes_raices');
+  toast('Proyecto agregado al cliente');
+}
+
+function cli360NewExp() {
+  if (!_cur360Client) return;
+  closeM('mClient360');
+  startExpForClient(_cur360Client.nombre);
+}
+
+function startExpForClient(clientName) {
+  openNewExpModal();
+  const rM = document.querySelector('input[name=orig][value="m"]');
+  if (rM) { 
+    rM.checked = true; 
+    rM.dispatchEvent(new Event('change')); 
+  }
+  if ($('nCli')) {
+    $('nCli').value = clientName;
+  }
+  if ($('nObj')) $('nObj').focus();
+}
+
+function editCurCliFrom360() {
+  if (!_cur360Client) return;
+  closeM('mClient360');
+  openNewClientDirectModal(_cur360Client.key);
+}
+
+function openNewClientDirectModal(clientKey) {
+  const c = clientKey ? CLIENTS_MAP[clientKey.toLowerCase()] : null;
+  $('mNewClientTitle').textContent = c ? 'Editar Cliente' : 'Nuevo Cliente';
+  $('cliFormKey').value = c ? c.key : '';
+  $('cliFormNombre').value = c ? c.nombre : '';
+  $('cliFormTipo').value = c ? c.tipo : 'Persona Física';
+  $('cliFormCedula').value = c ? c.cedula : '';
+  $('cliFormTel').value = c ? c.tel : '';
+  $('cliFormEmail').value = c ? c.email : '';
+  $('cliFormDir').value = c ? c.dir : '';
+  $('cliFormProyectos').value = c && c.proyectos ? c.proyectos.join(', ') : '';
+  $('cliFormNotas').value = c && c.notas && c.notas.length ? c.notas[0].txt : '';
+  
+  openM('mNewClientDirect');
+}
+
+function saveNewClientDirect() {
+  const nombre = $('cliFormNombre')?.value.trim();
+  if (!nombre) {
+    toast('El nombre es obligatorio');
+    return;
+  }
+  const key = nombre.toLowerCase();
+  const tipo = $('cliFormTipo')?.value || 'Persona Física';
+  const cedula = $('cliFormCedula')?.value.trim() || '';
+  const tel = $('cliFormTel')?.value.trim() || '';
+  const email = $('cliFormEmail')?.value.trim() || '';
+  const dir = $('cliFormDir')?.value.trim() || '';
+  const proyectosStr = $('cliFormProyectos')?.value.trim() || '';
+  const proyectos = proyectosStr ? proyectosStr.split(',').map(p => p.trim()).filter(Boolean) : [];
+  const notasStr = $('cliFormNotas')?.value.trim() || '';
+
+  const tags = new Set();
+  if ($('cliFormIntAgri')?.checked) tags.add('Agrimensura');
+  if ($('cliFormIntLegal')?.checked) tags.add('Legal');
+  if ($('cliFormIntRE')?.checked || proyectos.length > 0) tags.add('Bienes Raíces');
+
+  const clientData = {
+    key,
+    id: 'cli-' + key.replace(/[^a-z0-9]/g, '-'),
+    nombre,
+    tipo,
+    cedula,
+    tel,
+    email,
+    dir,
+    proyectos,
+    propiedades: [],
+    tags: Array.from(tags),
+    notas: notasStr ? [{ date: TODAY, who: 'Esteban Mejía', txt: notasStr }] : [],
+    totalHonorarios: 0,
+    totalPagado: 0
+  };
+
+  // Guardar en localStorage
+  try {
+    const saved = JSON.parse(localStorage.getItem('gsd_custom_clients_v1') || '{}');
+    saved[key] = clientData;
+    localStorage.setItem('gsd_custom_clients_v1', JSON.stringify(saved));
+  } catch(e) {}
+
+  // Sincronizar con backend si está disponible
+  fetch('/admin/clientes/api/guardar', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      nombre,
+      email,
+      telefono: tel,
+      cedula,
+      tipo_cliente: tipo,
+      notas: notasStr,
+      is_real_estate: tags.has('Bienes Raíces'),
+      tags: Array.from(tags),
+      proyectos_interes: proyectosStr
+    })
+  }).catch(e => console.log('Sync client notice:', e));
+
+  closeM('mNewClientDirect');
+  renderCli();
+  toast(`Cliente "${nombre}" guardado con éxito`);
+}
 function renderDocsAll(){const rows=DB.flatMap(e=>(e.docs||[]).filter(d=>d.st!=='ok').map(d=>({...d,e})));$('docsAll').innerHTML=rows.map(d=>`<div class="doc"><div class="ic miss"><i data-lucide="file"></i></div><div><b>${d.name}</b><small>${d.e.id} · ${d.e.cliente?.nombre||'Cliente'} · aporta: ${d.by==='cliente'?'cliente':'GSD'}</small></div><div class="acts"><span class="tag ${d.st==='wait'?'wait':'late'}">${d.st==='wait'?'Solicitado':'Pendiente'}</span><button class="btn sm" onclick="openExp('${d.e.id}','documentos')">Abrir</button></div></div>`).join('')||'<div class="empty" style="text-align:center;padding:28px;color:var(--gray);">No hay documentos pendientes. Todo al día.</div>';}
 let tplDivF = 'all';
 let _editTplData = null;
