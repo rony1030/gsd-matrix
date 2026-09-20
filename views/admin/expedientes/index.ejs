@@ -84,6 +84,13 @@ tr.row:hover td{background:var(--bg);cursor:pointer}
 .bar i{display:block;height:100%;background:var(--green)}
 .tag{display:inline-block;padding:2px 9px;border-radius:10px;font-size:10.5px;font-weight:500;white-space:nowrap}
 .tag.proc{background:var(--green-l);color:#2F6B4A}.tag.rev{background:var(--blue-l);color:var(--blue)}.tag.wait{background:var(--amber-l);color:var(--amber)}.tag.done{background:#EEF2F5;color:var(--navy)}.tag.late{background:var(--red-l);color:var(--red)}.tag.hi{background:var(--red-l);color:var(--red)}.tag.med{background:var(--amber-l);color:var(--amber)}.tag.lo{background:#EEF2F5;color:var(--gray)}
+.exp-status-select{height:28px;padding:0 8px;font-size:11px;font-weight:700;letter-spacing:0.4px;border-radius:6px;cursor:pointer;border:1px solid transparent;outline:none;transition:all .15s ease;width:auto;appearance:auto}
+.exp-status-select.proc{background:var(--green-l);color:#2F6B4A;border-color:#C6E2D5}
+.exp-status-select.rev{background:var(--blue-l);color:var(--blue);border-color:#BEE3F8}
+.exp-status-select.wait{background:var(--amber-l);color:var(--amber);border-color:#FEEBC8}
+.exp-status-select.done{background:#EEF2F5;color:var(--navy);border-color:#CBD5E1}
+.exp-status-select:hover{filter:brightness(0.96);box-shadow:0 1px 3px rgba(0,0,0,0.08)}
+.exp-status-select:focus{box-shadow:0 0 0 2px rgba(74,155,111,0.25)}
 .btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:#fff;color:var(--navy);padding:8px 14px;border-radius:6px;font-weight:500;font-size:12.5px}
 .btn:hover{background:var(--bg)}
 .btn.p{background:var(--green);border-color:var(--green);color:#fff}.btn.p:hover{background:#3E8A5F}
@@ -4325,8 +4332,9 @@ function renderExp(){
         <small style="color:var(--gray);font-size:11.5px">(${sub})</small>
       </div>
       <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-        <span class="tag ${es[1]}" style="font-size:11px;padding:3px 8px">${es[0]}</span>
-        <select onchange="setEstado(this.value)" style="width:auto;padding:3px 8px;font-size:11.5px;border-radius:6px;height:28px">${Object.entries(ESTADO).map(([k,v])=>`<option value="${k}" ${k===e.estado?'selected':''}>${v[0]}</option>`).join('')}</select>
+        <select class="exp-status-select ${es[1]}" onchange="setEstado(this.value)" title="Cambiar estado del expediente">
+          ${Object.entries(ESTADO).map(([k,v])=>`<option value="${k}" ${k===e.estado?'selected':''}>● ${v[0]}</option>`).join('')}
+        </select>
         <div style="height:18px;width:1px;background:var(--line);margin:0 2px"></div>
         <button class="btn sm" onclick="openClientModal()" style="height:28px;padding:0 9px;font-size:11.5px"><i data-lucide="user-check" style="width:13px;height:13px"></i>Perfil</button>
         <button class="btn sm" onclick="clientView()" style="height:28px;padding:0 9px;font-size:11.5px"><i data-lucide="eye" style="width:13px;height:13px"></i>Portal</button>
