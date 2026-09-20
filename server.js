@@ -895,7 +895,7 @@ cotiRouter.post('/generar-pdf', async (req, res) => {
   try {
     const pdfBuffer = await generateQuotationPDF(req.body);
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `inline; filename="Cotizacion_${req.body.referencia || 'GSD'}.pdf"`);
+    res.setHeader('Content-Disposition', `attachment; filename="Cotizacion_${req.body.referencia || 'GSD'}.pdf"`);
     res.send(pdfBuffer);
   } catch (err) {
     res.status(500).send('Error generando PDF: ' + err.message);
