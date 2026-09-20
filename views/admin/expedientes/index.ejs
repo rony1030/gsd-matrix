@@ -644,82 +644,336 @@ tr.row:hover td{background:var(--bg);cursor:pointer}
 /* Table Responsive */
 .table-responsive{width:100%;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:#CBD5E1 transparent}
 
-/* ===== EXECUTIVE TIMELINE STEPPER ===== */
-.exp-stepper{
-  background:#F8FAFC;
-  border-top:1px solid var(--line);
-  padding:12px 14px;
-  margin-top:10px;
-  border-radius:0 0 10px 10px;
-  overflow-x:auto;
-  -webkit-overflow-scrolling:touch;
+/* ===== EXECUTIVE TIMELINE & PIPELINE STEPPER ===== */
+.exp-stepper-container {
+  background: #F8FAFC;
+  border-top: 1px solid var(--line);
+  padding: 12px 14px;
+  margin-top: 10px;
+  border-radius: 0 0 10px 10px;
+  box-sizing: border-box;
 }
-.exp-stepper::-webkit-scrollbar{height:4px}
-.exp-stepper::-webkit-scrollbar-thumb{background:#CBD5E1;border-radius:4px}
-.stepper-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:8px;flex-wrap:wrap;}
-.stepper-header h3{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--navy);margin:0;display:flex;align-items:center;gap:6px}
-.stepper-track{
-  display:flex;
-  align-items:flex-start;
-  justify-content:space-between;
-  position:relative;
-  min-width:640px;
-  padding:0 12px;
-  gap:8px;
+.stepper-hero-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
 }
-.stepper-line{position:absolute;top:12px;left:32px;right:32px;height:2px;background:#CBD5E1;z-index:1}
-.stepper-line-fill{position:absolute;top:0;left:0;height:100%;background:var(--green);transition:width 0.4s ease}
-.step-node{
-  position:relative;
-  z-index:2;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  text-align:center;
-  cursor:pointer;
-  flex:1 1 0;
-  min-width:110px;
-  max-width:145px;
-  padding:0 4px;
-  background:none;
-  border:none;
-  font-family:inherit;
-  transition:transform 0.15s ease;
-  box-sizing:border-box;
+.stepper-icon-badge {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  background: var(--green-l);
+  color: var(--green);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
-.step-node:hover{transform:translateY(-1px)}
-.step-circle{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;transition:all 0.2s ease;margin-bottom:6px;background:#fff;border:1.5px solid #CBD5E1;color:#64748B;box-shadow:0 0 0 2px #F8FAFC}
-.step-node.done .step-circle{background:var(--green);border-color:var(--green);color:#fff;box-shadow:0 0 0 2px #F8FAFC,0 1px 3px rgba(74,155,111,0.25)}
-.step-node.cur .step-circle{background:#fff;border:2px solid var(--amber);color:var(--amber);box-shadow:0 0 0 2px #F8FAFC,0 0 6px rgba(217,119,6,0.3)}
-.step-node.open .step-circle{border-color:var(--navy);box-shadow:0 0 0 3px rgba(30,57,98,0.15)}
-.step-label{
-  font-size:10px;
-  font-weight:600;
-  color:var(--navy);
-  line-height:1.25;
-  margin-bottom:4px;
-  white-space:normal;
-  word-wrap:break-word;
-  overflow-wrap:break-word;
-  text-align:center;
-  display:block;
-  width:100%;
+.stepper-title {
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--navy);
+  margin: 0;
+  line-height: 1.2;
 }
-.step-node.pend .step-label{color:#64748B;font-weight:500}
-.step-status{
-  font-size:8.5px;
-  font-weight:700;
-  text-transform:uppercase;
-  letter-spacing:0.4px;
-  white-space:nowrap;
-  display:inline-block;
-  padding:1px 5px;
-  border-radius:4px;
+.stepper-subtitle {
+  font-size: 11px;
+  color: var(--gray);
+  margin-top: 2px;
+  display: block;
 }
-.step-node.done .step-status{color:#2F6B4A;background:#E8F4EF}
-.step-node.cur .step-status{color:#B7791F;background:#FDF3E1}
-.step-node.pend .step-status{color:#94A3B8;background:#F1F5F9}
-.step-drawer{margin-top:10px;padding:12px 14px;background:#fff;border:1px solid var(--line);border-radius:8px;animation:pop 0.18s ease}
+.stepper-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+.stepper-pill-count {
+  font-size: 11px;
+  color: var(--gray);
+  background: #ffffff;
+  border: 1px solid var(--line);
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: 500;
+}
+.stepper-pill-pct {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--green);
+  background: var(--green-l);
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+.stepper-pipeline-bar {
+  display: flex;
+  gap: 4px;
+  height: 6px;
+  border-radius: 999px;
+  background: transparent;
+  margin: 10px 0 12px;
+}
+.pipeline-segment {
+  flex: 1;
+  height: 100%;
+  border-radius: 4px;
+  background: #E2E8F0;
+  cursor: pointer;
+  transition: all .2s ease;
+  position: relative;
+}
+.pipeline-segment.done {
+  background: var(--green);
+}
+.pipeline-segment.cur {
+  background: var(--amber);
+  box-shadow: 0 0 8px rgba(217, 119, 6, 0.4);
+}
+.pipeline-segment:hover {
+  transform: scaleY(1.5);
+}
+.pipeline-segment.active {
+  box-shadow: 0 0 0 2px var(--navy);
+}
+
+/* Desktop Grid of Stage Cards */
+.stepper-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 8px;
+}
+.stage-card {
+  background: #ffffff;
+  border: 1px solid #E2E8F0;
+  border-radius: 9px;
+  padding: 10px 11px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 6px;
+  min-height: 78px;
+  user-select: none;
+}
+.stage-card:hover {
+  border-color: #94A3B8;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+.stage-card.cur {
+  border-color: #F59E0B;
+  background: #FFFDF5;
+  box-shadow: 0 0 0 1px #F59E0B, 0 2px 6px rgba(245, 158, 11, 0.12);
+}
+.stage-card.done {
+  border-color: #C6E2D5;
+  background: #F4FAF7;
+}
+.stage-card.selected {
+  border-color: var(--navy)!important;
+  box-shadow: 0 0 0 2px rgba(26, 58, 82, 0.25)!important;
+}
+.stage-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 4px;
+}
+.stage-num-badge {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.stage-num-badge.done {
+  background: var(--green);
+  color: #fff;
+}
+.stage-num-badge.cur {
+  background: var(--amber);
+  color: #fff;
+}
+.stage-num-badge.pend {
+  background: #EEF2F5;
+  color: #64748B;
+  border: 1px solid #CBD5E1;
+}
+.stage-status-tag {
+  font-size: 8.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  padding: 1px 5px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+.stage-status-tag.done {
+  color: #1E6B47;
+  background: #E8F4EF;
+}
+.stage-status-tag.cur {
+  color: #B45309;
+  background: #FEF3C7;
+}
+.stage-status-tag.pend {
+  color: #64748B;
+  background: #F1F5F9;
+}
+.stage-card-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--navy);
+  line-height: 1.25;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+.stage-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 10px;
+  color: #64748B;
+  margin-top: auto;
+  padding-top: 2px;
+}
+.stage-pct-mini {
+  font-weight: 600;
+  color: var(--navy);
+}
+
+.stepper-desktop-drawer {
+  margin-top: 12px;
+  padding: 14px 16px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  animation: pop 0.18s ease;
+}
+
+.stepper-mobile-view {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .stepper-cards-grid {
+    display: none!important;
+  }
+  .stepper-desktop-drawer {
+    display: none!important;
+  }
+  .stepper-mobile-view {
+    display: block!important;
+  }
+  .mobile-timeline-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin-top: 4px;
+  }
+  .mobile-timeline-item {
+    display: flex;
+    gap: 10px;
+    align-items: stretch;
+    position: relative;
+  }
+  .mobile-timeline-track {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 24px;
+    flex-shrink: 0;
+  }
+  .mobile-timeline-node {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    z-index: 2;
+    flex-shrink: 0;
+  }
+  .mobile-timeline-node.done {
+    background: var(--green);
+    color: #fff;
+  }
+  .mobile-timeline-node.cur {
+    background: var(--amber);
+    color: #fff;
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.25);
+  }
+  .mobile-timeline-node.pend {
+    background: #EEF2F5;
+    color: #64748B;
+    border: 1px solid #CBD5E1;
+  }
+  .mobile-timeline-line {
+    width: 2px;
+    flex: 1;
+    background: #CBD5E1;
+    margin: 2px 0;
+    min-height: 16px;
+  }
+  .mobile-timeline-line.done {
+    background: var(--green);
+  }
+  .mobile-timeline-content {
+    flex: 1;
+    background: #ffffff;
+    border: 1px solid #E2E8F0;
+    border-radius: 8px;
+    padding: 9px 11px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    transition: all .15s;
+  }
+  .mobile-timeline-item.cur .mobile-timeline-content {
+    border-color: #F59E0B;
+    background: #FFFDF5;
+  }
+  .mobile-timeline-item.open .mobile-timeline-content {
+    border-color: var(--navy);
+  }
+  .mobile-stage-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--navy);
+  }
+  .mobile-timeline-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 6px;
+  }
+  .mobile-timeline-sub {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 3px;
+    font-size: 10.5px;
+    color: #64748B;
+  }
+  .mobile-inline-drawer {
+    margin: -4px 0 10px 34px;
+    padding: 10px 12px;
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: 8px;
+  }
+}
 
 /* Mobile Drawer Controls */
 .btn-sidebar-toggle{display:none;background:none;border:none;color:var(--navy);padding:6px;border-radius:6px;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
@@ -3907,34 +4161,113 @@ function renderStepper(e, T) {
   if (!fases.length) return '';
   const total = fases.length;
   const doneCount = fases.filter((_, i) => phaseState(e, i) === 'done').length;
-  const fillPct = total > 1 ? Math.min(100, Math.round((doneCount / (total - 1)) * 100)) : (doneCount ? 100 : 0);
+  const curIdx = currentPhase(e);
+  const curFaseName = fases[curIdx] ? fases[curIdx][0] : 'En curso';
+  const pctTotal = Math.round((doneCount / total) * 100);
 
   return `
-  <div class="exp-stepper">
-    <div class="stepper-header">
-      <h3><i data-lucide="git-commit" style="width:14px;height:14px;color:var(--navy)"></i> Línea de Tiempo del Proceso</h3>
-      <span style="font-size:11.5px;color:var(--gray)"><b>${doneCount}</b> de ${total} etapas completadas</span>
-    </div>
-    <div class="stepper-track">
-      <div class="stepper-line">
-        <div class="stepper-line-fill" style="width:${fillPct}%"></div>
+  <div class="exp-stepper-container">
+    <div class="stepper-hero-top">
+      <div style="display:flex;align-items:center;gap:8px;min-width:0;">
+        <div class="stepper-icon-badge">
+          <i data-lucide="git-merge" style="width:15px;height:15px;"></i>
+        </div>
+        <div style="min-width:0;">
+          <h3 class="stepper-title">Línea de Tiempo del Proceso</h3>
+          <span class="stepper-subtitle">Etapa actual: <strong>${curIdx+1}. ${curFaseName}</strong></span>
+        </div>
       </div>
+      <div class="stepper-meta">
+        <span class="stepper-pill-count"><b>${doneCount}</b> de ${total} etapas completadas</span>
+        <span class="stepper-pill-pct">${pctTotal}%</span>
+      </div>
+    </div>
+
+    <!-- Segmented Pipeline Progress Bar -->
+    <div class="stepper-pipeline-bar">
       ${fases.map((f, i) => {
         const s = phaseState(e, i);
         const isOpen = openPhase === i;
-        const stateClass = s === 'done' ? 'done' : s === 'cur' ? 'cur' : 'pend';
-        const stateText = s === 'done' ? 'Completado' : s === 'cur' ? 'En proceso' : 'Pendiente';
         return `
-        <button class="step-node ${stateClass} ${isOpen ? 'open' : ''}" onclick="togglePhaseDrawer(${i})" title="Etapa ${i+1}: ${f[0]}">
-          <div class="step-circle">
-            ${s === 'done' ? '<i data-lucide="check" style="width:14px;height:14px;stroke-width:3"></i>' : (i + 1)}
-          </div>
-          <span class="step-label">${f[0]}</span>
-          <span class="step-status">${stateText}</span>
-        </button>
+          <div class="pipeline-segment ${s} ${isOpen ? 'active' : ''}" onclick="togglePhaseDrawer(${i})" title="Etapa ${i+1}: ${f[0]} (${s==='done'?'Completada':s==='cur'?'En curso':'Pendiente'})"></div>
         `;
       }).join('')}
     </div>
+
+    <!-- Desktop Grid of Interactive Stage Cards -->
+    <div class="stepper-cards-grid">
+      ${fases.map((f, i) => {
+        const s = phaseState(e, i);
+        const isOpen = openPhase === i;
+        const ts = (e.tasks || []).filter(t => t.phase === i && t.st !== 'na');
+        const d = ts.filter(t => t.st === 'done').length;
+        const isCur = s === 'cur';
+        const isDone = s === 'done';
+        return `
+          <div class="stage-card ${s} ${isOpen ? 'selected' : ''}" onclick="togglePhaseDrawer(${i})" title="Haz clic para ver tareas de la Etapa ${i+1}">
+            <div class="stage-card-header">
+              <span class="stage-num-badge ${s}">
+                ${isDone ? '<i data-lucide="check" style="width:11px;height:11px;stroke-width:3"></i>' : (i + 1)}
+              </span>
+              <span class="stage-status-tag ${s}">
+                ${isDone ? 'Listo' : isCur ? 'En curso' : 'Pendiente'}
+              </span>
+            </div>
+            <div class="stage-card-title">${f[0]}</div>
+            <div class="stage-card-footer">
+              <span><i data-lucide="check-circle-2" style="width:11px;height:11px;vertical-align:-1px;margin-right:2px;"></i>${d}/${ts.length} tareas</span>
+              ${ts.length ? `<span class="stage-pct-mini">${Math.round(d/ts.length*100)}%</span>` : ''}
+            </div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+
+    <!-- Mobile View: Clean Vertical Pipeline Checklist -->
+    <div class="stepper-mobile-view">
+      <div class="mobile-timeline-list">
+        ${fases.map((f, i) => {
+          const s = phaseState(e, i);
+          const isOpen = openPhase === i;
+          const ts = (e.tasks || []).filter(t => t.phase === i && t.st !== 'na');
+          const d = ts.filter(t => t.st === 'done').length;
+          const isCur = s === 'cur';
+          const isDone = s === 'done';
+          return `
+            <div class="mobile-timeline-item ${s} ${isOpen ? 'open' : ''}">
+              <div class="mobile-timeline-track">
+                <div class="mobile-timeline-node ${s}">
+                  ${isDone ? '<i data-lucide="check" style="width:11px;height:11px;stroke-width:3"></i>' : (i + 1)}
+                </div>
+                ${i < total - 1 ? `<div class="mobile-timeline-line ${isDone ? 'done' : ''}"></div>` : ''}
+              </div>
+              <div class="mobile-timeline-content" onclick="togglePhaseDrawer(${i})">
+                <div class="mobile-timeline-header">
+                  <span class="mobile-stage-name">${i+1}. ${f[0]}</span>
+                  <span class="stage-status-tag ${s}">${isDone ? 'Completada' : isCur ? 'En proceso' : 'Pendiente'}</span>
+                </div>
+                <div class="mobile-timeline-sub">
+                  <span>${d} de ${ts.length} tareas (${ts.length ? Math.round(d/ts.length*100) : 0}%)</span>
+                  <span style="display:flex;align-items:center;gap:2px;color:var(--navy);font-weight:600;font-size:11px;">
+                    ${isOpen ? 'Ocultar' : 'Ver detalle'} <i data-lucide="${isOpen ? 'chevron-up' : 'chevron-down'}" style="width:12px;height:12px;"></i>
+                  </span>
+                </div>
+              </div>
+            </div>
+            ${isOpen ? `
+              <div class="mobile-inline-drawer">
+                <div style="font-size:11px;color:var(--gray);margin-bottom:8px;">
+                  <b>Etapa ${i+1}:</b> ${f[0]}
+                </div>
+                ${ts.map(t => taskRow(t)).join('') || '<p class="sub" style="font-size:11.5px;padding:4px 0;">Sin tareas en esta etapa.</p>'}
+              </div>
+            ` : ''}
+          `;
+        }).join('')}
+      </div>
+    </div>
+
+    <!-- Desktop Detail Drawer -->
     ${openPhase !== null && fases[openPhase] ? (() => {
       const fi = openPhase;
       const ts = (e.tasks || []).filter(t => t.phase === fi);
@@ -3943,23 +4276,23 @@ function renderStepper(e, T) {
       const who = [...new Set(ts.map(t => t.who))].filter(Boolean).join(', ');
       const dues = ts.filter(t => t.due).map(t => t.due).sort();
       return `
-      <div class="step-drawer">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <div class="stepper-desktop-drawer">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--line);">
           <div style="display:flex;align-items:center;gap:8px">
-            <span class="tag ${phaseState(e, fi) === 'done' ? 'proc' : phaseState(e, fi) === 'cur' ? 'wait' : 'done'}">Etapa ${fi+1}</span>
-            <b style="font-size:13px;color:var(--navy)">${fases[fi][0]}</b>
+            <span class="tag ${phaseState(e, fi) === 'done' ? 'proc' : phaseState(e, fi) === 'cur' ? 'wait' : 'done'}" style="font-weight:700;">Etapa ${fi+1}</span>
+            <b style="font-size:13.5px;color:var(--navy)">${fases[fi][0]}</b>
           </div>
           <div style="display:flex;align-items:center;gap:10px">
-            <span style="font-size:11.5px;color:var(--gray)">${pct}% (${d}/${ts.length} tareas)</span>
+            <span style="font-size:12px;font-weight:600;color:var(--navy);">${pct}% (${d}/${ts.length} tareas)</span>
             <button class="btn sm ghost" onclick="togglePhaseDrawer(null)" style="padding:2px 6px" title="Cerrar detalle"><i data-lucide="x"></i></button>
           </div>
         </div>
-        <div class="kv" style="grid-template-columns:120px 1fr;margin-bottom:8px;font-size:11.5px">
+        <div class="kv" style="grid-template-columns:120px 1fr;margin-bottom:10px;font-size:11.5px">
           <span class="k">Responsables:</span><span class="v">${who || '—'}</span>
-          <span class="k">Fechas:</span><span class="v">${dues.length ? fd(dues[0]) + ' → ' + fd(dues[dues.length-1]) : 'Sin fechas asignadas'}</span>
+          <span class="k">Plazo estimado:</span><span class="v">${dues.length ? fd(dues[0]) + ' → ' + fd(dues[dues.length-1]) : 'Sin fechas asignadas'}</span>
         </div>
-        <div style="max-height:160px;overflow-y:auto">
-          ${ts.map(t => taskRow(t)).join('') || '<p class="sub" style="font-size:11.5px;padding:4px 0">Sin tareas en esta etapa.</p>'}
+        <div style="max-height:220px;overflow-y:auto">
+          ${ts.map(t => taskRow(t)).join('') || '<p class="sub" style="font-size:11.5px;padding:6px 0">Sin tareas en esta etapa.</p>'}
         </div>
       </div>
       `;
