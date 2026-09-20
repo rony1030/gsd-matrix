@@ -119,12 +119,16 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label">Slug (URL amigable)</label>
-          <div style="display:flex;gap:0.5rem;align-items:center;">
-            <span style="color:var(--gris-500);font-size:0.875rem;">/blog/</span>
-            <input type="text" id="slug" name="slug" class="form-input" value="<%= isEdit ? post.slug : '' %>" placeholder="guia-inversion-punta-cana" required style="flex:1;">
+          <label class="form-label" style="display:flex;align-items:center;justify-content:space-between">
+            <span>Enlace Web del Artículo (Slug URL)</span>
+            <span style="font-size:0.75rem;color:var(--gray);font-weight:400">Auto-generado desde el título</span>
+          </label>
+          <div style="display:flex;align-items:center;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:9px 12px;gap:8px;box-shadow:inset 0 1px 2px rgba(0,0,0,0.02)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--gray);flex-shrink:0"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            <span style="color:var(--gray);font-size:0.85rem;font-weight:500;user-select:none">gsdsource.com/blog/</span>
+            <span id="slug-badge-display" style="font-weight:600;color:var(--navy);font-size:0.85rem;background:#E2E8F0;padding:2px 8px;border-radius:4px;letter-spacing:0.3px"><%= isEdit ? (post.slug || 'slug-auto') : 'slug-auto' %></span>
+            <input type="hidden" id="slug" name="slug" value="<%= isEdit ? (post.slug || '') : '' %>">
           </div>
-          <p style="font-size:0.72rem;color:var(--gris-500);margin-top:0.25rem;">Generado automáticamente. Puedes personalizarlo.</p>
         </div>
 
         <div class="form-group">
@@ -292,19 +296,16 @@ const keywordsInput = document.getElementById('keywords');
 const contentInput = document.getElementById('contenido');
 
 titleInput?.addEventListener('input', function() {
-  if (!slugInput.dataset.manual) {
-    slugInput.value = generateSlug(this.value);
-    document.getElementById('slug-preview').textContent = slugInput.value || 'articulo';
-  }
+  const generated = generateSlug(this.value);
+  if (slugInput) slugInput.value = generated;
+  const badge = document.getElementById('slug-badge-display');
+  if (badge) badge.textContent = generated || 'slug-auto';
+  const preview = document.getElementById('slug-preview');
+  if (preview) preview.textContent = generated || 'articulo';
+
   if (!metaTitleInput.dataset.manual) {
     metaTitleInput.value = this.value;
   }
-  analyzeSeo();
-});
-
-slugInput?.addEventListener('input', function() {
-  this.dataset.manual = '1';
-  document.getElementById('slug-preview').textContent = this.value || 'articulo';
   analyzeSeo();
 });
 

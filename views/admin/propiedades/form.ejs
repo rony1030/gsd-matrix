@@ -339,21 +339,11 @@
               <span>Enlace Web del Inmueble (Slug URL)</span>
               <span style="font-size:0.75rem;color:var(--gray);font-weight:400">Auto-generado desde el título</span>
             </label>
-            <div style="display:flex;align-items:center;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:8px 12px;gap:8px;box-shadow:inset 0 1px 2px rgba(0,0,0,0.02)">
+            <div style="display:flex;align-items:center;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:9px 12px;gap:8px;box-shadow:inset 0 1px 2px rgba(0,0,0,0.02)">
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--gray);flex-shrink:0"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-              <span style="color:var(--gray);font-size:0.82rem;font-weight:500;user-select:none">https://gsd.do/propiedades/</span>
+              <span style="color:var(--gray);font-size:0.85rem;font-weight:500;user-select:none">gsd-bienes-raices.com/propiedades/</span>
               <span id="slug-badge-preview" style="font-weight:600;color:var(--navy);font-size:0.85rem;background:#E2E8F0;padding:2px 8px;border-radius:4px;letter-spacing:0.3px"><%= isEdit ? (prop.slug || 'slug-auto') : 'slug-auto' %></span>
               <input type="hidden" id="slug" name="slug" value="<%= isEdit ? (prop.slug || '') : '' %>">
-              <button type="button" class="btn sm ghost" id="btnToggleCustomSlug" onclick="toggleCustomSlug()" style="margin-left:auto;font-size:11px;padding:3px 8px;gap:4px">
-                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-                Personalizar enlace
-              </button>
-            </div>
-            <div id="custom-slug-box" style="display:none;margin-top:6px;padding:8px 12px;background:#fff;border:1px solid var(--line);border-radius:6px;">
-              <div style="display:flex;align-items:center;gap:8px">
-                <input type="text" id="slug_custom_input" class="form-input" style="font-size:12px;padding:5px 8px" placeholder="slug-personalizado" value="<%= isEdit ? (prop.slug || '') : '' %>" oninput="handleCustomSlugInput(this.value)">
-                <button type="button" class="btn sm" onclick="resetToAutoSlug()" style="font-size:11px;white-space:nowrap">Restaurar auto</button>
-              </div>
             </div>
           </div>
 
@@ -745,8 +735,6 @@ const metaDescInput = document.getElementById('meta_description');
 const shortDescInput = document.getElementById('short_description');
 const keywordsInput = document.getElementById('keywords');
 
-let isCustomSlug = false;
-
 function generateSlug(text) {
   return text.toString().toLowerCase().trim()
     .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
@@ -755,49 +743,17 @@ function generateSlug(text) {
     .replace(/\-\-+/g, '-');
 }
 
-function toggleCustomSlug() {
-  if (customSlugBox.style.display === 'none' || !customSlugBox.style.display) {
-    customSlugBox.style.display = 'block';
-    customSlugInput.value = slugHiddenInput.value || '';
-    customSlugInput.focus();
-  } else {
-    customSlugBox.style.display = 'none';
-  }
-}
-
-function handleCustomSlugInput(val) {
-  isCustomSlug = true;
-  const clean = generateSlug(val);
-  slugHiddenInput.value = clean;
-  if (slugBadge) slugBadge.textContent = clean || 'slug-personalizado';
-  const slugPrev = document.getElementById('slug-preview');
-  if (slugPrev) slugPrev.textContent = clean || 'propiedad';
-  analyzePropertySeo();
-}
-
-function resetToAutoSlug() {
-  isCustomSlug = false;
-  const auto = generateSlug(titleInput?.value || '');
-  slugHiddenInput.value = auto;
+titleInput?.addEventListener('input', function() {
+  const auto = generateSlug(this.value);
+  if (slugHiddenInput) slugHiddenInput.value = auto;
   if (slugBadge) slugBadge.textContent = auto || 'slug-auto';
-  if (customSlugInput) customSlugInput.value = auto;
-  customSlugBox.style.display = 'none';
   const slugPrev = document.getElementById('slug-preview');
   if (slugPrev) slugPrev.textContent = auto || 'propiedad';
-  analyzePropertySeo();
-}
 
-titleInput?.addEventListener('input', function() {
-  if (!isCustomSlug) {
-    const s = generateSlug(this.value);
-    slugHiddenInput.value = s;
-    if (slugBadge) slugBadge.textContent = s || 'slug-auto';
-    const slugPrev = document.getElementById('slug-preview');
-    if (slugPrev) slugPrev.textContent = s || 'propiedad';
-  }
   if (!metaTitleInput.dataset.manual) {
     metaTitleInput.value = this.value;
-    document.getElementById('seo-title-preview').textContent = this.value || 'Título de la propiedad';
+    const seoTitle = document.getElementById('seo-title-preview');
+    if (seoTitle) seoTitle.textContent = this.value || 'Título de la propiedad';
   }
   analyzePropertySeo();
 });
