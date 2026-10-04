@@ -65,6 +65,9 @@ h2{font-size:15px;font-weight:600;color:var(--navy)}
 .sub{color:var(--gray);margin-top:3px}
 .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin:20px 0}
 .kpi{background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+.kpi.kpi-clickable{cursor:pointer;transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease;user-select:none}
+.kpi.kpi-clickable:hover{transform:translateY(-2px);box-shadow:0 4px 14px rgba(26,58,82,0.08);border-color:var(--navy)}
+.kpi.kpi-clickable:active{transform:translateY(0)}
 .kpi .l{font-size:11.5px;color:var(--gray);display:flex;align-items:center;gap:6px}
 .kpi .v{font-size:26px;font-weight:600;color:var(--navy);margin-top:6px}
 .kpi.warn .v{color:var(--red)}
@@ -2363,8 +2366,15 @@ const URL_MAP = {
   tpl: '/admin/plantillas'
 };
 
+let activeView = 'dash';
+let prevView = 'dash';
+
 function go(v, push = true){
   if (!v || !$('v-'+v)) v = 'dash';
+  if (v !== 'exp') {
+    prevView = activeView || 'dash';
+    activeView = v;
+  }
   document.querySelectorAll('.view').forEach(x=>x.classList.remove('on'));
   $('v-'+v).classList.add('on');
   document.querySelectorAll('.side a').forEach(a => a.classList.remove('on'));
@@ -2376,6 +2386,53 @@ function go(v, push = true){
   icons();
   if (push && URL_MAP[v] && window.location.pathname !== URL_MAP[v]) {
     history.pushState({view: v}, '', URL_MAP[v]);
+  }
+}
+
+function filterByKpi(type) {
+  if (type === 'activos') {
+    listF = 'proc';
+    divF = 'all';
+    go('list');
+    if ($('listFilters')) {
+      [...$('listFilters').children].forEach(b => b.classList.toggle('on', b.dataset.f === 'proc'));
+    }
+    if ($('divFilters')) {
+      [...$('divFilters').children].forEach(b => b.classList.toggle('on', b.dataset.d === 'all'));
+    }
+    renderList();
+  } else if (type === 'atencion') {
+    go('mytasks');
+    mtF = 'all';
+    if ($('mtFilters')) {
+      [...$('mtFilters').children].forEach(b => b.classList.toggle('on', b.dataset.f === 'all'));
+    }
+    renderMy();
+  } else if (type === 'vencidas') {
+    go('mytasks');
+    mtF = 'late';
+    if ($('mtFilters')) {
+      [...$('mtFilters').children].forEach(b => b.classList.toggle('on', b.dataset.f === 'late'));
+    }
+    renderMy();
+  } else if (type === 'proximos') {
+    go('mytasks');
+    mtF = 'week';
+    if ($('mtFilters')) {
+      [...$('mtFilters').children].forEach(b => b.classList.toggle('on', b.dataset.f === 'week'));
+    }
+    renderMy();
+  } else if (type === 'completados') {
+    listF = 'done';
+    divF = 'all';
+    go('list');
+    if ($('listFilters')) {
+      [...$('listFilters').children].forEach(b => b.classList.toggle('on', b.dataset.f === 'done'));
+    }
+    if ($('divFilters')) {
+      [...$('divFilters').children].forEach(b => b.classList.toggle('on', b.dataset.d === 'all'));
+    }
+    renderList();
   }
 }
 
@@ -2428,7 +2485,13 @@ function rowHTML(e, withDate) {
   `;
 }
 function renderDash(){const al=alerts(),act=DB.filter(e=>e.estado!=='done');const late=al.filter(a=>a.c==='r').length,soon=DB.flatMap(e=>e.tasks||[]).filter(t=>t.due&&t.st!=='done'&&days(t.due)>=0&&days(t.due)<=14).length;
- $('kpis').innerHTML=[['folder-open','Expedientes activos',act.length],['alert-circle','Requieren atención',al.length,al.length?'warn':''],['clock','Tareas vencidas',late,late?'warn':''],['calendar','Próximos vencimientos',soon],['check-circle','Completados este mes',DB.filter(e=>e.estado==='done').length]].map(k=>`<div class="kpi ${k[3]||''}"><div class="l"><i data-lucide="${k[0]}"></i>${k[1]}</div><div class="v">${k[2]}</div></div>`).join('');
+ $('kpis').innerHTML=[
+   ['folder-open','Expedientes activos',act.length,'', 'filterByKpi(\'activos\')', 'Ver expedientes activos en proceso'],
+   ['alert-circle','Requieren atención',al.length,al.length?'warn':'', 'filterByKpi(\'atencion\')', 'Ver tareas y alertas pendientes'],
+   ['clock','Tareas vencidas',late,late?'warn':'', 'filterByKpi(\'vencidas\')', 'Filtrar tareas vencidas'],
+   ['calendar','Próximos vencimientos',soon,'', 'filterByKpi(\'proximos\')', 'Ver vencimientos de esta semana'],
+   ['check-circle','Completados este mes',DB.filter(e=>e.estado==='done').length,'', 'filterByKpi(\'completados\')', 'Ver expedientes cerrados y completados']
+ ].map(k=>`<div class="kpi kpi-clickable ${k[3]||''}" onclick="${k[4]}" title="${k[5]}" style="cursor:pointer;"><div class="l"><i data-lucide="${k[0]}"></i>${k[1]}</div><div class="v">${k[2]}</div></div>`).join('');
  $('dashAlerts').innerHTML=al.slice(0,3).map(a=>`<div class="alert" onclick="openExp('${a.e}')"><span class="dot ${a.c}"></span><div><b>${a.n}</b><small>${a.e} · ${a.s}</small><small>Responsable: ${a.w.split(' ')[0]}</small></div></div>`).join('')||'<div class="empty" style="text-align:center;padding:18px;color:var(--gray);">Sin alertas pendientes. Todo al día.</div>';
  $('dashRows').innerHTML=DB.slice(0,4).map(e=>rowHTML(e)).join('')||'<tr><td colspan="6" class="empty" style="text-align:center;padding:24px;color:var(--gray);">No hay expedientes registrados aún. Haz clic en "Nuevo expediente" para crear el primero.</td></tr>';}
 let listF='all',divF='all';
@@ -4511,6 +4574,10 @@ function renderExp(){
     <!-- FILA 1: Identificación y Acciones Unificadas -->
     <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;padding-bottom:10px;border-bottom:1px solid var(--line)">
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <button type="button" class="btn sm" onclick="go(prevView || 'dash')" style="height:28px;padding:0 10px;font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:5px;cursor:pointer;background:#F8FAFC;border:1px solid #CBD5E1;" title="Volver a la vista anterior">
+          <i data-lucide="arrow-left" style="width:14px;height:14px;"></i>
+          <span>Volver</span>
+        </button>
         <b style="font-size:13px;letter-spacing:0.5px;color:var(--navy);font-weight:700">${e.id}</b>
         ${divBadge(e.svc)}
         <h1 style="font-size:18px;margin:0 0 0 4px;display:inline;color:var(--navy);font-weight:700">${T.nombre}</h1>

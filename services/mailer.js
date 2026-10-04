@@ -8,7 +8,7 @@ const SMTP_CONFIG = {
     user: process.env.SMTP_USER || '',
     pass: process.env.SMTP_PASS || '',
   },
-  from: process.env.SMTP_FROM || (process.env.SMTP_USER ? `GSD Dominicana <${process.env.SMTP_USER}>` : 'GSD Dominicana <info@geosolutionssource.com>'),
+  from: process.env.SMTP_FROM || (process.env.SMTP_USER ? `GSD Dominicana <${process.env.SMTP_USER}>` : 'GSD Dominicana <noreply@geosolutionssource.com>'),
 };
 
 function buildUnifiedTemplate({ headerTitle, headerSubtitle, badgeText, badgeColor = '#1A3A52', bodyHtml, actionUrl = '', actionText = '' }) {

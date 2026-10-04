@@ -219,6 +219,45 @@ async function getDb() {
         ('bienes-raices', 'GSD Bienes Raíces', '@gsd.realestate', 'https://www.instagram.com/', '[]'),
         ('matriz', 'GSD Matriz / Ingeniería & Legal', '@gsdsource', 'https://www.instagram.com/', '[]');
 
+        CREATE TABLE IF NOT EXISTS glosario (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          slug TEXT UNIQUE NOT NULL,
+          termino TEXT NOT NULL,
+          definicion TEXT NOT NULL,
+          categoria TEXT NOT NULL,
+          broad_category TEXT DEFAULT 'legal',
+          letra TEXT NOT NULL,
+          relacionados_json TEXT DEFAULT '[]',
+          enlace_json TEXT DEFAULT '{}',
+          created_at TEXT DEFAULT (datetime('now','localtime')),
+          updated_at TEXT DEFAULT (datetime('now','localtime'))
+        );
+
+        CREATE TABLE IF NOT EXISTS areas_practica (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          slug TEXT UNIQUE NOT NULL,
+          url TEXT,
+          titulo TEXT NOT NULL,
+          modulo TEXT NOT NULL,
+          categoria TEXT NOT NULL,
+          resumen TEXT NOT NULL,
+          hero_imagen TEXT DEFAULT '',
+          hero_alt TEXT DEFAULT '',
+          hero_overlay TEXT DEFAULT '',
+          autor TEXT DEFAULT 'GSD',
+          autor_perfil_json TEXT DEFAULT '{}',
+          secciones_json TEXT DEFAULT '[]',
+          relacionados_json TEXT DEFAULT '[]',
+          glosario_json TEXT DEFAULT '[]',
+          meta_title TEXT,
+          meta_description TEXT,
+          keywords TEXT,
+          estado TEXT DEFAULT 'publicado',
+          is_draft INTEGER DEFAULT 0,
+          created_at TEXT DEFAULT (datetime('now','localtime')),
+          updated_at TEXT DEFAULT (datetime('now','localtime'))
+        );
+
         CREATE TABLE IF NOT EXISTS blogs (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           titulo TEXT NOT NULL,
