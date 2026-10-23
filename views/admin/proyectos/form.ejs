@@ -179,6 +179,25 @@
     position: relative;
   }
 
+  
+  .btn-zone-chip {
+    padding: 3px 9px;
+    font-size: 11px;
+    font-weight: 500;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: #fff;
+    color: var(--navy);
+    cursor: pointer;
+    transition: all .15s;
+    user-select: none;
+  }
+  .btn-zone-chip:hover {
+    background: #E8F4EF;
+    border-color: var(--green);
+    color: var(--green);
+  }
+
   /* Amenity chips selector */
   .amenity-chip-grid {
     display: flex;
@@ -368,7 +387,28 @@
         </div>
         <div class="f">
           <label>Ubicación / Sector *</label>
-          <input type="text" name="ubicacion" id="pUbicacion" value="<%= proyecto?.ubicacion || '' %>" placeholder="Ej: Bávaro, Punta Cana" required>
+          <input type="text" name="ubicacion" id="pUbicacion" list="zonasSugeridas" value="<%= proyecto?.ubicacion || '' %>" placeholder="Ej: Cana Bay, Punta Cana" required onchange="onZoneInputChange(this.value)">
+          <datalist id="zonasSugeridas">
+            <option value="Cana Bay, Punta Cana">Cana Bay (Hard Rock Golf / Arena Gorda)</option>
+            <option value="Cap Cana, La Altagracia">Cap Cana (Marina, Las Iguanas, Juanillo)</option>
+            <option value="Bávaro, Punta Cana">Bávaro (Los Corales, El Cortecito, Cocotal)</option>
+            <option value="Punta Cana, La Altagracia">Punta Cana Village / PUJ / Resort</option>
+            <option value="Circunvalación Verón - Bávaro">Circunvalación Verón</option>
+            <option value="Playa Macao, Punta Cana">Playa Macao</option>
+            <option value="Uvero Alto, La Altagracia">Uvero Alto</option>
+            <option value="La Romana / Casa de Campo">La Romana / Casa de Campo</option>
+            <option value="Las Terrenas, Samaná">Las Terrenas, Samaná</option>
+            <option value="Santo Domingo, Distrito Nacional">Santo Domingo</option>
+          </datalist>
+          <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;">
+            <button type="button" class="btn-zone-chip" onclick="setZonePreset('Cana Bay, Punta Cana', 18.7230, -68.4690)">📍 Cana Bay</button>
+            <button type="button" class="btn-zone-chip" onclick="setZonePreset('Cap Cana, La Altagracia', 18.4920, -68.3980)">📍 Cap Cana</button>
+            <button type="button" class="btn-zone-chip" onclick="setZonePreset('Bávaro, Punta Cana', 18.6850, -68.4250)">📍 Bávaro</button>
+            <button type="button" class="btn-zone-chip" onclick="setZonePreset('Punta Cana, La Altagracia', 18.5600, -68.3720)">📍 Punta Cana</button>
+            <button type="button" class="btn-zone-chip" onclick="setZonePreset('Circunvalación Verón - Bávaro', 18.6050, -68.4350)">📍 Verón</button>
+            <button type="button" class="btn-zone-chip" onclick="setZonePreset('Playa Macao, Punta Cana', 18.7750, -68.5350)">📍 Macao</button>
+            <button type="button" class="btn-zone-chip" onclick="setZonePreset('Las Terrenas, Samaná', 19.3200, -69.5400)">📍 Las Terrenas</button>
+          </div>
         </div>
         <div class="f">
           <label>Tipologías resumidas (Badge)</label>
@@ -992,6 +1032,46 @@
         .replace(/[^\w-]+/g, "")
         .replace(/--+/g, "-");
     });
+  }
+
+  
+  const ZONES_COORDS_MAP = {
+    'cana bay': { name: 'Cana Bay, Punta Cana', lat: 18.7230, lng: -68.4690 },
+    'cap cana': { name: 'Cap Cana, La Altagracia', lat: 18.4920, lng: -68.3980 },
+    'bavaro': { name: 'Bávaro, Punta Cana', lat: 18.6850, lng: -68.4250 },
+    'bávaro': { name: 'Bávaro, Punta Cana', lat: 18.6850, lng: -68.4250 },
+    'punta cana': { name: 'Punta Cana, La Altagracia', lat: 18.5600, lng: -68.3720 },
+    'veron': { name: 'Circunvalación Verón - Bávaro', lat: 18.6050, lng: -68.4350 },
+    'verón': { name: 'Circunvalación Verón - Bávaro', lat: 18.6050, lng: -68.4350 },
+    'macao': { name: 'Playa Macao, Punta Cana', lat: 18.7750, lng: -68.5350 },
+    'las terrenas': { name: 'Las Terrenas, Samaná', lat: 19.3200, lng: -69.5400 }
+  };
+
+  function setZonePreset(name, lat, lng) {
+    const input = document.getElementById('pUbicacion');
+    if (input) input.value = name;
+    let distBlock = blocksState.find(b => b.type === 'distancias');
+    if (!distBlock) {
+      addBlock('distancias');
+      distBlock = blocksState.find(b => b.type === 'distancias');
+    }
+    if (distBlock) {
+      distBlock.lat = lat;
+      distBlock.lng = lng;
+      distBlock.zona = name;
+    }
+    renderContainers();
+    syncHiddenJson();
+  }
+
+  function onZoneInputChange(val) {
+    const norm = String(val || '').toLowerCase();
+    for (const [k, z] of Object.entries(ZONES_COORDS_MAP)) {
+      if (norm.includes(k)) {
+        setZonePreset(z.name, z.lat, z.lng);
+        break;
+      }
+    }
   }
 
   // Form submit handler to guarantee serialization

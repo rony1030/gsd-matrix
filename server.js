@@ -743,11 +743,34 @@ app.get('/api/proyectos', async (req, res) => {
       try { galeria = JSON.parse(r.galeria || '[]'); } catch(e){}
       try { amenidades = JSON.parse(r.amenidades || '[]'); } catch(e){}
       try { bloques = JSON.parse(r.bloques || '[]'); } catch(e){}
+
+      let distBlock = bloques.find(b => b && b.type === 'distancias');
+      let lat = distBlock?.lat || r.lat || r.latitud;
+      let lng = distBlock?.lng || r.lng || r.longitud;
+      const normUbi = String(r.ubicacion || '').toLowerCase();
+      if (!lat || !lng || (normUbi.includes('cana bay') && lat < 18.6)) {
+        if (normUbi.includes('cana bay') || normUbi.includes('canabay')) {
+          lat = 18.7230; lng = -68.4690;
+        } else if (normUbi.includes('cap cana') || normUbi.includes('capcana')) {
+          lat = 18.4920; lng = -68.3980;
+        } else if (normUbi.includes('macao')) {
+          lat = 18.7750; lng = -68.5350;
+        } else if (normUbi.includes('bavaro') || normUbi.includes('bávaro')) {
+          lat = 18.6850; lng = -68.4250;
+        } else if (normUbi.includes('veron') || normUbi.includes('verón')) {
+          lat = 18.6050; lng = -68.4350;
+        } else {
+          lat = 18.5600; lng = -68.3720;
+        }
+      }
+
       return {
         slug: r.slug,
         nombre: r.nombre,
         promotor: r.promotor,
         ubicacion: r.ubicacion,
+        lat: Number(lat),
+        lng: Number(lng),
         tipologias: (r.tipologias || '').split(',').map(t => t.trim()).filter(Boolean),
         precio_desde: r.precio_desde,
         moneda: r.moneda,
